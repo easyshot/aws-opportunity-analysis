@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Opportunity Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>AWS Opportunity Analysis</h1>
+
+        <div class="input-section">
+            <h2>Opportunity Details</h2>
+            <form id="opportunityForm">
+                <div class="form-group">
+                    <label for="CustomerName">Customer Name:</label>
+                    <input type="text" id="CustomerName" name="CustomerName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="region">Region:</label>
+                    <input type="text" id="region" name="region" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="closeDate">Close Date (M/D/YYYY):</label>
+                    <input type="text" id="closeDate" name="closeDate" placeholder="6/15/2025" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="oppName">Opportunity Name:</label>
+                    <input type="text" id="oppName" name="oppName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="oppDescription">Opportunity Description:</label>
+                    <textarea id="oppDescription" name="oppDescription" rows="4" required></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" id="oppDetQueryButtonV3" class="primary-button">Analyze (Production)</button>
+                    <button type="button" id="oppDetQueryButtonV4" class="secondary-button">Analyze (Nova
+                        Premier)</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <h2>Analysis Results</h2>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Predicted ARR</h3>
+                    <div id="oppArrOut" class="metric-value">-</div>
+                </div>
+
+                <div class="metric-card">
+                    <h3>Predicted MRR</h3>
+                    <div id="oppMrrOut" class="metric-value">-</div>
+                </div>
+
+                <div class="metric-card">
+                    <h3>Launch Date</h3>
+                    <div id="oppLaunchDateOut" class="metric-value">-</div>
+                </div>
+
+                <div class="metric-card">
+                    <h3>Project Duration</h3>
+                    <div id="oppProjectDurationOut" class="metric-value">-</div>
+                </div>
+
+                <div class="metric-card">
+                    <h3>Confidence</h3>
+                    <div id="oppConfidenceOut" class="metric-value">-</div>
+                </div>
+            </div>
+
+            <div class="services-section">
+                <h3>Top Services</h3>
+                <div id="oppServicesOut" class="services-content">-</div>
+            </div>
+
+            <div class="similar-projects-section">
+                <h3>Similar Projects</h3>
+                <div id="similarProjectsArea" class="similar-projects-content">-</div>
+            </div>
+
+            <div class="full-analysis-section">
+                <h3>Full Analysis</h3>
+                <div id="textSummary" class="full-analysis-content">-</div>
+            </div>
+        </div>
+
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Analyzing opportunity data...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

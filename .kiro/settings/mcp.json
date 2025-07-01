@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "aws-serverless-mcp": {
+      "type": "http",
+      "url": "https://y1m5fhpajd.execute-api.us-east-1.amazonaws.com/dev/mcp",
+      "autoApprove": [],
+      "disabled": false
+    },
+    "github": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    }
+  }
+}
