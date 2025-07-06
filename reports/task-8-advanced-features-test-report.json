@@ -1,0 +1,64 @@
+{
+  "testSuite": "Task 8: Advanced Features Testing",
+  "timestamp": "2025-07-05T21:44:23.333Z",
+  "duration": "0s",
+  "summary": {
+    "total": 6,
+    "passed": 0,
+    "failed": 6,
+    "warnings": 0,
+    "successRate": "0%"
+  },
+  "requirements": {
+    "8.1": "Nova Premier model integration",
+    "8.2": "Funding analysis workflow with real Bedrock responses",
+    "8.3": "Follow-on opportunity identification multi-step workflow",
+    "8.4": "Rich formatted content display in all analysis sections",
+    "8.5": "Export and print capabilities with real analysis data",
+    "8.6": "Performance and reliability standards maintenance"
+  },
+  "details": [
+    {
+      "type": "FAILURE",
+      "category": "Nova Premier Integration",
+      "message": "fetch failed",
+      "timestamp": "2025-07-05T21:44:23.300Z"
+    },
+    {
+      "type": "FAILURE",
+      "category": "Funding Analysis Workflow",
+      "message": "fetch failed",
+      "timestamp": "2025-07-05T21:44:23.308Z"
+    },
+    {
+      "type": "FAILURE",
+      "category": "Follow-On Opportunity Workflow",
+      "message": "fetch failed",
+      "timestamp": "2025-07-05T21:44:23.313Z"
+    },
+    {
+      "type": "FAILURE",
+      "category": "Rich Content Display",
+      "message": "fetch failed",
+      "timestamp": "2025-07-05T21:44:23.318Z"
+    },
+    {
+      "type": "FAILURE",
+      "category": "Export and Print Capabilities",
+      "message": "fetch failed",
+      "timestamp": "2025-07-05T21:44:23.325Z"
+    },
+    {
+      "type": "FAILURE",
+      "category": "Performance Standards",
+      "message": "fetch failed",
+      "timestamp": "2025-07-05T21:44:23.332Z"
+    }
+  ],
+  "recommendations": [
+    "Address failed test cases before proceeding to production",
+    "Conduct user acceptance testing for advanced features",
+    "Monitor performance metrics in production environment",
+    "Set up automated testing for advanced features"
+  ]
+}

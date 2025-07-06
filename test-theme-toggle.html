@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Toggle Test</title>
+    <style>
+        :root {
+            --bg-primary: #fafbfc;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --border-color: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a202c;
+            --bg-secondary: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #4a5568;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.8;
+        }
+
+        .test-content {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Theme Toggle Test</h1>
+    
+    <button class="theme-toggle" onclick="toggleTheme()" title="Switch to Dark Mode">
+        <span class="icon">🌙</span>
+        <span class="theme-text">Dark</span>
+    </button>
+    
+    <div class="test-content">
+        <h2>Test Content</h2>
+        <p>This content should change appearance when you toggle the theme.</p>
+        <p>Current theme: <span id="current-theme">light</span></p>
+    </div>
+
+    <script>
+        // Clean implementation of toggleTheme global function
+        window.toggleTheme = function() {
+            // Get current theme or default to light
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            // Apply the new theme
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            // Update the toggle button if it exists
+            const themeToggle = document.querySelector('.theme-toggle');
+            if (themeToggle) {
+                const themeIcon = themeToggle.querySelector('.icon');
+                const themeText = themeToggle.querySelector('.theme-text');
+                
+                if (newTheme === 'dark') {
+                    if (themeIcon) themeIcon.textContent = '☀️';
+                    if (themeText) themeText.textContent = 'Light';
+                    themeToggle.title = 'Switch to Light Mode';
+                } else {
+                    if (themeIcon) themeIcon.textContent = '🌙';
+                    if (themeText) themeText.textContent = 'Dark';
+                    themeToggle.title = 'Switch to Dark Mode';
+                }
+            }
+            
+            // Update the current theme display
+            const currentThemeSpan = document.getElementById('current-theme');
+            if (currentThemeSpan) {
+                currentThemeSpan.textContent = newTheme;
+            }
+            
+            // Save theme preference to localStorage
+            try {
+                localStorage.setItem('poi-theme-preference', newTheme);
+            } catch (error) {
+                console.warn('Failed to save theme preference:', error);
+            }
+            
+            // Add smooth transition effect
+            try {
+                document.body.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    document.body.style.transition = '';
+                }, 300);
+            } catch (error) {
+                console.warn('Failed to add theme transition:', error);
+            }
+        };
+
+        // Initialize theme on page load
+        (function() {
+            // Wait for DOM to be ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeTheme);
+            } else {
+                initializeTheme();
+            }
+            
+            function initializeTheme() {
+                // Check for saved theme preference or default to light mode
+                const savedTheme = localStorage.getItem('poi-theme-preference') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                
+                // Update the toggle button to match the current theme
+                const themeToggle = document.querySelector('.theme-toggle');
+                if (themeToggle) {
+                    const themeIcon = themeToggle.querySelector('.icon');
+                    const themeText = themeToggle.querySelector('.theme-text');
+                    
+                    if (savedTheme === 'dark') {
+                        if (themeIcon) themeIcon.textContent = '☀️';
+                        if (themeText) themeText.textContent = 'Light';
+                        themeToggle.title = 'Switch to Light Mode';
+                    } else {
+                        if (themeIcon) themeIcon.textContent = '🌙';
+                        if (themeText) themeText.textContent = 'Dark';
+                        themeToggle.title = 'Switch to Dark Mode';
+                    }
+                }
+                
+                // Update the current theme display
+                const currentThemeSpan = document.getElementById('current-theme');
+                if (currentThemeSpan) {
+                    currentThemeSpan.textContent = savedTheme;
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

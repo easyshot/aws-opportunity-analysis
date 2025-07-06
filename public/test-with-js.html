@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test with Actual JS</title>
+    <link rel="stylesheet" href="styles-compact-option-c.css">
+    <style>
+        .test-section { margin: 20px; padding: 20px; border: 2px solid #007bff; border-radius: 8px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .test-button { padding: 10px 20px; margin: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="test-section">
+        <h1>Analyze Button Test with Actual JavaScript</h1>
+        
+        <div id="testResults"></div>
+        
+        <h2>Form Elements (Required for Testing)</h2>
+        <input type="text" id="customerName" placeholder="Customer Name" value="Test Customer">
+        <select id="region">
+            <option value="United States">United States</option>
+        </select>
+        <input type="date" id="closeDate" value="2025-12-31">
+        <input type="text" id="opportunityName" placeholder="Opportunity Name" value="Test Opportunity">
+        <textarea id="description" placeholder="Description">This is a test description with more than fifty characters to meet the minimum requirement for validation and testing purposes.</textarea>
+        
+        <h2>Test Buttons</h2>
+        <button class="test-button" onclick="runTests()">Run All Tests</button>
+        <button class="test-button" onclick="testAnalyzeDirectly()">Test Analyze Button Directly</button>
+        
+        <h2>Actual Analyze Button</h2>
+        <button class="primary-btn" id="analyzeBtn" onclick="analyzeOpportunity()">
+            <span class="btn-icon">🔍</span>
+            <span class="btn-text">Analyze Opportunity</span>
+        </button>
+        
+        <!-- Required elements for the analysis results -->
+        <div id="predictedArr" style="display:none;"></div>
+        <div id="predictedMrr" style="display:none;"></div>
+        <div id="launchDate" style="display:none;"></div>
+        <div id="timeToLaunch" style="display:none;"></div>
+        <div id="confidenceScore" style="display:none;"></div>
+        <div id="confidenceLabel" style="display:none;"></div>
+        <div id="confidenceFill" style="display:none;"></div>
+        <div id="topServices" style="display:none;"></div>
+        <div id="methodology" style="display:none;"></div>
+        <div id="findings" style="display:none;"></div>
+        <div id="riskFactors" style="display:none;"></div>
+        <div id="similarProjects" style="display:none;"></div>
+        <div id="rationale" style="display:none;"></div>
+        <div id="fullAnalysis" style="display:none;"></div>
+        <div id="fundingOptions" style="display:none;"></div>
+        <div id="followOnOpportunities" style="display:none;"></div>
+        <div id="detailedAnalysis" style="display:none;"></div>
+        <div id="additionalSections" style="display:none;"></div>
+        <div id="analysisStatus" style="display:none;"></div>
+    </div>
+
+    <script>
+        function addTestResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            document.getElementById('testResults').appendChild(div);
+        }
+        
+        function clearTestResults() {
+            document.getElementById('testResults').innerHTML = '';
+        }
+        
+        function runTests() {
+            clearTestResults();
+            addTestResult('Starting tests...', 'info');
+            
+            // Test 1: Check if the class exists
+            if (typeof CompactOpportunityAnalyzerC !== 'undefined') {
+                addTestResult('✓ CompactOpportunityAnalyzerC class is available', 'success');
+            } else {
+                addTestResult('✗ CompactOpportunityAnalyzerC class is not available', 'error');
+            }
+            
+            // Test 2: Check if global functions exist
+            const globalFunctions = ['analyzeOpportunity', 'clearForm', 'exportData', 'printReport', 'loadSampleData'];
+            globalFunctions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    addTestResult(`✓ ${funcName} function is available`, 'success');
+                } else {
+                    addTestResult(`✗ ${funcName} function is not available`, 'error');
+                }
+            });
+            
+            // Test 3: Check if DOM elements exist
+            const requiredElements = ['customerName', 'region', 'closeDate', 'opportunityName', 'description'];
+            requiredElements.forEach(id => {
+                if (document.getElementById(id)) {
+                    addTestResult(`✓ Element ${id} exists`, 'success');
+                } else {
+                    addTestResult(`✗ Element ${id} is missing`, 'error');
+                }
+            });
+            
+            // Test 4: Test API endpoint
+            testAPI();
+        }
+        
+        async function testAPI() {
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerName: 'Test Customer',
+                        region: 'United States',
+                        closeDate: '2025-12-31',
+                        opportunityName: 'Test Opportunity',
+                        description: 'This is a test description with more than fifty characters to meet the minimum requirement for validation.'
+                    })
+                });
+                
+                if (response.ok) {
+                    addTestResult('✓ API endpoint is working', 'success');
+                } else {
+                    addTestResult(`✗ API endpoint failed with status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addTestResult(`✗ API endpoint error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testAnalyzeDirectly() {
+            addTestResult('Testing analyze function directly...', 'info');
+            
+            if (typeof window.analyzeOpportunity === 'function') {
+                try {
+                    window.analyzeOpportunity();
+                    addTestResult('✓ analyzeOpportunity function called successfully', 'success');
+                } catch (error) {
+                    addTestResult(`✗ Error calling analyzeOpportunity: ${error.message}`, 'error');
+                    console.error('Analyze error:', error);
+                }
+            } else {
+                addTestResult('✗ analyzeOpportunity function not found', 'error');
+            }
+        }
+        
+        // Monitor for JavaScript errors
+        window.addEventListener('error', function(e) {
+            addTestResult(`✗ JavaScript Error: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
+        });
+        
+        // Run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 2000);
+        });
+    </script>
+    
+    <!-- Load the actual JavaScript file -->
+    <script src="app-compact-option-c.js"></script>
+</body>
+</html>

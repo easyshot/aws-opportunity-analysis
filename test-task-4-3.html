@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 4.3 Test - Enhanced Findings, Rationale, and Risk Factors</title>
+    <link rel="stylesheet" href="public/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Task 4.3 Implementation Test</h1>
+        <p>Testing enhanced findings, rationale, and risk factors display sections with bullet points, key insights highlighting, clear reasoning, historical data correlations, severity levels, and mitigation strategies.</p>
+        
+        <div class="test-section">
+            <h2>Test Controls</h2>
+            <button class="test-button" onclick="testFindings()">Test Findings Display</button>
+            <button class="test-button" onclick="testRationale()">Test Rationale Display</button>
+            <button class="test-button" onclick="testRiskFactors()">Test Risk Factors Display</button>
+            <button class="test-button" onclick="clearAllSections()">Clear All Sections</button>
+            <button class="test-button" onclick="testAllSections()">Test All Sections</button>
+        </div>
+
+        <!-- Detailed Findings Section -->
+        <div class="result-section findings-section">
+            <h3 class="result-title">
+                <span class="section-icon">🔍</span>
+                Detailed Findings
+                <span class="findings-count" id="findingsCount" style="display: none;"></span>
+            </h3>
+            <div class="result-content" id="findingsContent">
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">📋</div>
+                    <p>Detailed analysis findings will be shown here...</p>
+                    <small>This section will display key insights with bullet points and highlighting.</small>
+                </div>
+                <div class="findings-display" style="display: none;">
+                    <div class="findings-summary" id="findingsSummary">
+                        <div class="summary-stats">
+                            <span class="stat-item">
+                                <span class="stat-label">Key Insights:</span>
+                                <span class="stat-value" id="keyInsightsCount">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <span class="stat-label">Confidence Level:</span>
+                                <span class="stat-value" id="findingsConfidence">-</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="findings-list" id="findingsList">
+                        <!-- Findings will be populated dynamically -->
+                    </div>
+                    <div class="findings-actions">
+                        <button type="button" class="findings-action-btn" id="expandAllFindings">Expand All</button>
+                        <button type="button" class="findings-action-btn" id="collapseAllFindings">Collapse All</button>
+                        <button type="button" class="findings-action-btn" id="exportFindings">Export Findings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction Rationale Section -->
+        <div class="result-section rationale-section">
+            <h3 class="result-title">
+                <span class="section-icon">🧠</span>
+                Prediction Rationale
+                <span class="rationale-count" id="rationaleCount" style="display: none;"></span>
+            </h3>
+            <div class="result-content" id="rationaleContent">
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">💡</div>
+                    <p>Reasoning behind predictions will be explained here...</p>
+                    <small>This section will show clear reasoning and historical data correlations.</small>
+                </div>
+                <div class="rationale-display" style="display: none;">
+                    <div class="rationale-summary" id="rationaleSummary">
+                        <div class="summary-stats">
+                            <span class="stat-item">
+                                <span class="stat-label">Reasoning Points:</span>
+                                <span class="stat-value" id="reasoningPointsCount">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <span class="stat-label">Historical Correlations:</span>
+                                <span class="stat-value" id="correlationsCount">0</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="rationale-list" id="rationaleList">
+                        <!-- Rationale items will be populated dynamically -->
+                    </div>
+                    <div class="rationale-actions">
+                        <button type="button" class="rationale-action-btn" id="expandAllRationale">Expand All</button>
+                        <button type="button" class="rationale-action-btn" id="collapseAllRationale">Collapse All</button>
+                        <button type="button" class="rationale-action-btn" id="exportRationale">Export Rationale</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Factors Section -->
+        <div class="result-section risk-factors-section">
+            <h3 class="result-title">
+                <span class="section-icon">⚠️</span>
+                Risk Factors
+                <span class="risk-count" id="riskCount" style="display: none;"></span>
+            </h3>
+            <div class="result-content" id="riskFactorsContent">
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">🛡️</div>
+                    <p>Risk assessment and mitigation strategies will appear here...</p>
+                    <small>This section will display risk factors with severity levels and mitigation strategies.</small>
+                </div>
+                <div class="risk-factors-display" style="display: none;">
+                    <div class="risk-summary" id="riskSummary">
+                        <div class="summary-stats">
+                            <span class="stat-item high-risk">
+                                <span class="stat-label">High Risk:</span>
+                                <span class="stat-value" id="highRiskCount">0</span>
+                            </span>
+                            <span class="stat-item medium-risk">
+                                <span class="stat-label">Medium Risk:</span>
+                                <span class="stat-value" id="mediumRiskCount">0</span>
+                            </span>
+                            <span class="stat-item low-risk">
+                                <span class="stat-label">Low Risk:</span>
+                                <span class="stat-value" id="lowRiskCount">0</span>
+                            </span>
+                        </div>
+                        <div class="risk-overview" id="riskOverview">
+                            <div class="overall-risk-level" id="overallRiskLevel">
+                                <span class="risk-level-label">Overall Risk Level:</span>
+                                <span class="risk-level-value" id="overallRiskValue">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="risk-factors-list" id="riskFactorsList">
+                        <!-- Risk factors will be populated dynamically -->
+                    </div>
+                    <div class="risk-actions">
+                        <button type="button" class="risk-action-btn" id="expandAllRisks">Expand All</button>
+                        <button type="button" class="risk-action-btn" id="collapseAllRisks">Collapse All</button>
+                        <button type="button" class="risk-action-btn" id="filterHighRisk">Show High Risk Only</button>
+                        <button type="button" class="risk-action-btn" id="exportRisks">Export Risk Assessment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-results" id="testResults">
+            <h3>Test Results</h3>
+            <p>Click the test buttons above to verify the implementation.</p>
+        </div>
+    </div>
+
+    <script>
+        // Mock data for testing
+        const mockFindings = [
+            {
+                category: 'Revenue Analysis',
+                insight: 'Based on historical data analysis, the projected ARR shows strong alignment with similar projects in the healthcare sector. Key factors include:\n• Market demand indicators\n• Competitive positioning\n• Customer segment analysis',
+                confidence: 'HIGH',
+                supporting_data: 'Analysis of 45 similar healthcare projects over the past 2 years'
+            },
+            {
+                category: 'Technical Feasibility',
+                insight: 'The proposed architecture demonstrates significant compatibility with existing infrastructure, reducing implementation risks and accelerating deployment timelines.',
+                confidence: 'MEDIUM',
+                supporting_data: 'Technical assessment based on current system architecture'
+            },
+            {
+                category: 'Market Opportunity',
+                insight: 'Critical market timing factors indicate optimal launch window within the next 6 months, with major competitive advantages in the target segment.',
+                confidence: 'HIGH',
+                supporting_data: 'Market research and competitive analysis'
+            }
+        ];
+
+        const mockRationale = [
+            {
+                prediction: 'ARR Projection of $2.5M',
+                reasoning: 'The revenue projection is based on comprehensive analysis of similar healthcare modernization projects, considering customer size, technical complexity, and market conditions.',
+                historical_basis: 'Historical data from 25 similar projects shows average ARR of $2.3M ± $400K with 87% accuracy rate',
+                correlation_strength: 'STRONG'
+            },
+            {
+                prediction: '8-Month Implementation Timeline',
+                reasoning: 'Timeline estimates account for typical healthcare compliance requirements, data migration complexity, and stakeholder approval processes.',
+                historical_basis: 'Similar projects averaged 7.5 months with 15% completing within 6 months and 25% requiring 10+ months',
+                correlation_strength: 'MODERATE'
+            },
+            {
+                prediction: 'AWS Services Recommendation',
+                reasoning: 'Service selection prioritizes HIPAA compliance, scalability requirements, and integration capabilities with existing healthcare systems.',
+                historical_basis: 'Recommended services appear in 85% of successful healthcare implementations',
+                correlation_strength: 'STRONG'
+            }
+        ];
+
+        const mockRiskFactors = [
+            {
+                risk: 'Regulatory Compliance Delays',
+                severity: 'HIGH',
+                description: 'Healthcare regulations may require additional compliance reviews and certifications that could extend project timelines significantly.',
+                impact: 'Potential 2-4 month delay in go-live date, increased compliance costs, and possible scope modifications',
+                mitigation: 'Engage compliance specialists early, conduct pre-implementation regulatory review, establish clear compliance checkpoints throughout the project'
+            },
+            {
+                risk: 'Data Migration Complexity',
+                severity: 'MEDIUM',
+                description: 'Legacy healthcare systems may present unexpected data format challenges and integration complexities during migration.',
+                impact: 'Extended testing phase, potential data quality issues, and additional development effort',
+                mitigation: 'Conduct thorough data assessment, implement comprehensive testing protocols, plan for iterative migration approach'
+            },
+            {
+                risk: 'Stakeholder Alignment',
+                severity: 'MEDIUM',
+                description: 'Multiple healthcare stakeholders may have conflicting requirements and approval processes that could slow decision-making.',
+                impact: 'Delayed approvals, scope changes, and extended project duration',
+                mitigation: 'Establish clear governance structure, regular stakeholder meetings, and documented decision-making processes'
+            },
+            {
+                risk: 'Technical Integration',
+                severity: 'LOW',
+                description: 'Standard AWS services integration with existing healthcare IT infrastructure should proceed smoothly based on established patterns.',
+                impact: 'Minor technical adjustments and configuration changes',
+                mitigation: 'Follow AWS healthcare reference architectures, conduct proof-of-concept testing, engage AWS healthcare specialists'
+            }
+        ];
+
+        // Helper function to format currency
+        function formatCurrency(value) {
+            if (!value || isNaN(parseFloat(value))) {
+                return '$0';
+            }
+            const numValue = parseFloat(value);
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(numValue);
+        }
+
+        // Test functions
+        function testFindings() {
+            populateFindingsDisplay(mockFindings);
+            updateTestResults('Findings display populated with ' + mockFindings.length + ' items');
+        }
+
+        function testRationale() {
+            populateRationaleDisplay(mockRationale);
+            updateTestResults('Rationale display populated with ' + mockRationale.length + ' items');
+        }
+
+        function testRiskFactors() {
+            populateRiskFactorsDisplay(mockRiskFactors);
+            updateTestResults('Risk factors display populated with ' + mockRiskFactors.length + ' items');
+        }
+
+        function clearAllSections() {
+            clearFindingsDisplay();
+            clearRationaleDisplay();
+            clearRiskFactorsDisplay();
+            updateTestResults('All sections cleared');
+        }
+
+        function testAllSections() {
+            testFindings();
+            testRationale();
+            testRiskFactors();
+            updateTestResults('All sections populated with test data');
+        }
+
+        function updateTestResults(message) {
+            const results = document.getElementById('testResults');
+            const timestamp = new Date().toLocaleTimeString();
+            results.innerHTML += `<p><strong>[${timestamp}]</strong> ${message}</p>`;
+        }
+
+        // Include the implementation functions from app.js
+        // (In a real scenario, these would be loaded from the main app.js file)
+    </script>
+    
+    <!-- Load the actual implementation functions -->
+    <script src="public/app.js"></script>
+</body>
+</html>

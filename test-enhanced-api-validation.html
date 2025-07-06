@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced API Validation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Enhanced API Validation Test</h1>
+        
+        <div class="test-section">
+            <h3>Test Enhanced Input Fields</h3>
+            <p>This form tests the enhanced API validation with all the new fields that have been added to the backend.</p>
+            
+            <form id="testForm">
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="CustomerName">Customer Name *</label>
+                        <input type="text" id="CustomerName" name="CustomerName" value="Test Customer Corp">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="oppName">Opportunity Name *</label>
+                        <input type="text" id="oppName" name="oppName" value="Test Migration Opportunity">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="region">Region *</label>
+                        <select id="region" name="region">
+                            <option value="">Select Region</option>
+                            <option value="us-east-1" selected>US East (N. Virginia)</option>
+                            <option value="us-west-2">US West (Oregon)</option>
+                            <option value="eu-west-1">Europe (Ireland)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="closeDate">Close Date *</label>
+                        <input type="date" id="closeDate" name="closeDate" value="2025-12-31">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="industry">Industry</label>
+                        <select id="industry" name="industry">
+                            <option value="">Select Industry</option>
+                            <option value="Technology" selected>Technology</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerSegment">Customer Segment</label>
+                        <select id="customerSegment" name="customerSegment">
+                            <option value="">Select Segment</option>
+                            <option value="Enterprise" selected>Enterprise</option>
+                            <option value="Mid-Market">Mid-Market</option>
+                            <option value="SMB">SMB</option>
+                            <option value="Public Sector">Public Sector</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partnerName">Partner Name</label>
+                        <input type="text" id="partnerName" name="partnerName" value="AWS Partner Solutions">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="activityFocus">Activity Focus</label>
+                        <select id="activityFocus" name="activityFocus">
+                            <option value="">Select Activity</option>
+                            <option value="Migration" selected>Migration</option>
+                            <option value="Modernization">Modernization</option>
+                            <option value="New Development">New Development</option>
+                            <option value="Analytics">Analytics</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="migrationPhase">Migration Phase</label>
+                        <select id="migrationPhase" name="migrationPhase">
+                            <option value="">Select Phase</option>
+                            <option value="Assessment">Assessment</option>
+                            <option value="Planning" selected>Planning</option>
+                            <option value="Migration">Migration</option>
+                            <option value="Optimization">Optimization</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="salesforceLink">Salesforce Link</label>
+                        <input type="url" id="salesforceLink" name="salesforceLink" value="https://example.salesforce.com/opportunity/123">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="awsCalculatorLink">AWS Calculator Link</label>
+                        <input type="url" id="awsCalculatorLink" name="awsCalculatorLink" value="https://calculator.aws/estimate/123">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="oppDescription">Opportunity Description *</label>
+                    <textarea id="oppDescription" name="oppDescription">This is a comprehensive test of the enhanced API validation with all the new fields that have been added to support better opportunity analysis and more detailed data collection.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="businessDescription">Business Description</label>
+                    <textarea id="businessDescription" name="businessDescription">Large scale cloud migration project involving multiple workloads and data centers with complex integration requirements.</textarea>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button type="button" onclick="testValidRequest()">Test Valid Request</button>
+                    <button type="button" onclick="testInvalidRequest()">Test Invalid Request</button>
+                    <button type="button" onclick="testMissingFields()">Test Missing Required Fields</button>
+                    <button type="button" onclick="testInvalidUrls()">Test Invalid URLs</button>
+                    <button type="button" onclick="clearResults()">Clear Results</button>
+                </div>
+            </form>
+            
+            <div id="results" class="results" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8123';
+        
+        function getFormData() {
+            const form = document.getElementById('testForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            return data;
+        }
+        
+        function showResults(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.className = `results ${type}`;
+            resultsDiv.textContent = message;
+            resultsDiv.style.display = 'block';
+        }
+        
+        async function makeApiRequest(data, testName) {
+            try {
+                showResults(`🔄 Testing: ${testName}\nSending request...`, 'info');
+                
+                const response = await fetch(`${API_BASE_URL}/api/analyze/mock`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResults(`✅ ${testName} - SUCCESS\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    showResults(`❌ ${testName} - VALIDATION ERROR\n\nStatus: ${response.status}\nError: ${result.message}\nValidation Errors: ${JSON.stringify(result.validationErrors || [], null, 2)}`, 'error');
+                }
+                
+            } catch (error) {
+                showResults(`❌ ${testName} - NETWORK ERROR\n\nError: ${error.message}\n\nNote: Make sure the server is running on port 8123`, 'error');
+            }
+        }
+        
+        async function testValidRequest() {
+            const data = getFormData();
+            await makeApiRequest(data, 'Valid Enhanced Request');
+        }
+        
+        async function testInvalidRequest() {
+            const data = getFormData();
+            // Make the request invalid by setting a past date
+            data.closeDate = '2020-01-01';
+            data.CustomerName = 'A'.repeat(150); // Too long
+            await makeApiRequest(data, 'Invalid Request (Past Date + Long Name)');
+        }
+        
+        async function testMissingFields() {
+            const data = getFormData();
+            // Remove required fields
+            data.CustomerName = '';
+            data.oppName = '';
+            data.oppDescription = '';
+            data.region = '';
+            data.closeDate = '';
+            await makeApiRequest(data, 'Missing Required Fields');
+        }
+        
+        async function testInvalidUrls() {
+            const data = getFormData();
+            data.salesforceLink = 'not-a-valid-url';
+            data.awsCalculatorLink = 'also-not-valid';
+            await makeApiRequest(data, 'Invalid URLs');
+        }
+        
+        function clearResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'none';
+        }
+        
+        // Show initial instructions
+        showResults(`📋 Enhanced API Validation Test Ready\n\nThis page tests the new enhanced input field validation.\n\nClick any test button to verify the API validation is working correctly.\n\nMake sure the backend server is running on port 8123.`, 'info');
+    </script>
+</body>
+</html>

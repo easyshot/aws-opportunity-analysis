@@ -1,31 +1,57 @@
-# Partner Opportunity Intelligence - Technical Stack
+# AWS Bedrock Partner Management System - Technical Stack
 
 ## Technology Stack
-- **Backend**: Node.js with Express (currently using app-debug.js for stability)
-- **Frontend**: Modern HTML5, CSS3, JavaScript (ES6+) with class-based architecture
+- **Backend**: Node.js 18.x with Express (production-ready with full AWS integration)
+- **Frontend**: Modern HTML5, CSS3, JavaScript (ES6+) with class-based architecture and PWA capabilities
 - **UI Framework**: Vanilla JavaScript with modern web standards (no external frameworks)
-- **AWS Services**:
-  - AWS Bedrock (for AI/ML capabilities, Titan and Nova Premier models)
-  - AWS Lambda (for serverless execution)
-  - Amazon Athena (for SQL queries against data)
-  - AWS Bedrock Agent (for prompt management)
+- **Infrastructure**: AWS CDK (TypeScript) for Infrastructure as Code
+- **AWS Services** (Complete Integration):
+  - **AWS Bedrock**: AI/ML capabilities with Titan and Nova Premier models, Agent orchestration
+  - **AWS Lambda**: Serverless compute with specialized functions and shared utilities layer
+  - **Amazon Athena**: SQL queries against historical data with performance optimization
+  - **Amazon DynamoDB**: NoSQL database with Global Tables and Streams
+  - **Amazon S3**: Object storage with intelligent tiering and cross-region replication
+  - **Amazon CloudFront**: Global CDN with edge caching and security headers
+  - **AWS API Gateway**: REST API with throttling, caching, and CORS
+  - **Amazon EventBridge**: Event-driven architecture and workflow orchestration
+  - **Amazon OpenSearch Serverless**: Vector database for RAG enhancement
+  - **AWS Systems Manager**: Parameter Store for configuration management
+  - **AWS Secrets Manager**: Secure credential storage and rotation
+  - **Amazon CloudWatch**: Monitoring, logging, and alerting
+  - **AWS X-Ray**: Distributed tracing and performance analysis
 
-## Dependencies (Minimal Configuration)
-- **AWS SDK v3** (Core):
-  - @aws-sdk/client-athena
-  - @aws-sdk/client-bedrock-agent
-  - @aws-sdk/client-bedrock-agent-runtime
-  - @aws-sdk/client-bedrock-runtime
-  - @aws-sdk/client-lambda
-- **Backend** (Essential):
-  - express: Web server framework
+## Dependencies (Production Ready)
+- **AWS SDK v3** (Complete Integration):
+  - @aws-sdk/client-athena: SQL query execution
+  - @aws-sdk/client-bedrock-agent: AI agent orchestration
+  - @aws-sdk/client-bedrock-agent-runtime: Agent runtime execution
+  - @aws-sdk/client-bedrock-runtime: AI model inference
+  - @aws-sdk/client-lambda: Serverless function invocation
+  - @aws-sdk/client-dynamodb: NoSQL database operations
+  - @aws-sdk/client-s3: Object storage operations
+  - @aws-sdk/client-cloudwatch: Monitoring and metrics
+  - @aws-sdk/client-ssm: Configuration management
+  - @aws-sdk/client-secrets-manager: Secure credential storage
+
+- **Backend** (Production Grade):
+  - express: Web server framework with security middleware
   - dotenv: Environment variable management
-  - body-parser: Request body parsing
-  - http-proxy-middleware: API proxying for frontend
+  - body-parser: Request body parsing and validation
+  - http-proxy-middleware: API proxying for frontend development
+  - cors: Cross-origin resource sharing configuration
+  - helmet: Security headers and protection
+
+- **Infrastructure** (AWS CDK):
+  - aws-cdk-lib: Infrastructure as Code framework
+  - constructs: CDK construct library
+  - @aws-cdk/aws-lambda-nodejs: Node.js Lambda constructs
 
 ## Development Dependencies
 - nodemon: Auto-restart during development
 - concurrently: Run multiple npm scripts simultaneously
+- jest: Testing framework for unit and integration tests
+- eslint: Code quality and style enforcement
+- prettier: Code formatting
 
 ## Modern Frontend Architecture
 
@@ -54,26 +80,32 @@
 
 ## Build & Run Commands
 ```bash
-# Install minimal dependencies (recommended)
+# Install all dependencies
 npm install
 
-# Start backend server only (debug mode - currently active)
-npm start
+# Development (Local with Mock Data)
+npm run dev-all                    # Start both backend and frontend servers (recommended)
+npm run dev                        # Backend only (port 8123)
+npm run dev-frontend               # Frontend only (port 3123)
+npm run debug                      # Backend in debug mode with comprehensive mock data
 
-# Start backend server with auto-restart
-npm run dev
+# Production Deployment
+npm run cdk:deploy                 # Deploy complete AWS infrastructure
+npm run lambda:deploy              # Deploy Lambda functions only
+npm run dynamodb:deploy           # Deploy database infrastructure
+npm run bedrock-agent:deploy      # Deploy AI orchestration
+npm run knowledge-base:deploy     # Deploy RAG enhancement
 
-# Start backend server in debug mode (explicit)
-npm run debug
+# Testing and Validation
+npm run test:comprehensive         # Run complete test suite
+npm run test:health               # Health check validation
+npm run test:performance          # Performance testing
+npm run validate:all              # Complete system validation
 
-# Start frontend server only
-npm run frontend
-
-# Start frontend server with auto-restart
-npm run dev-frontend
-
-# Start both backend and frontend servers (recommended for development)
-npm run dev-all
+# Monitoring and Diagnostics
+npm run validate:aws              # AWS connectivity validation
+npm run validate:bedrock          # Bedrock service validation
+npm run validate:infrastructure   # Infrastructure health check
 ```
 
 ## Environment Configuration

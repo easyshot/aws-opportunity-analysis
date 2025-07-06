@@ -4,95 +4,1064 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="AWS Opportunity Analysis - Analyze business opportunities using AWS Bedrock and historical project data">
+    <meta name="keywords" content="AWS, Bedrock, Opportunity Analysis, Business Intelligence">
+    <meta name="author" content="AWS Opportunity Analysis Team">
+
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.amazonaws.com">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://bedrock-runtime.us-east-1.amazonaws.com">
+
     <title>AWS Opportunity Analysis</title>
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Progressive Web App manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#232f3e">
 </head>
 
 <body>
     <div class="container">
         <h1>AWS Opportunity Analysis</h1>
 
-        <div class="input-section">
-            <h2>Opportunity Details</h2>
-            <form id="opportunityForm">
-                <div class="form-group">
-                    <label for="CustomerName">Customer Name:</label>
-                    <input type="text" id="CustomerName" name="CustomerName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="region">Region:</label>
-                    <input type="text" id="region" name="region" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="closeDate">Close Date (M/D/YYYY):</label>
-                    <input type="text" id="closeDate" name="closeDate" placeholder="6/15/2025" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="oppName">Opportunity Name:</label>
-                    <input type="text" id="oppName" name="oppName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="oppDescription">Opportunity Description:</label>
-                    <textarea id="oppDescription" name="oppDescription" rows="4" required></textarea>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" id="oppDetQueryButtonV3" class="primary-button">Analyze (Production)</button>
-                    <button type="button" id="oppDetQueryButtonV4" class="secondary-button">Analyze (Nova
-                        Premier)</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="results-section" id="resultsSection" style="display: none;">
-            <h2>Analysis Results</h2>
-
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <h3>Predicted ARR</h3>
-                    <div id="oppArrOut" class="metric-value">-</div>
-                </div>
-
-                <div class="metric-card">
-                    <h3>Predicted MRR</h3>
-                    <div id="oppMrrOut" class="metric-value">-</div>
-                </div>
-
-                <div class="metric-card">
-                    <h3>Launch Date</h3>
-                    <div id="oppLaunchDateOut" class="metric-value">-</div>
-                </div>
-
-                <div class="metric-card">
-                    <h3>Project Duration</h3>
-                    <div id="oppProjectDurationOut" class="metric-value">-</div>
-                </div>
-
-                <div class="metric-card">
-                    <h3>Confidence</h3>
-                    <div id="oppConfidenceOut" class="metric-value">-</div>
-                </div>
+        <!-- Connection Status and Progress Indicators -->
+        <div class="status-bar">
+            <div class="connection-status-container">
+                <span class="status-label">Real-time Updates:</span>
+                <span id="connection-status" class="connection-status status-disconnected">Disconnected</span>
             </div>
-
-            <div class="services-section">
-                <h3>Top Services</h3>
-                <div id="oppServicesOut" class="services-content">-</div>
-            </div>
-
-            <div class="similar-projects-section">
-                <h3>Similar Projects</h3>
-                <div id="similarProjectsArea" class="similar-projects-content">-</div>
-            </div>
-
-            <div class="full-analysis-section">
-                <h3>Full Analysis</h3>
-                <div id="textSummary" class="full-analysis-content">-</div>
+            <div class="analysis-status-container">
+                <span class="status-label">Analysis:</span>
+                <span id="analysis-status" class="analysis-status status-ready">Ready</span>
             </div>
         </div>
+
+        <!-- Progress Indicator -->
+        <div id="progress-container" class="progress-container" style="display: none;">
+            <div class="progress-steps">
+                <div id="progress-step-1" class="progress-step">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Query Generation</div>
+                </div>
+                <div id="progress-step-2" class="progress-step">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Data Retrieval</div>
+                </div>
+                <div id="progress-step-3" class="progress-step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Analysis</div>
+                </div>
+            </div>
+            <div id="progress-message" class="progress-message"></div>
+        </div>
+
+        <!-- Main Application Grid Layout -->
+        <div class="main-grid">
+            <!-- Left Panel - Input Fields and Projections -->
+            <div class="left-panel">
+                <!-- Opportunity Input Section -->
+                <div class="input-section">
+                    <h2>Opportunity Details</h2>
+                    <form id="opportunityForm">
+                        <!-- Basic Details Section -->
+                        <div class="field-section">
+                            <h3 class="section-title">Basic Details</h3>
+                            <div class="field-group">
+                                <div class="form-group">
+                                    <label for="CustomerName">Customer Name <span class="required">*</span></label>
+                                    <input type="text" id="CustomerName" name="CustomerName" required
+                                        placeholder="Enter customer name..." data-validation="required|minLength:2"
+                                        autocomplete="organization">
+                                    <div class="validation-indicator" id="CustomerName-indicator"></div>
+                                    <div class="field-error" id="CustomerName-error"></div>
+                                    <div class="field-success" id="CustomerName-success" style="display: none;"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="oppName">Opportunity Name <span class="required">*</span></label>
+                                    <input type="text" id="oppName" name="oppName" required
+                                        placeholder="Enter opportunity name..." data-validation="required|minLength:3"
+                                        autocomplete="off">
+                                    <div class="validation-indicator" id="oppName-indicator"></div>
+                                    <div class="field-error" id="oppName-error"></div>
+                                    <div class="field-success" id="oppName-success" style="display: none;"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="oppDescription">Opportunity Description <span
+                                            class="required">*</span></label>
+                                    <textarea id="oppDescription" name="oppDescription" rows="4" required
+                                        placeholder="Provide detailed description of the opportunity, including business objectives, technical requirements, and expected outcomes..."
+                                        data-validation="required|minLength:10|maxLength:2000"
+                                        autocomplete="off"></textarea>
+                                    <div class="validation-indicator" id="oppDescription-indicator"></div>
+                                    <div class="field-error" id="oppDescription-error"></div>
+                                    <div class="field-success" id="oppDescription-success" style="display: none;"></div>
+                                    <div class="character-count">
+                                        <span id="oppDescription-count">0</span>/2000 characters
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location & Timing Section -->
+                        <div class="field-section">
+                            <h3 class="section-title">Location & Timing</h3>
+                            <div class="field-group">
+                                <div class="form-group">
+                                    <label for="region">Region <span class="required">*</span></label>
+                                    <select id="region" name="region" required data-validation="required"
+                                        autocomplete="off">
+                                        <option value="">Select AWS Region</option>
+                                        <!-- US Regions -->
+                                        <optgroup label="United States">
+                                            <option value="us-east-1">US East (N. Virginia) - us-east-1</option>
+                                            <option value="us-east-2">US East (Ohio) - us-east-2</option>
+                                            <option value="us-west-1">US West (N. California) - us-west-1</option>
+                                            <option value="us-west-2">US West (Oregon) - us-west-2</option>
+                                        </optgroup>
+                                        <!-- US GovCloud Regions -->
+                                        <optgroup label="AWS GovCloud (US)">
+                                            <option value="us-gov-east-1">AWS GovCloud (US-East) - us-gov-east-1
+                                            </option>
+                                            <option value="us-gov-west-1">AWS GovCloud (US-West) - us-gov-west-1
+                                            </option>
+                                        </optgroup>
+                                        <!-- Canada Regions -->
+                                        <optgroup label="Canada">
+                                            <option value="ca-central-1">Canada (Central) - ca-central-1</option>
+                                            <option value="ca-west-1">Canada (West) - ca-west-1</option>
+                                        </optgroup>
+                                        <!-- Europe Regions -->
+                                        <optgroup label="Europe">
+                                            <option value="eu-west-1">Europe (Ireland) - eu-west-1</option>
+                                            <option value="eu-west-2">Europe (London) - eu-west-2</option>
+                                            <option value="eu-west-3">Europe (Paris) - eu-west-3</option>
+                                            <option value="eu-central-1">Europe (Frankfurt) - eu-central-1</option>
+                                            <option value="eu-central-2">Europe (Zurich) - eu-central-2</option>
+                                            <option value="eu-north-1">Europe (Stockholm) - eu-north-1</option>
+                                            <option value="eu-south-1">Europe (Milan) - eu-south-1</option>
+                                            <option value="eu-south-2">Europe (Spain) - eu-south-2</option>
+                                        </optgroup>
+                                        <!-- Asia Pacific Regions -->
+                                        <optgroup label="Asia Pacific">
+                                            <option value="ap-northeast-1">Asia Pacific (Tokyo) - ap-northeast-1
+                                            </option>
+                                            <option value="ap-northeast-2">Asia Pacific (Seoul) - ap-northeast-2
+                                            </option>
+                                            <option value="ap-northeast-3">Asia Pacific (Osaka) - ap-northeast-3
+                                            </option>
+                                            <option value="ap-southeast-1">Asia Pacific (Singapore) - ap-southeast-1
+                                            </option>
+                                            <option value="ap-southeast-2">Asia Pacific (Sydney) - ap-southeast-2
+                                            </option>
+                                            <option value="ap-southeast-3">Asia Pacific (Jakarta) - ap-southeast-3
+                                            </option>
+                                            <option value="ap-southeast-4">Asia Pacific (Melbourne) - ap-southeast-4
+                                            </option>
+                                            <option value="ap-southeast-5">Asia Pacific (Malaysia) - ap-southeast-5
+                                            </option>
+                                            <option value="ap-south-1">Asia Pacific (Mumbai) - ap-south-1</option>
+                                            <option value="ap-south-2">Asia Pacific (Hyderabad) - ap-south-2</option>
+                                            <option value="ap-east-1">Asia Pacific (Hong Kong) - ap-east-1</option>
+                                        </optgroup>
+                                        <!-- Middle East Regions -->
+                                        <optgroup label="Middle East">
+                                            <option value="me-south-1">Middle East (Bahrain) - me-south-1</option>
+                                            <option value="me-central-1">Middle East (UAE) - me-central-1</option>
+                                        </optgroup>
+                                        <!-- Africa Regions -->
+                                        <optgroup label="Africa">
+                                            <option value="af-south-1">Africa (Cape Town) - af-south-1</option>
+                                        </optgroup>
+                                        <!-- South America Regions -->
+                                        <optgroup label="South America">
+                                            <option value="sa-east-1">South America (São Paulo) - sa-east-1</option>
+                                        </optgroup>
+                                        <!-- China Regions -->
+                                        <optgroup label="China">
+                                            <option value="cn-north-1">China (Beijing) - cn-north-1</option>
+                                            <option value="cn-northwest-1">China (Ningxia) - cn-northwest-1</option>
+                                        </optgroup>
+                                        <!-- Israel Regions -->
+                                        <optgroup label="Israel">
+                                            <option value="il-central-1">Israel (Tel Aviv) - il-central-1</option>
+                                        </optgroup>
+                                    </select>
+                                    <div class="validation-indicator" id="region-indicator"></div>
+                                    <div class="field-error" id="region-error"></div>
+                                    <div class="field-success" id="region-success" style="display: none;"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="closeDate">Close Date <span class="required">*</span></label>
+                                    <input type="date" id="closeDate" name="closeDate" required
+                                        data-validation="required|validDate|futureDate" autocomplete="off">
+                                    <div class="validation-indicator" id="closeDate-indicator"></div>
+                                    <div class="field-error" id="closeDate-error"></div>
+                                    <div class="field-success" id="closeDate-success" style="display: none;"></div>
+                                    <div class="field-hint">
+                                        <small>Select the expected close date for this opportunity</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Business Context Section -->
+                        <div class="field-section">
+                            <h3 class="section-title">Business Context</h3>
+                            <div class="field-group">
+                                <div class="form-group">
+                                    <label for="industry">Industry</label>
+                                    <select id="industry" name="industry" data-validation="optional" autocomplete="off">
+                                        <option value="">Select Industry</option>
+                                        <option value="Financial Services">Financial Services</option>
+                                        <option value="Healthcare">Healthcare & Life Sciences</option>
+                                        <option value="Manufacturing">Manufacturing</option>
+                                        <option value="Retail">Retail & E-commerce</option>
+                                        <option value="Technology">Technology</option>
+                                        <option value="Media & Entertainment">Media & Entertainment</option>
+                                        <option value="Government">Government & Public Sector</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Energy">Energy & Utilities</option>
+                                        <option value="Automotive">Automotive</option>
+                                        <option value="Telecommunications">Telecommunications</option>
+                                        <option value="Travel & Hospitality">Travel & Hospitality</option>
+                                        <option value="Real Estate">Real Estate</option>
+                                        <option value="Agriculture">Agriculture</option>
+                                        <option value="Non-Profit">Non-Profit</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <input type="text" id="industryOther" name="industryOther"
+                                        placeholder="Please specify industry..." style="display: none; margin-top: 8px;"
+                                        data-validation="conditionalRequired" autocomplete="off">
+                                    <div class="validation-indicator" id="industry-indicator"></div>
+                                    <div class="field-error" id="industry-error"></div>
+                                    <div class="field-success" id="industry-success" style="display: none;"></div>
+                                    <div class="field-hint">
+                                        <small>Select the primary industry sector for this opportunity</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="customerSegment">Customer Segment</label>
+                                    <select id="customerSegment" name="customerSegment" data-validation="optional"
+                                        autocomplete="off">
+                                        <option value="">Select Customer Segment</option>
+                                        <option value="Enterprise">Enterprise (1000+ employees)</option>
+                                        <option value="Mid-Market">Mid-Market (100-999 employees)</option>
+                                        <option value="SMB">Small & Medium Business (1-99 employees)</option>
+                                        <option value="Public Sector">Public Sector</option>
+                                        <option value="Startup">Startup</option>
+                                        <option value="ISV">Independent Software Vendor</option>
+                                    </select>
+                                    <div class="validation-indicator" id="customerSegment-indicator"></div>
+                                    <div class="field-error" id="customerSegment-error"></div>
+                                    <div class="field-success" id="customerSegment-success" style="display: none;">
+                                    </div>
+                                    <div class="field-hint">
+                                        <small>Choose the customer segment that best describes the organization
+                                            size</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="partnerName">Partner Name</label>
+                                    <input type="text" id="partnerName" name="partnerName"
+                                        placeholder="Optional - AWS Partner involved in this opportunity"
+                                        data-validation="optional|minLength:2" autocomplete="organization">
+                                    <div class="validation-indicator" id="partnerName-indicator"></div>
+                                    <div class="field-error" id="partnerName-error"></div>
+                                    <div class="field-success" id="partnerName-success" style="display: none;"></div>
+                                    <div class="field-hint">
+                                        <small>Enter the name of any AWS Partner involved in this opportunity
+                                            (optional)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technical Details Section -->
+                        <div class="field-section">
+                            <h3 class="section-title">Technical Details</h3>
+                            <div class="field-group">
+                                <div class="form-group">
+                                    <label for="activityFocus">Activity Focus</label>
+                                    <select id="activityFocus" name="activityFocus" data-validation="optional"
+                                        autocomplete="off">
+                                        <option value="">Select Primary Activity</option>
+                                        <option value="Migration">Migration</option>
+                                        <option value="Modernization">Modernization</option>
+                                        <option value="New Development">New Development</option>
+                                        <option value="Analytics">Analytics</option>
+                                        <option value="AI/ML">AI/ML & Generative AI</option>
+                                        <option value="Data Lake">Data Lake & Big Data</option>
+                                        <option value="DevOps">DevOps & CI/CD</option>
+                                        <option value="Security">Security & Compliance</option>
+                                        <option value="Disaster Recovery">Disaster Recovery</option>
+                                        <option value="Cost Optimization">Cost Optimization</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <div class="validation-indicator" id="activityFocus-indicator"></div>
+                                    <div class="field-error" id="activityFocus-error"></div>
+                                    <div class="field-success" id="activityFocus-success" style="display: none;"></div>
+                                    <div class="field-hint">
+                                        <small>Select the primary technical activity for this opportunity</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="businessDescription">Business Description</label>
+                                    <textarea id="businessDescription" name="businessDescription" rows="4"
+                                        placeholder="Provide detailed business context, requirements, objectives, and technical specifications..."
+                                        data-validation="optional|minLength:10|maxLength:1500"
+                                        autocomplete="off"></textarea>
+                                    <div class="validation-indicator" id="businessDescription-indicator"></div>
+                                    <div class="field-error" id="businessDescription-error"></div>
+                                    <div class="field-success" id="businessDescription-success" style="display: none;">
+                                    </div>
+                                    <div class="character-count">
+                                        <span id="businessDescription-count">0</span>/1500 characters
+                                    </div>
+                                    <div class="field-hint">
+                                        <small>Describe the business context, technical requirements, and project
+                                            objectives</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="migrationPhase">Migration Phase</label>
+                                    <select id="migrationPhase" name="migrationPhase" data-validation="optional"
+                                        autocomplete="off">
+                                        <option value="">Select Current Phase</option>
+                                        <option value="Assessment">Assessment</option>
+                                        <option value="Planning">Planning</option>
+                                        <option value="Migration">Migration</option>
+                                        <option value="Optimization">Optimization</option>
+                                        <option value="N/A">Not Applicable</option>
+                                    </select>
+                                    <div class="validation-indicator" id="migrationPhase-indicator"></div>
+                                    <div class="field-error" id="migrationPhase-error"></div>
+                                    <div class="field-success" id="migrationPhase-success" style="display: none;"></div>
+                                    <div class="field-hint">
+                                        <small>Select the current phase if this involves migration to AWS</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="salesforceLink">Salesforce Link</label>
+                                    <input type="url" id="salesforceLink" name="salesforceLink"
+                                        placeholder="https://example.salesforce.com/..."
+                                        data-validation="optional|validUrl" autocomplete="url">
+                                    <div class="validation-indicator" id="salesforceLink-indicator"></div>
+                                    <div class="field-error" id="salesforceLink-error"></div>
+                                    <div class="field-success" id="salesforceLink-success" style="display: none;"></div>
+                                    <div class="field-hint">
+                                        <small>Optional - Link to the Salesforce opportunity record</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="awsCalculatorLink">AWS Calculator Link</label>
+                                    <input type="url" id="awsCalculatorLink" name="awsCalculatorLink"
+                                        placeholder="https://calculator.aws/..." data-validation="optional|validUrl"
+                                        autocomplete="url">
+                                    <div class="validation-indicator" id="awsCalculatorLink-indicator"></div>
+                                    <div class="field-error" id="awsCalculatorLink-error"></div>
+                                    <div class="field-success" id="awsCalculatorLink-success" style="display: none;">
+                                    </div>
+                                    <div class="field-hint">
+                                        <small>Optional - Link to AWS Pricing Calculator estimate</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Action Buttons Section -->
+                <div class="action-section">
+                    <h2>Analysis Actions</h2>
+                    <div class="button-group primary-actions">
+                        <button type="button" id="oppDetQueryButtonV3" class="primary-button">
+                            <span class="button-text">Analyze (Standard)</span>
+                            <span class="button-spinner" style="display: none;"></span>
+                        </button>
+                        <button type="button" id="oppDetQueryButtonV4" class="secondary-button">
+                            <span class="button-text">Analyze (Nova Premier)</span>
+                            <span class="button-spinner" style="display: none;"></span>
+                        </button>
+                        <button type="button" id="fundingAnalysisButton" class="tertiary-button">
+                            <span class="button-text">Funding Analysis</span>
+                            <span class="button-spinner" style="display: none;"></span>
+                        </button>
+                    </div>
+                    <div class="button-group secondary-actions">
+                        <button type="button" id="nextOpportunityButton" class="outline-button">Next
+                            Opportunity</button>
+                        <button type="button" id="resetFormButton" class="outline-button">Reset Form</button>
+                        <button type="button" id="exportResultsButton" class="outline-button" disabled>Export
+                            Results</button>
+                    </div>
+                </div>
+
+                <!-- Enhanced Projections Section -->
+                <div class="projections-section">
+                    <h2>Opportunity Projections</h2>
+                    <div class="projections-grid">
+                        <!-- Task 3.1: Enhanced ARR Display -->
+                        <div class="projection-card arr-card">
+                            <h3>Annual Recurring Revenue</h3>
+                            <div class="projection-value" id="projectedARR">
+                                <span class="value" id="arrValue">-</span>
+                                <span class="confidence-range" id="arrRange">Confidence range will appear here</span>
+                                <div class="currency-details">
+                                    <span class="formatted-currency" id="arrFormatted"></span>
+                                    <span class="confidence-score" id="arrConfidence"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 3.1: Enhanced MRR Display -->
+                        <div class="projection-card mrr-card">
+                            <h3>Monthly Recurring Revenue</h3>
+                            <div class="projection-value" id="projectedMRR">
+                                <span class="value" id="mrrValue">-</span>
+                                <span class="relationship" id="mrrRelationship">Relationship to ARR will appear
+                                    here</span>
+                                <div class="currency-details">
+                                    <span class="formatted-currency" id="mrrFormatted"></span>
+                                    <span class="arr-relationship" id="mrrArrRelation"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 3.2: Enhanced Launch Date Display -->
+                        <div class="projection-card launch-date-card">
+                            <h3>Launch Date</h3>
+                            <div class="projection-value" id="projectedLaunchDate">
+                                <span class="value" id="launchDateValue">-</span>
+                                <span class="timeline" id="launchTimeline">Timeline will appear here</span>
+                                <div class="date-details">
+                                    <span class="formatted-date" id="launchDateFormatted"></span>
+                                    <span class="days-from-now" id="launchDaysFromNow"></span>
+                                    <div class="timeline-visualization" id="launchTimelineViz">
+                                        <div class="timeline-bar">
+                                            <div class="timeline-progress" id="launchProgress"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 3.2: Enhanced Time to Launch Display -->
+                        <div class="projection-card time-to-launch-card">
+                            <h3>Time to Launch</h3>
+                            <div class="projection-value" id="projectedTimeToLaunch">
+                                <span class="value" id="timeToLaunchValue">-</span>
+                                <span class="duration" id="launchDuration">Duration details will appear here</span>
+                                <div class="duration-details">
+                                    <span class="formatted-duration" id="durationFormatted"></span>
+                                    <div class="duration-visualization" id="durationViz">
+                                        <div class="duration-bar">
+                                            <div class="duration-segments" id="durationSegments"></div>
+                                        </div>
+                                        <div class="duration-milestones" id="durationMilestones"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 3.3: Enhanced Confidence Level Display -->
+                        <div class="projection-card confidence-card">
+                            <h3>Confidence Level</h3>
+                            <div class="projection-value" id="projectedConfidence">
+                                <span class="value confidence-level" id="confidenceValue">-</span>
+                                <div class="confidence-details">
+                                    <div class="confidence-indicator" id="confidenceIndicator">
+                                        <div class="confidence-bar">
+                                            <div class="confidence-fill" id="confidenceFill"></div>
+                                        </div>
+                                        <span class="confidence-percentage" id="confidencePercentage"></span>
+                                    </div>
+                                    <div class="confidence-factors" id="confidenceFactorsDisplay">
+                                        <span class="factors-label">Key factors will appear here</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 3.3: Enhanced Top Services Display -->
+                        <div class="projection-card full-width services-card">
+                            <h3>Top Services</h3>
+                            <div class="projection-value" id="projectedTopServices">
+                                <div class="services-list" id="servicesList">
+                                    <div class="services-placeholder">Top AWS services with estimated costs will appear
+                                        here</div>
+                                    <div class="services-structured" id="servicesStructured" style="display: none;">
+                                        <!-- Services will be populated dynamically -->
+                                    </div>
+                                </div>
+                                <div class="services-summary" id="servicesSummary" style="display: none;">
+                                    <div class="total-estimated-cost" id="totalEstimatedCost"></div>
+                                    <div class="services-count" id="servicesCount"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Analysis Results -->
+            <div class="right-panel">
+                <!-- Key Metrics Display -->
+                <div class="metrics-display-section">
+                    <h2>Key Metrics</h2>
+                    <div class="metrics-summary">
+                        <div class="metric-item">
+                            <span class="metric-label">ARR:</span>
+                            <span class="metric-value" id="metricsARR">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">MRR:</span>
+                            <span class="metric-value" id="metricsMRR">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Launch:</span>
+                            <span class="metric-value" id="metricsLaunch">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Confidence:</span>
+                            <span class="metric-value" id="metricsConfidence">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Results Section -->
+                <div class="analysis-results-section">
+                    <h2>Analysis Results</h2>
+
+                    <!-- Methodology Section -->
+                    <div class="result-section methodology-section">
+                        <h3 class="result-title">
+                            <span class="section-icon">🔬</span>
+                            Analysis Methodology
+                        </h3>
+                        <div class="result-content" id="methodologyContent">
+                            <div class="placeholder-content">
+                                <div class="placeholder-icon">📊</div>
+                                <p>Analysis methodology will appear here after running analysis...</p>
+                                <small>This section will show the approach, data sources, and confidence factors used in the analysis.</small>
+                            </div>
+                            <div class="methodology-details" style="display: none;">
+                                <div class="methodology-item analysis-approach-item">
+                                    <div class="methodology-header">
+                                        <span class="methodology-icon">🎯</span>
+                                        <h4>Analysis Approach</h4>
+                                    </div>
+                                    <div class="methodology-text" id="analysisApproach">
+                                        <div class="approach-summary" id="approachSummary"></div>
+                                        <div class="approach-steps" id="approachSteps"></div>
+                                        <div class="approach-techniques" id="approachTechniques"></div>
+                                    </div>
+                                </div>
+                                <div class="methodology-item data-sources-item">
+                                    <div class="methodology-header">
+                                        <span class="methodology-icon">📚</span>
+                                        <h4>Data Sources</h4>
+                                    </div>
+                                    <div class="methodology-text" id="dataSources">
+                                        <div class="data-sources-list" id="dataSourcesList"></div>
+                                        <div class="data-quality-info" id="dataQualityInfo"></div>
+                                        <div class="data-coverage" id="dataCoverage"></div>
+                                    </div>
+                                </div>
+                                <div class="methodology-item confidence-factors-item">
+                                    <div class="methodology-header">
+                                        <span class="methodology-icon">📈</span>
+                                        <h4>Confidence Factors</h4>
+                                    </div>
+                                    <div class="methodology-text" id="confidenceFactors">
+                                        <div class="confidence-factors-list" id="confidenceFactorsList"></div>
+                                        <div class="confidence-scoring" id="confidenceScoring"></div>
+                                        <div class="confidence-limitations" id="confidenceLimitations"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Similar Projects Section -->
+                    <div class="result-section similar-projects-section">
+                        <h3 class="result-title">
+                            <span class="section-icon">📊</span>
+                            Similar Projects
+                            <span class="projects-count" id="projectsCount" style="display: none;"></span>
+                        </h3>
+                        <div class="result-content" id="similarProjectsContent">
+                            <div class="placeholder-content">
+                                <div class="placeholder-icon">🔍</div>
+                                <p>Similar historical projects will be displayed here after analysis...</p>
+                                <small>This section will show comparable projects with detailed metrics and expandable information.</small>
+                            </div>
+                            <div class="projects-table-container" style="display: none;">
+                                <div class="table-controls">
+                                    <div class="controls-row">
+                                        <div class="search-container">
+                                            <input type="text" id="projectsSearch" placeholder="Search projects by name, customer, or industry..." class="search-input">
+                                            <button type="button" id="clearSearch" class="clear-search-btn" style="display: none;">×</button>
+                                        </div>
+                                        <div class="filter-container">
+                                            <select id="industryFilter" class="filter-select">
+                                                <option value="">All Industries</option>
+                                            </select>
+                                            <select id="regionFilter" class="filter-select">
+                                                <option value="">All Regions</option>
+                                            </select>
+                                            <select id="projectsSort" class="sort-select">
+                                                <option value="">Sort by...</option>
+                                                <option value="similarity-desc">Similarity (High to Low)</option>
+                                                <option value="similarity-asc">Similarity (Low to High)</option>
+                                                <option value="arr-desc">ARR (High to Low)</option>
+                                                <option value="arr-asc">ARR (Low to High)</option>
+                                                <option value="mrr-desc">MRR (High to Low)</option>
+                                                <option value="mrr-asc">MRR (Low to High)</option>
+                                                <option value="date-desc">Close Date (Recent)</option>
+                                                <option value="date-asc">Close Date (Oldest)</option>
+                                                <option value="name-asc">Project Name (A-Z)</option>
+                                                <option value="name-desc">Project Name (Z-A)</option>
+                                                <option value="customer-asc">Customer (A-Z)</option>
+                                                <option value="customer-desc">Customer (Z-A)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="table-info">
+                                        <span id="filteredCount" class="filtered-count"></span>
+                                        <div class="table-actions">
+                                            <button type="button" id="expandAllProjects" class="table-action-btn">Expand All</button>
+                                            <button type="button" id="collapseAllProjects" class="table-action-btn">Collapse All</button>
+                                            <button type="button" id="exportProjects" class="table-action-btn">Export</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-wrapper">
+                                    <table class="projects-table" id="projectsTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="sortable" data-sort="expand">
+                                                    <span class="expand-icon">▼</span>
+                                                </th>
+                                                <th class="sortable" data-sort="name">
+                                                    Project Name
+                                                    <span class="sort-indicator"></span>
+                                                </th>
+                                                <th class="sortable" data-sort="customer">
+                                                    Customer
+                                                    <span class="sort-indicator"></span>
+                                                </th>
+                                                <th class="sortable" data-sort="industry">
+                                                    Industry
+                                                    <span class="sort-indicator"></span>
+                                                </th>
+                                                <th class="sortable" data-sort="region">
+                                                    Region
+                                                    <span class="sort-indicator"></span>
+                                                </th>
+                                                <th class="sortable" data-sort="arr">
+                                                    ARR
+                                                    <span class="sort-indicator"></span>
+                                                </th>
+                                                <th class="sortable" data-sort="mrr">
+                                                    MRR
+                                                    <span class="sort-indicator"></span>
+                                                </th>
+                                                <th class="sortable" data-sort="services">
+                                                    Top Services
+                                                    <span class="sort-indicator"></span>
+                                                </th>
+                                                <th class="sortable" data-sort="date">
+                                                    Close Date
+                                                    <span class="sort-indicator"></span>
+                                                </th>
+                                                <th class="sortable" data-sort="similarity">
+                                                    Similarity
+                                                    <span class="sort-indicator"></span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="projectsTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="table-pagination" id="tablePagination" style="display: none;">
+                                    <div class="pagination-info">
+                                        <span id="paginationInfo"></span>
+                                    </div>
+                                    <div class="pagination-controls">
+                                        <button type="button" id="prevPage" class="pagination-btn" disabled>Previous</button>
+                                        <div class="page-numbers" id="pageNumbers"></div>
+                                        <button type="button" id="nextPage" class="pagination-btn" disabled>Next</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Findings Section -->
+                    <div class="result-section findings-section">
+                        <h3 class="result-title">
+                            <span class="section-icon">🔍</span>
+                            Detailed Findings
+                            <span class="findings-count" id="findingsCount" style="display: none;"></span>
+                        </h3>
+                        <div class="result-content" id="findingsContent">
+                            <div class="placeholder-content">
+                                <div class="placeholder-icon">📋</div>
+                                <p>Detailed analysis findings will be shown here...</p>
+                                <small>This section will display key insights with bullet points and highlighting.</small>
+                            </div>
+                            <div class="findings-display" style="display: none;">
+                                <div class="findings-summary" id="findingsSummary">
+                                    <div class="summary-stats">
+                                        <span class="stat-item">
+                                            <span class="stat-label">Key Insights:</span>
+                                            <span class="stat-value" id="keyInsightsCount">0</span>
+                                        </span>
+                                        <span class="stat-item">
+                                            <span class="stat-label">Confidence Level:</span>
+                                            <span class="stat-value" id="findingsConfidence">-</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="findings-list" id="findingsList">
+                                    <!-- Findings will be populated dynamically -->
+                                </div>
+                                <div class="findings-actions">
+                                    <button type="button" class="findings-action-btn" id="expandAllFindings">Expand All</button>
+                                    <button type="button" class="findings-action-btn" id="collapseAllFindings">Collapse All</button>
+                                    <button type="button" class="findings-action-btn" id="exportFindings">Export Findings</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prediction Rationale Section -->
+                    <div class="result-section rationale-section">
+                        <h3 class="result-title">
+                            <span class="section-icon">🧠</span>
+                            Prediction Rationale
+                            <span class="rationale-count" id="rationaleCount" style="display: none;"></span>
+                        </h3>
+                        <div class="result-content" id="rationaleContent">
+                            <div class="placeholder-content">
+                                <div class="placeholder-icon">💡</div>
+                                <p>Reasoning behind predictions will be explained here...</p>
+                                <small>This section will show clear reasoning and historical data correlations.</small>
+                            </div>
+                            <div class="rationale-display" style="display: none;">
+                                <div class="rationale-summary" id="rationaleSummary">
+                                    <div class="summary-stats">
+                                        <span class="stat-item">
+                                            <span class="stat-label">Reasoning Points:</span>
+                                            <span class="stat-value" id="reasoningPointsCount">0</span>
+                                        </span>
+                                        <span class="stat-item">
+                                            <span class="stat-label">Historical Correlations:</span>
+                                            <span class="stat-value" id="correlationsCount">0</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="rationale-list" id="rationaleList">
+                                    <!-- Rationale items will be populated dynamically -->
+                                </div>
+                                <div class="rationale-actions">
+                                    <button type="button" class="rationale-action-btn" id="expandAllRationale">Expand All</button>
+                                    <button type="button" class="rationale-action-btn" id="collapseAllRationale">Collapse All</button>
+                                    <button type="button" class="rationale-action-btn" id="exportRationale">Export Rationale</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Factors Section -->
+                    <div class="result-section risk-factors-section">
+                        <h3 class="result-title">
+                            <span class="section-icon">⚠️</span>
+                            Risk Factors
+                            <span class="risk-count" id="riskCount" style="display: none;"></span>
+                        </h3>
+                        <div class="result-content" id="riskFactorsContent">
+                            <div class="placeholder-content">
+                                <div class="placeholder-icon">🛡️</div>
+                                <p>Risk assessment and mitigation strategies will appear here...</p>
+                                <small>This section will display risk factors with severity levels and mitigation strategies.</small>
+                            </div>
+                            <div class="risk-factors-display" style="display: none;">
+                                <div class="risk-summary" id="riskSummary">
+                                    <div class="summary-stats">
+                                        <span class="stat-item high-risk">
+                                            <span class="stat-label">High Risk:</span>
+                                            <span class="stat-value" id="highRiskCount">0</span>
+                                        </span>
+                                        <span class="stat-item medium-risk">
+                                            <span class="stat-label">Medium Risk:</span>
+                                            <span class="stat-value" id="mediumRiskCount">0</span>
+                                        </span>
+                                        <span class="stat-item low-risk">
+                                            <span class="stat-label">Low Risk:</span>
+                                            <span class="stat-value" id="lowRiskCount">0</span>
+                                        </span>
+                                    </div>
+                                    <div class="risk-overview" id="riskOverview">
+                                        <div class="overall-risk-level" id="overallRiskLevel">
+                                            <span class="risk-level-label">Overall Risk Level:</span>
+                                            <span class="risk-level-value" id="overallRiskValue">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="risk-factors-list" id="riskFactorsList">
+                                    <!-- Risk factors will be populated dynamically -->
+                                </div>
+                                <div class="risk-actions">
+                                    <button type="button" class="risk-action-btn" id="expandAllRisks">Expand All</button>
+                                    <button type="button" class="risk-action-btn" id="collapseAllRisks">Collapse All</button>
+                                    <button type="button" class="risk-action-btn" id="filterHighRisk">Show High Risk Only</button>
+                                    <button type="button" class="risk-action-btn" id="exportRisks">Export Risk Assessment</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Architecture Recommendations Section -->
+                    <div class="result-section architecture-section">
+                        <h3 class="result-title">
+                            <span class="section-icon">🏗️</span>
+                            Architecture Recommendations
+                            <span class="architecture-count" id="architectureCount" style="display: none;"></span>
+                        </h3>
+                        <div class="result-content" id="architectureContent">
+                            <div class="placeholder-content">
+                                <div class="placeholder-icon">🏛️</div>
+                                <p>Architecture recommendations will be displayed here after analysis...</p>
+                                <small>This section will show organized architecture components with visual indicators and expandable sections.</small>
+                            </div>
+                            <div class="architecture-display" style="display: none;">
+                                <div class="architecture-summary" id="architectureSummary">
+                                    <div class="summary-stats">
+                                        <span class="stat-item">
+                                            <span class="stat-label">Components:</span>
+                                            <span class="stat-value" id="componentsCount">0</span>
+                                        </span>
+                                        <span class="stat-item">
+                                            <span class="stat-label">Services:</span>
+                                            <span class="stat-value" id="servicesCount">0</span>
+                                        </span>
+                                        <span class="stat-item">
+                                            <span class="stat-label">Complexity:</span>
+                                            <span class="stat-value" id="complexityLevel">-</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="architecture-sections" id="architectureSections">
+                                    <!-- Network Foundation Section -->
+                                    <div class="arch-section" id="networkFoundationSection">
+                                        <div class="arch-section-header" data-section="networkFoundation">
+                                            <div class="arch-section-title">
+                                                <span class="arch-icon">🌐</span>
+                                                <h4>Network Foundation</h4>
+                                                <span class="component-count" id="networkFoundationCount">0</span>
+                                            </div>
+                                            <div class="arch-section-controls">
+                                                <button type="button" class="expand-toggle" data-target="networkFoundation">
+                                                    <span class="expand-icon">▼</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="arch-content expandable" id="networkFoundation">
+                                            <div class="arch-components" id="networkFoundationComponents"></div>
+                                            <div class="arch-links" id="networkFoundationLinks"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Compute Layer Section -->
+                                    <div class="arch-section" id="computeLayerSection">
+                                        <div class="arch-section-header" data-section="computeLayer">
+                                            <div class="arch-section-title">
+                                                <span class="arch-icon">⚡</span>
+                                                <h4>Compute Layer</h4>
+                                                <span class="component-count" id="computeLayerCount">0</span>
+                                            </div>
+                                            <div class="arch-section-controls">
+                                                <button type="button" class="expand-toggle" data-target="computeLayer">
+                                                    <span class="expand-icon">▼</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="arch-content expandable" id="computeLayer">
+                                            <div class="arch-components" id="computeLayerComponents"></div>
+                                            <div class="arch-links" id="computeLayerLinks"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Data Layer Section -->
+                                    <div class="arch-section" id="dataLayerSection">
+                                        <div class="arch-section-header" data-section="dataLayer">
+                                            <div class="arch-section-title">
+                                                <span class="arch-icon">🗄️</span>
+                                                <h4>Data Layer</h4>
+                                                <span class="component-count" id="dataLayerCount">0</span>
+                                            </div>
+                                            <div class="arch-section-controls">
+                                                <button type="button" class="expand-toggle" data-target="dataLayer">
+                                                    <span class="expand-icon">▼</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="arch-content expandable" id="dataLayer">
+                                            <div class="arch-components" id="dataLayerComponents"></div>
+                                            <div class="arch-links" id="dataLayerLinks"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Security Components Section -->
+                                    <div class="arch-section" id="securityComponentsSection">
+                                        <div class="arch-section-header" data-section="securityComponents">
+                                            <div class="arch-section-title">
+                                                <span class="arch-icon">🔒</span>
+                                                <h4>Security Components</h4>
+                                                <span class="component-count" id="securityComponentsCount">0</span>
+                                            </div>
+                                            <div class="arch-section-controls">
+                                                <button type="button" class="expand-toggle" data-target="securityComponents">
+                                                    <span class="expand-icon">▼</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="arch-content expandable" id="securityComponents">
+                                            <div class="arch-components" id="securityComponentsComponents"></div>
+                                            <div class="arch-links" id="securityComponentsLinks"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Integration Points Section -->
+                                    <div class="arch-section" id="integrationPointsSection">
+                                        <div class="arch-section-header" data-section="integrationPoints">
+                                            <div class="arch-section-title">
+                                                <span class="arch-icon">🔗</span>
+                                                <h4>Integration Points</h4>
+                                                <span class="component-count" id="integrationPointsCount">0</span>
+                                            </div>
+                                            <div class="arch-section-controls">
+                                                <button type="button" class="expand-toggle" data-target="integrationPoints">
+                                                    <span class="expand-icon">▼</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="arch-content expandable" id="integrationPoints">
+                                            <div class="arch-components" id="integrationPointsComponents"></div>
+                                            <div class="arch-links" id="integrationPointsLinks"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Scaling Elements Section -->
+                                    <div class="arch-section" id="scalingElementsSection">
+                                        <div class="arch-section-header" data-section="scalingElements">
+                                            <div class="arch-section-title">
+                                                <span class="arch-icon">📈</span>
+                                                <h4>Scaling Elements</h4>
+                                                <span class="component-count" id="scalingElementsCount">0</span>
+                                            </div>
+                                            <div class="arch-section-controls">
+                                                <button type="button" class="expand-toggle" data-target="scalingElements">
+                                                    <span class="expand-icon">▼</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="arch-content expandable" id="scalingElements">
+                                            <div class="arch-components" id="scalingElementsComponents"></div>
+                                            <div class="arch-links" id="scalingElementsLinks"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Management Tools Section -->
+                                    <div class="arch-section" id="managementToolsSection">
+                                        <div class="arch-section-header" data-section="managementTools">
+                                            <div class="arch-section-title">
+                                                <span class="arch-icon">🛠️</span>
+                                                <h4>Management Tools</h4>
+                                                <span class="component-count" id="managementToolsCount">0</span>
+                                            </div>
+                                            <div class="arch-section-controls">
+                                                <button type="button" class="expand-toggle" data-target="managementTools">
+                                                    <span class="expand-icon">▼</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="arch-content expandable" id="managementTools">
+                                            <div class="arch-components" id="managementToolsComponents"></div>
+                                            <div class="arch-links" id="managementToolsLinks"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="architecture-actions">
+                                    <button type="button" class="arch-action-btn" id="expandAllArchitecture">Expand All</button>
+                                    <button type="button" class="arch-action-btn" id="collapseAllArchitecture">Collapse All</button>
+                                    <button type="button" class="arch-action-btn" id="exportArchitecture">Export Architecture</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Query Section -->
+                    <div class="result-section">
+                        <h3 class="result-title">Generated Query</h3>
+                        <div class="result-content" id="queryContent">
+                            <div class="placeholder-content">Generated SQL query will be shown here...</div>
+                            <div class="query-display" style="display: none;">
+                                <pre class="query-text" id="queryText"></pre>
+                                <button class="copy-button" id="copyQueryButton">Copy Query</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Query Results Section -->
+                    <div class="result-section">
+                        <h3 class="result-title">Query Results</h3>
+                        <div class="result-content" id="queryResultsContent">
+                            <div class="placeholder-content">Raw query results will be displayed here...</div>
+                            <div class="query-results-display" style="display: none;">
+                                <div class="results-summary" id="resultsSummary"></div>
+                                <div class="results-data" id="resultsData"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Section -->
+                    <div class="result-section">
+                        <h3 class="result-title">Executive Summary</h3>
+                        <div class="result-content" id="summaryContent">
+                            <div class="placeholder-content">Executive summary will be generated here...</div>
+                            <div class="executive-summary" style="display: none;" id="executiveSummary">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
 
         <div id="loadingOverlay" class="loading-overlay">
             <div class="spinner"></div>
@@ -100,6 +1069,7 @@
         </div>
     </div>
 
+    <script src="eventbridge-client.js"></script>
     <script src="app.js"></script>
 </body>
 

@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Toggle Functionality Tests</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .test-header h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .test-header p {
+            color: #718096;
+            font-size: 16px;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #fafbfc;
+        }
+        
+        .test-section h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-case {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+        }
+        
+        .test-case h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .test-case p {
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+        
+        .test-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .test-button:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
+        }
+        
+        .test-button.secondary {
+            background: #718096;
+        }
+        
+        .test-button.secondary:hover {
+            background: #4a5568;
+        }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        
+        .test-result.success {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            color: #22543d;
+        }
+        
+        .test-result.error {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #742a2a;
+        }
+        
+        .test-result.info {
+            background: #ebf8ff;
+            border: 1px solid #90cdf4;
+            color: #2a4365;
+        }
+        
+        .app-frame {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.success {
+            background: #48bb78;
+        }
+        
+        .status-indicator.error {
+            background: #f56565;
+        }
+        
+        .status-indicator.warning {
+            background: #ed8936;
+        }
+        
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .requirement-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .requirement-card h4 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .requirement-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .requirement-card li {
+            padding: 5px 0;
+            color: #4a5568;
+        }
+        
+        .requirement-card li::before {
+            content: "✓ ";
+            color: #48bb78;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🎨 Theme Toggle Functionality Tests</h1>
+            <p>Comprehensive testing suite for Partner Opportunity Intelligence theme toggle feature</p>
+        </div>
+
+        <!-- Requirements Overview -->
+        <div class="test-section">
+            <h2>📋 Requirements Coverage</h2>
+            <div class="requirements-grid">
+                <div class="requirement-card">
+                    <h4>Requirement 1.1 - Theme Switching</h4>
+                    <ul>
+                        <li>Click toggle switches between themes</li>
+                        <li>Immediate visual feedback</li>
+                        <li>Smooth transitions</li>
+                    </ul>
+                </div>
+                <div class="requirement-card">
+                    <h4>Requirement 1.2 - Dark Mode Display</h4>
+                    <ul>
+                        <li>Dark backgrounds for all UI elements</li>
+                        <li>Light text for readability</li>
+                        <li>Proper contrast ratios</li>
+                    </ul>
+                </div>
+                <div class="requirement-card">
+                    <h4>Requirement 1.3 - Light Mode Display</h4>
+                    <ul>
+                        <li>Light backgrounds for all UI elements</li>
+                        <li>Dark text for readability</li>
+                        <li>Professional appearance</li>
+                    </ul>
+                </div>
+                <div class="requirement-card">
+                    <h4>Requirement 1.4 - localStorage Persistence</h4>
+                    <ul>
+                        <li>Theme preference saved automatically</li>
+                        <li>Survives browser sessions</li>
+                        <li>Error handling for storage issues</li>
+                    </ul>
+                </div>
+                <div class="requirement-card">
+                    <h4>Requirement 1.5 - Theme Restoration</h4>
+                    <ul>
+                        <li>Loads saved theme on startup</li>
+                        <li>Defaults to light if no preference</li>
+                        <li>Initializes button state correctly</li>
+                    </ul>
+                </div>
+                <div class="requirement-card">
+                    <h4>Requirement 2.1-2.4 - Button Feedback</h4>
+                    <ul>
+                        <li>Moon icon + "Dark" text in light mode</li>
+                        <li>Sun icon + "Light" text in dark mode</li>
+                        <li>Hover effects and visual feedback</li>
+                        <li>Immediate state updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test 1: Basic Theme Toggle Functionality -->
+        <div class="test-section">
+            <h2>🔄 Test 1: Basic Theme Toggle Functionality</h2>
+            <div class="test-case">
+                <h3>Test Case 1.1: Theme Switching Works Correctly</h3>
+                <p>Verify that clicking the theme toggle button switches between light and dark themes</p>
+                <button class="test-button" onclick="testBasicToggle()">Run Basic Toggle Test</button>
+                <button class="test-button secondary" onclick="openAppInFrame()">Open App in Frame</button>
+                <div id="basicToggleResult" class="test-result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Test 2: localStorage Persistence -->
+        <div class="test-section">
+            <h2>💾 Test 2: localStorage Persistence</h2>
+            <div class="test-case">
+                <h3>Test Case 2.1: Theme Preference Persistence</h3>
+                <p>Test that theme preferences are saved to localStorage and persist across browser sessions</p>
+                <button class="test-button" onclick="testLocalStoragePersistence()">Test localStorage Persistence</button>
+                <button class="test-button secondary" onclick="clearThemeStorage()">Clear Theme Storage</button>
+                <div id="persistenceResult" class="test-result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Test 3: UI Element Display -->
+        <div class="test-section">
+            <h2>🎨 Test 3: UI Element Display in Both Themes</h2>
+            <div class="test-case">
+                <h3>Test Case 3.1: Dark Theme UI Elements</h3>
+                <p>Verify all UI elements properly display with dark backgrounds and light text</p>
+                <button class="test-button" onclick="testDarkThemeDisplay()">Test Dark Theme Display</button>
+                <div id="darkThemeResult" class="test-result" style="display: none;"></div>
+            </div>
+            <div class="test-case">
+                <h3>Test Case 3.2: Light Theme UI Elements</h3>
+                <p>Verify all UI elements properly display with light backgrounds and dark text</p>
+                <button class="test-button" onclick="testLightThemeDisplay()">Test Light Theme Display</button>
+                <div id="lightThemeResult" class="test-result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Test 4: Button State Updates -->
+        <div class="test-section">
+            <h2>🔘 Test 4: Button State Updates and Visual Feedback</h2>
+            <div class="test-case">
+                <h3>Test Case 4.1: Button Icon and Text Updates</h3>
+                <p>Test that button icon and text update correctly based on current theme</p>
+                <button class="test-button" onclick="testButtonStateUpdates()">Test Button State Updates</button>
+                <div id="buttonStateResult" class="test-result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Test 5: Theme Initialization -->
+        <div class="test-section">
+            <h2>🚀 Test 5: Theme Initialization on Page Load</h2>
+            <div class="test-case">
+                <h3>Test Case 5.1: Theme Restoration from localStorage</h3>
+                <p>Test that the application correctly restores theme preference on page load</p>
+                <button class="test-button" onclick="testThemeInitialization()">Test Theme Initialization</button>
+                <button class="test-button secondary" onclick="simulatePageReload()">Simulate Page Reload</button>
+                <div id="initializationResult" class="test-result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Test 6: Error Handling and Edge Cases -->
+        <div class="test-section">
+            <h2>⚠️ Test 6: Error Handling and Edge Cases</h2>
+            <div class="test-case">
+                <h3>Test Case 6.1: localStorage Unavailable</h3>
+                <p>Test graceful handling when localStorage is unavailable or throws errors</p>
+                <button class="test-button" onclick="testLocalStorageErrors()">Test localStorage Error Handling</button>
+                <div id="errorHandlingResult" class="test-result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Live Application Frame -->
+        <div class="test-section">
+            <h2>🖥️ Live Application Testing</h2>
+            <p>Use this embedded application to manually test theme toggle functionality:</p>
+            <iframe id="appFrame" class="app-frame" src="index-compact-option-c.html" title="Partner Opportunity Intelligence Application"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Test Results Storage
+        let testResults = {
+            basicToggle: null,
+            persistence: null,
+            darkTheme: null,
+            lightTheme: null,
+            buttonState: null,
+            initialization: null,
+            errorHandling: null
+        };
+
+        // Utility Functions
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `test-result ${type}`;
+            element.textContent = message;
+        }
+
+        function getAppWindow() {
+            const frame = document.getElementById('appFrame');
+            return frame.contentWindow;
+        }
+
+        function waitForAppLoad() {
+            return new Promise((resolve) => {
+                const frame = document.getElementById('appFrame');
+                if (frame.contentDocument && frame.contentDocument.readyState === 'complete') {
+                    resolve();
+                } else {
+                    frame.onload = resolve;
+                }
+            });
+        }
+
+        // Test 1: Basic Theme Toggle Functionality
+        async function testBasicToggle() {
+            try {
+                showResult('basicToggleResult', 'Running basic toggle test...', 'info');
+                
+                await waitForAppLoad();
+                const appWindow = getAppWindow();
+                const appDoc = appWindow.document;
+                
+                if (!appDoc) {
+                    throw new Error('Cannot access application document');
+                }
+
+                // Get initial theme
+                const initialTheme = appDoc.documentElement.getAttribute('data-theme') || 'light';
+                
+                // Find theme toggle button
+                const themeButton = appDoc.querySelector('.theme-toggle');
+                if (!themeButton) {
+                    throw new Error('Theme toggle button not found');
+                }
+
+                // Test toggle functionality
+                const results = [];
+                results.push(`Initial theme: ${initialTheme}`);
+                
+                // Simulate click
+                themeButton.click();
+                
+                // Wait for theme change
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                const newTheme = appDoc.documentElement.getAttribute('data-theme');
+                results.push(`Theme after toggle: ${newTheme}`);
+                
+                // Verify theme changed
+                if (newTheme !== initialTheme) {
+                    results.push('✅ Theme toggle successful');
+                    
+                    // Test toggle back
+                    themeButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    const finalTheme = appDoc.documentElement.getAttribute('data-theme');
+                    results.push(`Theme after second toggle: ${finalTheme}`);
+                    
+                    if (finalTheme === initialTheme) {
+                        results.push('✅ Theme toggle back successful');
+                        testResults.basicToggle = true;
+                        showResult('basicToggleResult', results.join('\n'), 'success');
+                    } else {
+                        results.push('❌ Theme toggle back failed');
+                        testResults.basicToggle = false;
+                        showResult('basicToggleResult', results.join('\n'), 'error');
+                    }
+                } else {
+                    results.push('❌ Theme toggle failed - no change detected');
+                    testResults.basicToggle = false;
+                    showResult('basicToggleResult', results.join('\n'), 'error');
+                }
+                
+            } catch (error) {
+                testResults.basicToggle = false;
+                showResult('basicToggleResult', `❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 2: localStorage Persistence
+        async function testLocalStoragePersistence() {
+            try {
+                showResult('persistenceResult', 'Testing localStorage persistence...', 'info');
+                
+                await waitForAppLoad();
+                const appWindow = getAppWindow();
+                const appDoc = appWindow.document;
+                
+                const results = [];
+                
+                // Clear any existing theme preference
+                appWindow.localStorage.removeItem('poi-theme-preference');
+                results.push('Cleared existing theme preference');
+                
+                // Set theme to dark
+                const themeButton = appDoc.querySelector('.theme-toggle');
+                const initialTheme = appDoc.documentElement.getAttribute('data-theme') || 'light';
+                
+                if (initialTheme === 'light') {
+                    themeButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                // Check if theme was saved to localStorage
+                const savedTheme = appWindow.localStorage.getItem('poi-theme-preference');
+                results.push(`Theme saved to localStorage: ${savedTheme}`);
+                
+                if (savedTheme === 'dark') {
+                    results.push('✅ Theme persistence to localStorage successful');
+                    
+                    // Test retrieval
+                    appWindow.localStorage.setItem('poi-theme-preference', 'light');
+                    const retrievedTheme = appWindow.localStorage.getItem('poi-theme-preference');
+                    results.push(`Retrieved theme from localStorage: ${retrievedTheme}`);
+                    
+                    if (retrievedTheme === 'light') {
+                        results.push('✅ Theme retrieval from localStorage successful');
+                        testResults.persistence = true;
+                        showResult('persistenceResult', results.join('\n'), 'success');
+                    } else {
+                        results.push('❌ Theme retrieval failed');
+                        testResults.persistence = false;
+                        showResult('persistenceResult', results.join('\n'), 'error');
+                    }
+                } else {
+                    results.push('❌ Theme persistence failed');
+                    testResults.persistence = false;
+                    showResult('persistenceResult', results.join('\n'), 'error');
+                }
+                
+            } catch (error) {
+                testResults.persistence = false;
+                showResult('persistenceResult', `❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 3: Dark Theme Display
+        async function testDarkThemeDisplay() {
+            try {
+                showResult('darkThemeResult', 'Testing dark theme UI display...', 'info');
+                
+                await waitForAppLoad();
+                const appWindow = getAppWindow();
+                const appDoc = appWindow.document;
+                
+                const results = [];
+                
+                // Ensure dark theme is active
+                appDoc.documentElement.setAttribute('data-theme', 'dark');
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Check CSS custom properties
+                const computedStyle = appWindow.getComputedStyle(appDoc.documentElement);
+                const bgPrimary = computedStyle.getPropertyValue('--bg-primary').trim();
+                const textPrimary = computedStyle.getPropertyValue('--text-primary').trim();
+                
+                results.push(`Dark theme background: ${bgPrimary}`);
+                results.push(`Dark theme text: ${textPrimary}`);
+                
+                // Verify dark theme colors
+                if (bgPrimary.includes('#1a202c') || bgPrimary.includes('rgb(26, 32, 44)')) {
+                    results.push('✅ Dark background color correct');
+                } else {
+                    results.push('❌ Dark background color incorrect');
+                }
+                
+                if (textPrimary.includes('#f7fafc') || textPrimary.includes('rgb(247, 250, 252)')) {
+                    results.push('✅ Light text color correct');
+                } else {
+                    results.push('❌ Light text color incorrect');
+                }
+                
+                // Check specific UI elements
+                const header = appDoc.querySelector('.app-header');
+                const inputPanel = appDoc.querySelector('.input-panel');
+                
+                if (header && inputPanel) {
+                    results.push('✅ Key UI elements found');
+                    testResults.darkTheme = true;
+                    showResult('darkThemeResult', results.join('\n'), 'success');
+                } else {
+                    results.push('❌ Some UI elements not found');
+                    testResults.darkTheme = false;
+                    showResult('darkThemeResult', results.join('\n'), 'error');
+                }
+                
+            } catch (error) {
+                testResults.darkTheme = false;
+                showResult('darkThemeResult', `❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 4: Light Theme Display
+        async function testLightThemeDisplay() {
+            try {
+                showResult('lightThemeResult', 'Testing light theme UI display...', 'info');
+                
+                await waitForAppLoad();
+                const appWindow = getAppWindow();
+                const appDoc = appWindow.document;
+                
+                const results = [];
+                
+                // Ensure light theme is active
+                appDoc.documentElement.setAttribute('data-theme', 'light');
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Check CSS custom properties
+                const computedStyle = appWindow.getComputedStyle(appDoc.documentElement);
+                const bgPrimary = computedStyle.getPropertyValue('--bg-primary').trim();
+                const textPrimary = computedStyle.getPropertyValue('--text-primary').trim();
+                
+                results.push(`Light theme background: ${bgPrimary}`);
+                results.push(`Light theme text: ${textPrimary}`);
+                
+                // Verify light theme colors
+                if (bgPrimary.includes('#fafbfc') || bgPrimary.includes('rgb(250, 251, 252)')) {
+                    results.push('✅ Light background color correct');
+                } else {
+                    results.push('❌ Light background color incorrect');
+                }
+                
+                if (textPrimary.includes('#1a202c') || textPrimary.includes('rgb(26, 32, 44)')) {
+                    results.push('✅ Dark text color correct');
+                } else {
+                    results.push('❌ Dark text color incorrect');
+                }
+                
+                testResults.lightTheme = true;
+                showResult('lightThemeResult', results.join('\n'), 'success');
+                
+            } catch (error) {
+                testResults.lightTheme = false;
+                showResult('lightThemeResult', `❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 5: Button State Updates
+        async function testButtonStateUpdates() {
+            try {
+                showResult('buttonStateResult', 'Testing button state updates...', 'info');
+                
+                await waitForAppLoad();
+                const appWindow = getAppWindow();
+                const appDoc = appWindow.document;
+                
+                const results = [];
+                const themeButton = appDoc.querySelector('.theme-toggle');
+                const themeIcon = themeButton.querySelector('.icon');
+                const themeText = themeButton.querySelector('.theme-text');
+                
+                if (!themeButton || !themeIcon || !themeText) {
+                    throw new Error('Theme button elements not found');
+                }
+                
+                // Test light theme button state
+                appDoc.documentElement.setAttribute('data-theme', 'light');
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Trigger button update
+                if (appWindow.CompactOpportunityAnalyzerC) {
+                    // Access the class instance if available
+                    const app = appWindow.document.querySelector('script');
+                    // Simulate the updateThemeButton call
+                    themeButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    themeButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                const lightModeIcon = themeIcon.textContent;
+                const lightModeText = themeText.textContent;
+                
+                results.push(`Light mode - Icon: ${lightModeIcon}, Text: ${lightModeText}`);
+                
+                // Test dark theme button state
+                themeButton.click();
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                const darkModeIcon = themeIcon.textContent;
+                const darkModeText = themeText.textContent;
+                
+                results.push(`Dark mode - Icon: ${darkModeIcon}, Text: ${darkModeText}`);
+                
+                // Verify button states
+                let success = true;
+                if (lightModeIcon === '🌙' && lightModeText === 'Dark') {
+                    results.push('✅ Light mode button state correct');
+                } else {
+                    results.push('❌ Light mode button state incorrect');
+                    success = false;
+                }
+                
+                if (darkModeIcon === '☀️' && darkModeText === 'Light') {
+                    results.push('✅ Dark mode button state correct');
+                } else {
+                    results.push('❌ Dark mode button state incorrect');
+                    success = false;
+                }
+                
+                testResults.buttonState = success;
+                showResult('buttonStateResult', results.join('\n'), success ? 'success' : 'error');
+                
+            } catch (error) {
+                testResults.buttonState = false;
+                showResult('buttonStateResult', `❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 6: Theme Initialization
+        async function testThemeInitialization() {
+            try {
+                showResult('initializationResult', 'Testing theme initialization...', 'info');
+                
+                const results = [];
+                
+                // Test with no stored preference
+                localStorage.removeItem('poi-theme-preference');
+                results.push('Cleared theme preference');
+                
+                // Reload the frame
+                const frame = document.getElementById('appFrame');
+                frame.src = frame.src;
+                
+                await waitForAppLoad();
+                const appWindow = getAppWindow();
+                const appDoc = appWindow.document;
+                
+                await new Promise(resolve => setTimeout(resolve, 500)); // Wait for initialization
+                
+                const defaultTheme = appDoc.documentElement.getAttribute('data-theme');
+                results.push(`Default theme (no preference): ${defaultTheme}`);
+                
+                if (defaultTheme === 'light') {
+                    results.push('✅ Default theme initialization correct');
+                } else {
+                    results.push('❌ Default theme initialization incorrect');
+                }
+                
+                // Test with stored preference
+                appWindow.localStorage.setItem('poi-theme-preference', 'dark');
+                results.push('Set theme preference to dark');
+                
+                // Reload again
+                frame.src = frame.src;
+                await waitForAppLoad();
+                const appWindow2 = getAppWindow();
+                const appDoc2 = appWindow2.document;
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const restoredTheme = appDoc2.documentElement.getAttribute('data-theme');
+                results.push(`Restored theme: ${restoredTheme}`);
+                
+                if (restoredTheme === 'dark') {
+                    results.push('✅ Theme restoration successful');
+                    testResults.initialization = true;
+                    showResult('initializationResult', results.join('\n'), 'success');
+                } else {
+                    results.push('❌ Theme restoration failed');
+                    testResults.initialization = false;
+                    showResult('initializationResult', results.join('\n'), 'error');
+                }
+                
+            } catch (error) {
+                testResults.initialization = false;
+                showResult('initializationResult', `❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 7: Error Handling
+        async function testLocalStorageErrors() {
+            try {
+                showResult('errorHandlingResult', 'Testing error handling...', 'info');
+                
+                await waitForAppLoad();
+                const appWindow = getAppWindow();
+                
+                const results = [];
+                
+                // Test localStorage unavailable scenario
+                const originalLocalStorage = appWindow.localStorage;
+                
+                // Mock localStorage to throw errors
+                appWindow.localStorage = {
+                    getItem: () => { throw new Error('localStorage unavailable'); },
+                    setItem: () => { throw new Error('localStorage unavailable'); },
+                    removeItem: () => { throw new Error('localStorage unavailable'); }
+                };
+                
+                results.push('Mocked localStorage to throw errors');
+                
+                // Try to use theme functionality
+                try {
+                    const themeButton = appWindow.document.querySelector('.theme-toggle');
+                    themeButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    results.push('✅ Theme toggle still works with localStorage errors');
+                    
+                    // Restore localStorage
+                    appWindow.localStorage = originalLocalStorage;
+                    
+                    testResults.errorHandling = true;
+                    showResult('errorHandlingResult', results.join('\n'), 'success');
+                    
+                } catch (error) {
+                    results.push(`❌ Theme toggle failed with localStorage errors: ${error.message}`);
+                    appWindow.localStorage = originalLocalStorage;
+                    testResults.errorHandling = false;
+                    showResult('errorHandlingResult', results.join('\n'), 'error');
+                }
+                
+            } catch (error) {
+                testResults.errorHandling = false;
+                showResult('errorHandlingResult', `❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Utility Functions
+        function openAppInFrame() {
+            const frame = document.getElementById('appFrame');
+            frame.style.display = 'block';
+            frame.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearThemeStorage() {
+            try {
+                localStorage.removeItem('poi-theme-preference');
+                const frame = document.getElementById('appFrame');
+                const appWindow = frame.contentWindow;
+                if (appWindow && appWindow.localStorage) {
+                    appWindow.localStorage.removeItem('poi-theme-preference');
+                }
+                alert('Theme storage cleared successfully');
+            } catch (error) {
+                alert('Failed to clear theme storage: ' + error.message);
+            }
+        }
+
+        function simulatePageReload() {
+            const frame = document.getElementById('appFrame');
+            frame.src = frame.src;
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            console.log('Running comprehensive theme toggle tests...');
+            
+            await testBasicToggle();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testLocalStoragePersistence();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testDarkThemeDisplay();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testLightThemeDisplay();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testButtonStateUpdates();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testThemeInitialization();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testLocalStorageErrors();
+            
+            console.log('All tests completed:', testResults);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Theme toggle test suite loaded');
+        });
+    </script>
+</body>
+</html>

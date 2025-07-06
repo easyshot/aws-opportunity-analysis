@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation Test</title>
+    <link rel="stylesheet" href="public/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Form Validation Test</h1>
+        
+        <form id="opportunityForm">
+            <div class="field-section">
+                <h3>Test Required Fields</h3>
+                
+                <div class="form-group">
+                    <label for="CustomerName">Customer Name <span class="required">*</span></label>
+                    <input type="text" id="CustomerName" name="CustomerName" required
+                        placeholder="Enter customer name..." data-validation="required|minLength:2">
+                    <div class="validation-indicator" id="CustomerName-indicator"></div>
+                    <div class="field-error" id="CustomerName-error"></div>
+                    <div class="field-success" id="CustomerName-success" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="oppName">Opportunity Name <span class="required">*</span></label>
+                    <input type="text" id="oppName" name="oppName" required
+                        placeholder="Enter opportunity name..." data-validation="required|minLength:3">
+                    <div class="validation-indicator" id="oppName-indicator"></div>
+                    <div class="field-error" id="oppName-error"></div>
+                    <div class="field-success" id="oppName-success" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="salesforceLink">Salesforce Link</label>
+                    <input type="url" id="salesforceLink" name="salesforceLink"
+                        placeholder="https://example.salesforce.com..." data-validation="optional|validUrl">
+                    <div class="validation-indicator" id="salesforceLink-indicator"></div>
+                    <div class="field-error" id="salesforceLink-error"></div>
+                    <div class="field-success" id="salesforceLink-success" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="closeDate">Close Date <span class="required">*</span></label>
+                    <input type="date" id="closeDate" name="closeDate" required
+                        data-validation="required|validDate|futureDate">
+                    <div class="validation-indicator" id="closeDate-indicator"></div>
+                    <div class="field-error" id="closeDate-error"></div>
+                    <div class="field-success" id="closeDate-success" style="display: none;"></div>
+                </div>
+            </div>
+        </form>
+
+        <div class="button-group">
+            <button type="button" id="oppDetQueryButtonV3" class="primary-button">
+                Test Button (Should be disabled until form is valid)
+            </button>
+        </div>
+    </div>
+
+    <script src="public/app.js"></script>
+    <script>
+        // Test validation after page loads
+        setTimeout(() => {
+            console.log('Testing validation system...');
+            
+            // Test invalid input
+            const customerField = document.getElementById('CustomerName');
+            customerField.value = 'A'; // Too short
+            customerField.dispatchEvent(new Event('input'));
+            
+            // Test valid input
+            setTimeout(() => {
+                customerField.value = 'Valid Customer Name';
+                customerField.dispatchEvent(new Event('input'));
+            }, 1000);
+            
+            // Test URL validation
+            const urlField = document.getElementById('salesforceLink');
+            urlField.value = 'invalid-url';
+            urlField.dispatchEvent(new Event('input'));
+            
+            setTimeout(() => {
+                urlField.value = 'https://example.salesforce.com';
+                urlField.dispatchEvent(new Event('input'));
+            }, 2000);
+            
+        }, 500);
+    </script>
+</body>
+</html>

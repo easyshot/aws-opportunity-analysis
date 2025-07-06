@@ -1,32 +1,47 @@
-# Partner Opportunity Intelligence - Project Structure
+# AWS Bedrock Partner Management System - Project Structure
 
 ## Directory Organization
 
 ### Root Level
-- `app.js`: Main application entry point for the backend server (currently corrupted, using app-debug.js)
-- `app-debug.js`: Debug version of the main application (currently active backend)
-- `frontend-server.js`: Separate server for serving the frontend on port 3123
-- `package.json`: Project dependencies and scripts (minimal version for core functionality)
-- `package-minimal.json`: Streamlined dependencies for essential functionality
+- `app.js`: Main application entry point for production backend server with full AWS integration
+- `app-debug.js`: Debug version with comprehensive mock data (currently active for immediate testing)
+- `frontend-server.js`: Separate server for serving the frontend on port 3123 with API proxy
+- `package.json`: Complete project dependencies and scripts for all functionality
+- `cdk.json`: AWS CDK configuration for infrastructure deployment
 - `.env`: Environment variables (not committed to version control)
+- **Implementation Summaries**: Multiple task implementation summaries documenting completed work
 
 ### `/automations`
-Contains backend automation scripts that orchestrate the analysis workflow:
-- `invokeBedrockQueryPrompt-v3.js`: Generates SQL queries using Bedrock (AWS SDK v3)
-- `InvLamFilterAut-v3.js`: Executes SQL queries via Lambda (AWS SDK v3)
-- `finalBedAnalysisPrompt-v3.js`: Analyzes data using standard Bedrock model (AWS SDK v3)
-- `finalBedAnalysisPromptNovaPremier-v3.js`: Analyzes data using Nova Premier model (AWS SDK v3)
-- (Legacy scripts without `-v3` suffix are retained for reference)
+Backend automation scripts that orchestrate the complete analysis workflow:
+- `invokeBedrockQueryPrompt-v3.js`: Generates SQL queries using Bedrock Agent (AWS SDK v3)
+- `InvLamFilterAut-v3.js`: Executes SQL queries via Lambda with error handling (AWS SDK v3)
+- `finalBedAnalysisPrompt-v3.js`: Standard Bedrock Titan model analysis (AWS SDK v3)
+- `finalBedAnalysisPromptNovaPremier-v3.js`: Enhanced Nova Premier model analysis (AWS SDK v3)
+- `enhancedFundingAnalysis-v3.js`: Multi-tier funding analysis with ROI calculations
+- `enhancedFollowOnAnalysis-v3.js`: Strategic follow-on opportunity identification
+- (Legacy scripts without `-v3` suffix retained for reference)
 
 ### `/config`
-Configuration files for AWS services:
-- `aws-config-v3.js`: AWS SDK v3 configuration (current standard)
-- `aws-config.js`: Legacy AWS SDK configuration
+Configuration files for AWS services and infrastructure:
+- `aws-config-v3.js`: Centralized AWS SDK v3 configuration with infrastructure integration
+- `infrastructure-config.js`: Infrastructure configuration management
+- `aws-config.js`: Legacy AWS SDK configuration (deprecated)
 
 ### `/lambda`
-AWS Lambda functions:
-- `catapult_get_dataset-v3.js`: Executes SQL against Athena (AWS SDK v3)
-- `catapult_get_dataset.js`: Legacy version
+AWS Lambda functions for serverless processing:
+- `catapult_get_dataset-v3.js`: Athena query execution with advanced error handling (AWS SDK v3)
+- Specialized Lambda functions for different analysis types (deployed via CDK)
+- Shared utilities layer for common functionality across all functions
+
+### `/lib`
+AWS CDK infrastructure stacks and services:
+- `aws-opportunity-analysis-stack.js`: Main infrastructure stack
+- `dynamodb-stack.js`: Database infrastructure with caching and session management
+- `bedrock-knowledge-base-stack.js`: RAG-enhanced knowledge base with OpenSearch
+- `monitoring-stack.js`: Comprehensive monitoring and observability
+- `security-stack.js`: Enterprise security controls and compliance
+- `disaster-recovery-stack.js`: Multi-region deployment and backup automation
+- **30+ specialized stacks** for different infrastructure components
 
 ### `/public` - Modern Frontend Architecture
 Multiple UI implementations with progressive enhancement:

@@ -1,5 +1,21 @@
 /* Option C: Modern Dashboard Layout */
 
+:root {
+    --bg-primary: #fafbfc;
+    --bg-secondary: #ffffff;
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --border-color: #e2e8f0;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --text-primary: #f7fafc;
+    --text-secondary: #cbd5e1;
+    --border-color: #4a5568;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -755,4 +771,391 @@ textarea:focus {
 /* Update timestamp */
 .timestamp::before {
     content: "Last updated: ";
+}
+/* Th
+eme Toggle Button */
+.theme-toggle {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.theme-toggle:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+}
+
+/* Dark mode styles */
+[data-theme="dark"] body {
+    background: #1a202c;
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .input-panel,
+[data-theme="dark"] .results-panel {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .input-field {
+    background: #4a5568;
+    border-color: #718096;
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .panel-header {
+    background: #374151;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .panel-header h2 {
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .input-label {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .metric-box {
+    background: #374151;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .metric-value {
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .services-content,
+[data-theme="dark"] .confidence-display {
+    background: #374151;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .analysis-item {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .item-header {
+    background: #374151;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .item-header h3 {
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .additional-section {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .section-header {
+    background: #374151;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .section-header h2 {
+    color: #f7fafc;
+}
+/* Add
+itional dark mode styles for complete coverage */
+[data-theme="dark"] .metrics-section {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .services-section {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .confidence-section {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .section-title {
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .metric-label {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .empty-text {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .gauge-label {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .status-text {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .char-counter {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .secondary-btn {
+    background: #374151;
+    color: #cbd5e1;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .secondary-btn:hover {
+    background: #4a5568;
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .detailed-analysis {
+    background: #1a202c;
+}
+
+[data-theme="dark"] .analysis-header h2 {
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .control-btn {
+    background: #374151;
+    color: #cbd5e1;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .control-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+[data-theme="dark"] .control-btn:hover:not(.active) {
+    background: #4a5568;
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .loading-state {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .item-status {
+    color: #34d399;
+}/* S
+tronger dark mode overrides to fix white backgrounds */
+[data-theme="dark"] .input-panel {
+    background: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #f7fafc !important;
+}
+
+[data-theme="dark"] .results-panel {
+    background: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #f7fafc !important;
+}
+
+[data-theme="dark"] .panel-header {
+    background: #374151 !important;
+    border-color: #4a5568 !important;
+    color: #f7fafc !important;
+}
+
+[data-theme="dark"] .metrics-section,
+[data-theme="dark"] .services-section,
+[data-theme="dark"] .confidence-section {
+    background: transparent !important;
+    color: #f7fafc !important;
+}
+
+[data-theme="dark"] .services-content,
+[data-theme="dark"] .confidence-display {
+    background: #374151 !important;
+    border-color: #4a5568 !important;
+    color: #f7fafc !important;
+}
+
+[data-theme="dark"] .metric-box {
+    background: #374151 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .empty-state {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .empty-icon {
+    opacity: 0.5;
+}/
+* Fix action panel (button area) dark mode */
+[data-theme="dark"] .action-panel {
+    background: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #f7fafc !important;
+}
+
+[data-theme="dark"] .opportunity-form {
+    background: transparent !important;
+    color: #f7fafc !important;
+}/
+* Final fix for action panel white background */
+[data-theme="dark"] .action-panel {
+    background: #2d3748 !important;
+    border-top-color: #4a5568 !important;
+}
+
+/* Also fix panel header backgrounds */
+[data-theme="dark"] .panel-header {
+    background: #374151 !important;
+    border-bottom-color: #4a5568 !important;
+}/* Compre
+hensive fix for all remaining white/light backgrounds in dark mode */
+[data-theme="dark"] .panel-header {
+    background: #374151 !important;
+    border-bottom-color: #4a5568 !important;
+    color: #f7fafc !important;
+}
+
+[data-theme="dark"] .panel-header h2 {
+    color: #f7fafc !important;
+}
+
+[data-theme="dark"] .completion-status .status-text {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .opportunity-form {
+    background: transparent !important;
+}
+
+/* Fix any remaining light backgrounds */
+[data-theme="dark"] .services-content {
+    background: #374151 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .confidence-display {
+    background: #374151 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .item-header {
+    background: #374151 !important;
+    border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .section-header {
+    background: #374151 !important;
+    border-color: #4a5568 !important;
+}
+/* T
+ask 4: Enhanced Theme Toggle Button Styling */
+.action-btn.theme-toggle {
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn.theme-toggle:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-1px) scale(1.02);
+}
+
+.action-btn.theme-toggle .icon {
+    transition: transform 0.3s ease;
+}
+
+.action-btn.theme-toggle:hover .icon {
+    transform: rotate(15deg);
+}
+
+.action-btn.theme-toggle .theme-text {
+    transition: opacity 0.2s ease;
+}
+
+/* Theme-specific button states for visual feedback */
+.action-btn.theme-toggle[data-current-theme="dark"] {
+    background: rgba(255,255,255,0.2);
+}
+
+.action-btn.theme-toggle[data-current-theme="light"] {
+    background: rgba(255,255,255,0.15);
+}
+
+/* Enhanced hover effects for theme toggle */
+.action-btn.theme-toggle:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Smooth transitions for theme changes */
+.action-btn.theme-toggle * {
+    transition: all 0.2s ease;
+}
+/* Er
+ror Styles */
+.validation-error, .analysis-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    color: #dc2626;
+    font-size: 14px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.validation-error strong {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.validation-error ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.validation-error li {
+    margin: 4px 0;
+}
+
+.analysis-error .error-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.analysis-error .error-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.analysis-error .error-message {
+    flex: 1;
+}
+
+[data-theme="dark"] .validation-error,
+[data-theme="dark"] .analysis-error {
+    background: #451a1a;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

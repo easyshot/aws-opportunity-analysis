@@ -9,6 +9,7 @@ class CompactOpportunityAnalyzerC {
         this.updateTimestamp();
         this.setupCharacterCounter();
         this.updateCompletionStatus();
+        this.initializeTheme();
     }
 
     initializeEventListeners() {
@@ -225,9 +226,16 @@ class CompactOpportunityAnalyzerC {
     }
 
     async analyzeOpportunity() {
-        if (this.isAnalyzing) return;
+        console.log('analyzeOpportunity called');
+        
+        if (this.isAnalyzing) {
+            console.log('Already analyzing, returning');
+            return;
+        }
 
         const errors = this.validateForm();
+        console.log('Validation errors:', errors);
+        
         if (errors.length > 0) {
             this.showValidationErrors(errors);
             return;
@@ -238,7 +246,11 @@ class CompactOpportunityAnalyzerC {
 
         try {
             const formData = this.getFormData();
+            console.log('Form data:', formData);
+            
             const response = await this.callAnalysisAPI(formData);
+            console.log('API response:', response);
+            
             this.displayResults(response);
             this.showAnalysisSection();
         } catch (error) {
@@ -878,6 +890,224 @@ class CompactOpportunityAnalyzerC {
 
     printReport() {
         window.print();
+    }
+
+    // Task 5: Add theme initialization on page load - COMPLETED
+    // Requirements: 1.5, 2.1, 2.2 - Theme restoration, default theme, button initialization
+    initializeTheme() {
+        try {
+            console.log('Initializing theme system...');
+            
+            // Initialize theme properties
+            this.themeStorageKey = 'poi-theme-preference';
+            
+            // Implement theme restoration from localStorage when the application starts
+            const storedTheme = this.getStoredTheme();
+            console.log('Stored theme preference:', storedTheme);
+            
+            // Set default theme if no preference is stored
+            this.currentTheme = storedTheme || 'light';
+            console.log('Current theme set to:', this.currentTheme);
+            
+            // Validate theme value before applying
+            if (this.currentTheme !== 'light' && this.currentTheme !== 'dark') {
+                console.warn('Invalid stored theme, defaulting to light');
+                this.currentTheme = 'light';
+            }
+            
+            // Apply the theme to the DOM
+            const themeApplied = this.applyTheme(this.currentTheme);
+            if (!themeApplied) {
+                console.error('Failed to apply theme, falling back to light theme');
+                this.currentTheme = 'light';
+                this.applyTheme(this.currentTheme);
+            }
+            
+            // Initialize button state to match the loaded theme
+            this.updateThemeButton();
+            
+            // Set up global theme toggle function for HTML onclick handlers
+            window.toggleTheme = () => this.toggleTheme();
+            
+            // Verify initialization completed successfully
+            const appliedTheme = document.documentElement.getAttribute('data-theme');
+            if (appliedTheme === this.currentTheme) {
+                console.log('Theme initialization completed successfully:', this.currentTheme);
+            } else {
+                console.error('Theme initialization verification failed');
+            }
+            
+        } catch (error) {
+            console.error('Theme initialization failed:', error);
+            
+            // Fallback initialization
+            try {
+                this.currentTheme = 'light';
+                this.themeStorageKey = 'poi-theme-preference';
+                this.applyTheme('light');
+                this.updateThemeButton();
+                window.toggleTheme = () => this.toggleTheme();
+                console.log('Fallback theme initialization completed');
+            } catch (fallbackError) {
+                console.error('Fallback theme initialization also failed:', fallbackError);
+            }
+        }
+    }
+
+    getStoredTheme() {
+        try {
+            return localStorage.getItem(this.themeStorageKey || 'poi-theme-preference');
+        } catch (error) {
+            console.warn('Failed to retrieve theme from localStorage:', error);
+            return null;
+        }
+    }
+
+    setTheme(theme) {
+        // Validate theme value
+        if (theme !== 'light' && theme !== 'dark') {
+            console.warn('Invalid theme value:', theme);
+            return false;
+        }
+
+        this.currentTheme = theme;
+        this.applyTheme(theme);
+        this.saveTheme(theme);
+        this.updateThemeButton();
+        return true;
+    }
+
+    toggleTheme() {
+        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+        
+        // Add smooth transition effect
+        this.addThemeTransition();
+    }
+
+    applyTheme(theme) {
+        try {
+            // Validate theme parameter
+            if (!theme || (theme !== 'light' && theme !== 'dark')) {
+                console.warn('Invalid theme parameter for applyTheme:', theme);
+                theme = 'light'; // Fallback to light theme
+            }
+
+            // Check if document and documentElement exist
+            if (!document || !document.documentElement) {
+                throw new Error('Document or document element not available');
+            }
+
+            // Apply theme by setting data-theme attribute on document element
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Ensure theme changes are applied immediately to all UI elements
+            // Force a reflow to ensure immediate application
+            document.documentElement.offsetHeight;
+            
+            // Verify the theme was applied successfully
+            const appliedTheme = document.documentElement.getAttribute('data-theme');
+            if (appliedTheme !== theme) {
+                throw new Error(`Theme application failed: expected ${theme}, got ${appliedTheme}`);
+            }
+
+            console.log(`Theme successfully applied: ${theme}`);
+            return true;
+
+        } catch (error) {
+            console.error('Failed to apply theme to DOM:', error);
+            
+            // Attempt fallback theme application
+            try {
+                if (document && document.documentElement) {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    console.log('Fallback to light theme applied');
+                }
+            } catch (fallbackError) {
+                console.error('Fallback theme application also failed:', fallbackError);
+            }
+            
+            return false;
+        }
+    }
+
+    saveTheme(theme) {
+        try {
+            localStorage.setItem(this.themeStorageKey || 'poi-theme-preference', theme);
+        } catch (error) {
+            console.warn('Failed to save theme to localStorage:', error);
+        }
+    }
+
+    updateThemeButton() {
+        try {
+            const themeToggle = document.querySelector('.theme-toggle');
+            if (!themeToggle) {
+                console.log('Theme toggle button not found');
+                return;
+            }
+
+            const themeIcon = themeToggle.querySelector('.icon');
+            const themeText = themeToggle.querySelector('.theme-text');
+
+            if (this.currentTheme === 'dark') {
+                if (themeIcon) themeIcon.textContent = '☀️';
+                if (themeText) themeText.textContent = 'Light';
+                themeToggle.title = 'Switch to Light Mode';
+            } else {
+                if (themeIcon) themeIcon.textContent = '🌙';
+                if (themeText) themeText.textContent = 'Dark';
+                themeToggle.title = 'Switch to Dark Mode';
+            }
+        } catch (error) {
+            console.error('Failed to update theme button:', error);
+        }
+    }
+
+    addThemeTransition() {
+        try {
+            if (document && document.body) {
+                document.body.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    if (document && document.body) {
+                        document.body.style.transition = '';
+                    }
+                }, 300);
+            }
+        } catch (error) {
+            console.warn('Failed to add theme transition effect:', error);
+        }
+    }
+
+    showError(message) {
+        this.removeExistingErrors();
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'analysis-error';
+        errorDiv.innerHTML = `
+            <div class="error-content">
+                <span class="error-icon">⚠️</span>
+                <span class="error-message">${message}</span>
+            </div>
+        `;
+        
+        const actionPanel = document.querySelector('.action-panel');
+        if (actionPanel) {
+            actionPanel.parentNode.insertBefore(errorDiv, actionPanel);
+        }
+    }
+
+    showAnalysisSection() {
+        const detailedAnalysis = document.getElementById('detailedAnalysis');
+        const additionalSections = document.getElementById('additionalSections');
+        
+        if (detailedAnalysis) {
+            detailedAnalysis.style.display = 'block';
+        }
+        
+        if (additionalSections) {
+            additionalSections.style.display = 'block';
+        }
     }
 }
 
