@@ -1,6 +1,36 @@
 # Partner Opportunity Intelligence Application - Changelog
 
-## [2.0.0] - 2025-07-03 (Current Release)
+## [2.1.0] - 2025-07-06 (Current Release)
+### Enhanced Debugging and Backend Stability
+
+#### Added - Debugging and Troubleshooting
+- **Real-time Debug Panels**: Frontend display of SQL queries, query results, and Bedrock payloads
+- **Enhanced Backend Logging**: Comprehensive debug output in automation scripts
+- **Data Flow Tracing**: End-to-end visibility from frontend input to Bedrock response
+- **Payload Inspection**: Detailed view of data sent to and received from Bedrock
+- **Error Identification**: Clear identification of where data flow breaks down
+- **Debug Configuration**: Environment variables for enabling debug features
+
+#### Added - Operational Excellence
+- **Troubleshooting Runbooks**: Comprehensive troubleshooting procedures for common issues
+- **Operational Procedures**: Complete operational procedures and maintenance guides
+- **Capacity Planning**: Performance baselines and scaling guidance
+- **Disaster Recovery**: Backup and recovery procedures with automated testing
+- **Health Monitoring**: Multi-tier health checks and automated diagnostics
+
+#### Changed - Backend Architecture
+- **Backend Stability**: Currently using app-debug.js for stable operation (app.js has corruption issues)
+- **Enhanced Error Handling**: Improved error handling with detailed context and stack traces
+- **Performance Monitoring**: Real-time performance metrics and bottleneck identification
+- **Debug Integration**: Comprehensive debugging capabilities throughout the analysis workflow
+
+#### Fixed - Data Flow Issues
+- **Query Results Tracing**: Enhanced visibility into SQL query generation and execution
+- **Bedrock Payload Debugging**: Complete capture and display of data sent to Bedrock
+- **Mock Data Investigation**: Ongoing work to resolve why Bedrock generates mock data instead of real data
+- **Response Processing**: Improved parsing and display of Bedrock analysis results
+
+## [2.0.0] - 2025-07-03
 ### Major Release - Modern Dashboard Interface
 
 #### Added - Modern UI Architecture
@@ -68,6 +98,12 @@
 
 ## Migration Notes
 
+### From v2.0.0 to v2.1.0
+- **Debug Features**: New debug panels automatically available in the modern interface
+- **Backend Status**: Continue using app-debug.js for stable operation
+- **Configuration**: Add debug environment variables for enhanced troubleshooting
+- **Documentation**: New troubleshooting runbooks and operational procedures available
+
 ### From v0.3.5.0 to v2.0.0
 - **Interface Change**: Primary interface moved from `/` to `/index-compact.html`
 - **New Features**: All new real-time features are automatically available
@@ -78,5 +114,18 @@
 ### Recommended Actions
 1. **Update Bookmarks**: Use `http://localhost:3123/index-compact.html` for the modern interface
 2. **Test New Features**: Explore the enhanced analysis capabilities and interactive elements
-3. **Provide Feedback**: Report any issues or suggestions for further improvements
-4. **Training**: Familiarize users with the new interface and enhanced functionality 
+3. **Enable Debugging**: Configure debug environment variables for troubleshooting
+4. **Review Documentation**: Familiarize with new troubleshooting runbooks and operational procedures
+5. **Provide Feedback**: Report any issues or suggestions for further improvements
+6. **Training**: Familiarize users with the new interface and enhanced functionality
+
+## Known Issues
+- **Backend Stability**: Main app.js has corruption issues, using app-debug.js for stability
+- **Mock Data Generation**: Bedrock sometimes generates mock data instead of using real query results
+- **Data Flow Debugging**: Ongoing investigation into query results to Bedrock payload injection
+
+## Upcoming Fixes
+- **Backend Corruption**: Resolution of app.js corruption and migration to production backend
+- **Real Data Flow**: Implementation of fixes to ensure real data is used in analysis
+- **Performance Optimization**: Caching implementation and load testing
+- **Production Readiness**: Complete AWS integration validation and monitoring setup 

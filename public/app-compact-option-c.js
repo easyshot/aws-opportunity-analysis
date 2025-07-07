@@ -167,15 +167,14 @@ class CompactOpportunityAnalyzerC {
             }
         });
 
-        // Validate close date
+        // Validate close date format (but allow past dates)
         const closeDate = document.getElementById('closeDate');
         if (closeDate && closeDate.value) {
             const selectedDate = new Date(closeDate.value);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
             
-            if (selectedDate < today) {
-                errors.push('Close Date must be in the future');
+            // Check if the date is valid
+            if (isNaN(selectedDate.getTime())) {
+                errors.push('Please enter a valid close date');
                 this.highlightError(closeDate);
             }
         }
@@ -264,11 +263,11 @@ class CompactOpportunityAnalyzerC {
 
     getFormData() {
         return {
-            customerName: document.getElementById('customerName').value,
+            CustomerName: document.getElementById('customerName').value,
             region: document.getElementById('region').value,
             closeDate: document.getElementById('closeDate').value,
-            opportunityName: document.getElementById('opportunityName').value,
-            description: document.getElementById('description').value
+            oppName: document.getElementById('opportunityName').value,
+            oppDescription: document.getElementById('description').value
         };
     }
 
@@ -322,6 +321,18 @@ class CompactOpportunityAnalyzerC {
     }
 
     displayResults(data) {
+        console.log('Frontend displayResults - Received data:', {
+            methodology: data.methodology?.substring(0, 100) + '...',
+            findings: data.findings?.substring(0, 100) + '...',
+            riskFactors: data.riskFactors?.substring(0, 100) + '...',
+            similarProjects: data.similarProjects?.substring(0, 100) + '...',
+            rationale: data.rationale?.substring(0, 100) + '...',
+            fullAnalysis: data.fullAnalysis?.substring(0, 100) + '...',
+            fundingOptions: data.fundingOptions?.substring(0, 100) + '...',
+            followOnOpportunities: data.followOnOpportunities?.substring(0, 100) + '...',
+            formattedSummaryText: data.formattedSummaryText?.substring(0, 100) + '...'
+        });
+
         // Update metrics with enhanced animations
         this.updateMetricWithAnimation('predictedArr', data.metrics?.predictedArr || 'N/A');
         this.updateMetricWithAnimation('predictedMrr', data.metrics?.predictedMrr || 'N/A');
@@ -334,15 +345,21 @@ class CompactOpportunityAnalyzerC {
         // Update top services with modern layout
         this.updateElement('topServices', this.formatServicesModern(data.metrics?.topServices || data.services));
 
-        // Update analysis sections with rich content
-        this.updateElement('methodology', data.methodology || this.generateModernMethodology());
-        this.updateElement('findings', data.findings || this.generateModernFindings());
-        this.updateElement('riskFactors', data.riskFactors || this.generateModernRiskFactors());
-        this.updateElement('similarProjects', data.similarProjects || this.generateModernSimilarProjects());
-        this.updateElement('rationale', data.rationale || this.generateModernRationale());
-        this.updateElement('fullAnalysis', data.fullAnalysis || this.generateModernFullAnalysis());
-        this.updateElement('fundingOptions', data.fundingOptions || this.generateModernFundingOptions());
-        this.updateElement('followOnOpportunities', data.followOnOpportunities || this.generateModernFollowOnOpportunities());
+        // Update analysis sections with actual Bedrock response data
+        this.updateElement('methodology', data.methodology || 'Analysis methodology not available');
+        this.updateElement('findings', data.findings || 'Key findings not available');
+        this.updateElement('riskFactors', data.riskFactors || 'Risk factors not available');
+        this.updateElement('similarProjects', data.similarProjects || 'Similar projects not available');
+        this.updateElement('rationale', data.rationale || 'Analysis rationale not available');
+        this.updateElement('fullAnalysis', data.fullAnalysis || 'Full analysis not available');
+        this.updateElement('fundingOptions', data.fundingOptions || 'Funding options not available');
+        this.updateElement('followOnOpportunities', data.followOnOpportunities || 'Follow-on opportunities not available');
+        
+        // Display the complete Bedrock response
+        this.updateElement('bedrockResponse', data.formattedSummaryText || 'Complete Bedrock response not available');
+
+        // Update debug information
+        this.updateDebugInfo(data);
     }
 
     updateMetricWithAnimation(id, value) {
@@ -1100,6 +1117,7 @@ class CompactOpportunityAnalyzerC {
     showAnalysisSection() {
         const detailedAnalysis = document.getElementById('detailedAnalysis');
         const additionalSections = document.getElementById('additionalSections');
+        const debugSection = document.getElementById('debugSection');
         
         if (detailedAnalysis) {
             detailedAnalysis.style.display = 'block';
@@ -1108,6 +1126,39 @@ class CompactOpportunityAnalyzerC {
         if (additionalSections) {
             additionalSections.style.display = 'block';
         }
+        
+        if (debugSection) {
+            debugSection.style.display = 'block';
+        }
+    }
+
+    updateDebugInfo(data) {
+        // Update SQL Query (this will be populated from backend)
+        const sqlQueryElement = document.getElementById('debugSqlQuery');
+        if (sqlQueryElement) {
+            sqlQueryElement.value = data.debug?.sqlQuery || 'SQL query not available in response';
+        }
+
+        // Update Query Results (this will be populated from backend)
+        const queryResultsElement = document.getElementById('debugQueryResults');
+        if (queryResultsElement) {
+            queryResultsElement.value = data.debug?.queryResults || 'Query results not available in response';
+        }
+
+        // Update Full Bedrock Response
+        const fullResponseElement = document.getElementById('debugFullResponse');
+        if (fullResponseElement) {
+            fullResponseElement.value = data.formattedSummaryText || data.debug?.fullResponse || 'Full response not available';
+        }
+    }
+}
+
+// Global functions for debug functionality
+function toggleDebugSection() {
+    const debugSection = document.getElementById('debugSection');
+    if (debugSection) {
+        const isVisible = debugSection.style.display !== 'none';
+        debugSection.style.display = isVisible ? 'none' : 'block';
     }
 }
 

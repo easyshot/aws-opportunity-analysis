@@ -21,12 +21,14 @@ exports.execute = async (params) => {
     if (typeof params === 'string') {
       try {
         const parsedParams = JSON.parse(params);
-        sqlQuery = parsedParams.query;
+        sqlQuery = parsedParams.sql_query || parsedParams.query;
       } catch (e) {
         sqlQuery = params;
       }
     } else if (params.query) {
       sqlQuery = params.query;
+    } else if (params.sql_query) {
+      sqlQuery = params.sql_query;
     }
     
     if (!sqlQuery) {
@@ -82,7 +84,15 @@ async function invokeLambda(payload) {
     // Extract the body if it exists
     const body = parsedResponse.body ? JSON.parse(parsedResponse.body) : parsedResponse;
     
-    return body.ResultSet ? JSON.stringify(body.ResultSet) : JSON.stringify(body);
+    const result = body.ResultSet ? JSON.stringify(body.ResultSet) : JSON.stringify(body);
+    console.log("InvLamFilterAut: Lambda returned data length:", result.length);
+    console.log("InvLamFilterAut: First 500 chars of returned data:", result.substring(0, 500));
+    
+    // Store the query results for debug purposes
+    if (!global.debugInfo) global.debugInfo = {};
+    global.debugInfo.queryResults = result;
+    
+    return result;
   } catch (error) {
     console.error('Error invoking Lambda function:', error);
     throw new Error(`Failed to invoke Lambda function: ${error.message}`);

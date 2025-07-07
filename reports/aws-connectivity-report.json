@@ -1,0 +1,358 @@
+{
+  "timestamp": "2025-07-06T23:20:41.744Z",
+  "metadata": {
+    "version": "1.0.0",
+    "environment": "development",
+    "region": "us-east-1"
+  },
+  "summary": {
+    "total": 10,
+    "healthy": 0,
+    "degraded": 1,
+    "unhealthy": 9,
+    "averageResponseTime": 63,
+    "overallStatus": "unhealthy"
+  },
+  "services": {
+    "core": [
+      {
+        "service": "Lambda Function",
+        "status": "unhealthy",
+        "responseTime": 0,
+        "error": "CATAPULT_GET_DATASET_LAMBDA environment variable not set",
+        "timestamp": "2025-07-06T23:20:41.772Z"
+      }
+    ],
+    "ai": [
+      {
+        "service": "Bedrock Agent",
+        "status": "unhealthy",
+        "responseTime": 0,
+        "error": "CATAPULT_QUERY_PROMPT_ID environment variable not set",
+        "timestamp": "2025-07-06T23:20:41.772Z"
+      },
+      {
+        "service": "Bedrock Runtime",
+        "status": "unhealthy",
+        "responseTime": 75,
+        "error": "Could not load credentials from any providers",
+        "timestamp": "2025-07-06T23:20:41.847Z"
+      },
+      {
+        "service": "Bedrock Prompts",
+        "status": "degraded",
+        "responseTime": 2,
+        "details": {
+          "accessible": 0,
+          "total": 3,
+          "prompts": [
+            {
+              "error": "Query Prompt ID not configured"
+            },
+            {
+              "error": "Analysis Prompt ID not configured"
+            },
+            {
+              "error": "Nova Premier Prompt ID not configured"
+            }
+          ]
+        },
+        "timestamp": "2025-07-06T23:20:41.774Z"
+      }
+    ],
+    "data": [
+      {
+        "service": "Athena Database",
+        "status": "unhealthy",
+        "responseTime": 74,
+        "error": "Could not load credentials from any providers",
+        "timestamp": "2025-07-06T23:20:41.847Z"
+      },
+      {
+        "service": "Athena S3 Access",
+        "status": "unhealthy",
+        "responseTime": 0,
+        "error": "ATHENA_OUTPUT_LOCATION environment variable not set",
+        "timestamp": "2025-07-06T23:20:41.773Z"
+      },
+      {
+        "service": "DynamoDB Tables",
+        "status": "unhealthy",
+        "responseTime": 75,
+        "error": "Could not load credentials from any providers",
+        "timestamp": "2025-07-06T23:20:41.848Z"
+      },
+      {
+        "service": "S3 Access",
+        "status": "unhealthy",
+        "responseTime": 0,
+        "error": "ATHENA_OUTPUT_LOCATION environment variable not set",
+        "timestamp": "2025-07-06T23:20:41.774Z"
+      }
+    ],
+    "infrastructure": [
+      {
+        "service": "AWS Credentials",
+        "status": "unhealthy",
+        "responseTime": 77,
+        "error": "Could not load credentials from any providers",
+        "timestamp": "2025-07-06T23:20:41.846Z"
+      },
+      {
+        "service": "EventBridge",
+        "status": "unhealthy",
+        "responseTime": 75,
+        "error": "Could not load credentials from any providers",
+        "timestamp": "2025-07-06T23:20:41.848Z"
+      }
+    ],
+    "monitoring": []
+  },
+  "analysis": {
+    "criticalIssues": [
+      {
+        "service": "AWS Credentials",
+        "error": "Could not load credentials from any providers",
+        "impact": "All AWS services will be inaccessible"
+      },
+      {
+        "service": "Bedrock Agent",
+        "error": "CATAPULT_QUERY_PROMPT_ID environment variable not set",
+        "impact": "Query generation will fail"
+      },
+      {
+        "service": "Bedrock Runtime",
+        "error": "Could not load credentials from any providers",
+        "impact": "AI analysis will be unavailable"
+      },
+      {
+        "service": "Lambda Function",
+        "error": "CATAPULT_GET_DATASET_LAMBDA environment variable not set",
+        "impact": "Data retrieval from Athena will fail"
+      },
+      {
+        "service": "Athena Database",
+        "error": "Could not load credentials from any providers",
+        "impact": "Historical data queries will fail"
+      },
+      {
+        "service": "Athena S3 Access",
+        "error": "ATHENA_OUTPUT_LOCATION environment variable not set",
+        "impact": "Query results cannot be stored"
+      },
+      {
+        "service": "DynamoDB Tables",
+        "error": "Could not load credentials from any providers",
+        "impact": "Caching and session management affected"
+      },
+      {
+        "service": "EventBridge",
+        "error": "Could not load credentials from any providers",
+        "impact": "Event-driven features may not work"
+      },
+      {
+        "service": "S3 Access",
+        "error": "ATHENA_OUTPUT_LOCATION environment variable not set",
+        "impact": "File storage and retrieval affected"
+      }
+    ],
+    "performanceIssues": [],
+    "configurationIssues": [
+      {
+        "service": "Bedrock Agent",
+        "error": "CATAPULT_QUERY_PROMPT_ID environment variable not set",
+        "suggestion": "Check .env file and ensure all required environment variables are set"
+      },
+      {
+        "service": "Lambda Function",
+        "error": "CATAPULT_GET_DATASET_LAMBDA environment variable not set",
+        "suggestion": "Check .env file and ensure all required environment variables are set"
+      },
+      {
+        "service": "Athena S3 Access",
+        "error": "ATHENA_OUTPUT_LOCATION environment variable not set",
+        "suggestion": "Check .env file and ensure all required environment variables are set"
+      },
+      {
+        "service": "S3 Access",
+        "error": "ATHENA_OUTPUT_LOCATION environment variable not set",
+        "suggestion": "Check .env file and ensure all required environment variables are set"
+      }
+    ],
+    "networkIssues": [],
+    "patterns": [
+      {
+        "type": "widespread_failure",
+        "description": "More than half of services are unhealthy",
+        "suggestion": "Check AWS credentials and network connectivity"
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "Critical",
+      "category": "Service Health",
+      "issue": "9 services are unhealthy",
+      "action": "Address unhealthy services before proceeding with deployment",
+      "services": [
+        "AWS Credentials",
+        "Bedrock Agent",
+        "Bedrock Runtime",
+        "Lambda Function",
+        "Athena Database",
+        "Athena S3 Access",
+        "DynamoDB Tables",
+        "EventBridge",
+        "S3 Access"
+      ]
+    },
+    {
+      "priority": "High",
+      "category": "Configuration",
+      "issue": "Configuration errors detected",
+      "action": "Review and fix configuration issues",
+      "details": [
+        {
+          "service": "Bedrock Agent",
+          "error": "CATAPULT_QUERY_PROMPT_ID environment variable not set"
+        },
+        {
+          "service": "Lambda Function",
+          "error": "CATAPULT_GET_DATASET_LAMBDA environment variable not set"
+        },
+        {
+          "service": "Athena S3 Access",
+          "error": "ATHENA_OUTPUT_LOCATION environment variable not set"
+        },
+        {
+          "service": "S3 Access",
+          "error": "ATHENA_OUTPUT_LOCATION environment variable not set"
+        }
+      ]
+    }
+  ],
+  "troubleshooting": {
+    "commonIssues": [
+      {
+        "issue": "AWS Credentials Invalid",
+        "symptoms": [
+          "Access denied errors",
+          "Unauthorized responses"
+        ],
+        "solutions": [
+          "Verify AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are set",
+          "Check if credentials have expired",
+          "Ensure credentials have necessary permissions",
+          "Try using AWS CLI to test credentials: aws sts get-caller-identity"
+        ]
+      },
+      {
+        "issue": "Environment Variables Missing",
+        "symptoms": [
+          "Environment variable not set errors"
+        ],
+        "solutions": [
+          "Copy .env.template to .env",
+          "Fill in all required environment variables",
+          "Restart the application after updating .env",
+          "Verify environment variables are loaded: echo $AWS_REGION"
+        ]
+      },
+      {
+        "issue": "Network Connectivity Issues",
+        "symptoms": [
+          "Timeout errors",
+          "Connection refused",
+          "DNS resolution failures"
+        ],
+        "solutions": [
+          "Check internet connectivity",
+          "Verify firewall settings allow HTTPS traffic",
+          "Test DNS resolution: nslookup bedrock-runtime.us-east-1.amazonaws.com",
+          "Check if VPN or proxy is interfering"
+        ]
+      },
+      {
+        "issue": "IAM Permission Issues",
+        "symptoms": [
+          "Access denied for specific services",
+          "Unauthorized operation"
+        ],
+        "solutions": [
+          "Review IAM policies attached to your user/role",
+          "Ensure policies include necessary service permissions",
+          "Check if service is available in your region",
+          "Verify resource ARNs in policies are correct"
+        ]
+      }
+    ],
+    "serviceSpecific": {
+      "AWS Credentials": {
+        "error": "Could not load credentials from any providers",
+        "suggestions": []
+      },
+      "Bedrock Agent": {
+        "error": "CATAPULT_QUERY_PROMPT_ID environment variable not set",
+        "suggestions": [
+          "Verify Bedrock is available in your AWS region",
+          "Check if you have access to Bedrock service",
+          "Ensure prompt IDs are correct and accessible",
+          "Review Bedrock IAM permissions"
+        ]
+      },
+      "Bedrock Runtime": {
+        "error": "Could not load credentials from any providers",
+        "suggestions": [
+          "Verify Bedrock is available in your AWS region",
+          "Check if you have access to Bedrock service",
+          "Ensure prompt IDs are correct and accessible",
+          "Review Bedrock IAM permissions"
+        ]
+      },
+      "Lambda Function": {
+        "error": "CATAPULT_GET_DATASET_LAMBDA environment variable not set",
+        "suggestions": [
+          "Verify Lambda function exists and is deployed",
+          "Check Lambda function name in environment variables",
+          "Ensure Lambda execution role has necessary permissions",
+          "Review Lambda function logs for errors"
+        ]
+      },
+      "Athena Database": {
+        "error": "Could not load credentials from any providers",
+        "suggestions": [
+          "Verify Athena database exists",
+          "Check S3 bucket permissions for Athena results",
+          "Ensure Athena service role has S3 access",
+          "Verify S3 bucket exists and is accessible"
+        ]
+      },
+      "Athena S3 Access": {
+        "error": "ATHENA_OUTPUT_LOCATION environment variable not set",
+        "suggestions": [
+          "Verify Athena database exists",
+          "Check S3 bucket permissions for Athena results",
+          "Ensure Athena service role has S3 access",
+          "Verify S3 bucket exists and is accessible"
+        ]
+      },
+      "DynamoDB Tables": {
+        "error": "Could not load credentials from any providers",
+        "suggestions": [
+          "Deploy DynamoDB tables using infrastructure scripts",
+          "Verify table names match application configuration",
+          "Check DynamoDB permissions in IAM policy",
+          "Ensure tables are in the correct region"
+        ]
+      },
+      "EventBridge": {
+        "error": "Could not load credentials from any providers",
+        "suggestions": []
+      },
+      "S3 Access": {
+        "error": "ATHENA_OUTPUT_LOCATION environment variable not set",
+        "suggestions": []
+      }
+    }
+  }
+}

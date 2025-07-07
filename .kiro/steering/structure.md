@@ -3,8 +3,8 @@
 ## Directory Organization
 
 ### Root Level
-- `app.js`: Main application entry point for production backend server with full AWS integration
-- `app-debug.js`: Debug version with comprehensive mock data (currently active for immediate testing)
+- `app.js`: Main application entry point for production backend server with full AWS integration (currently has corruption issues)
+- `app-debug.js`: Debug version with comprehensive mock data and enhanced debugging (currently active for stable operation)
 - `frontend-server.js`: Separate server for serving the frontend on port 3123 with API proxy
 - `package.json`: Complete project dependencies and scripts for all functionality
 - `cdk.json`: AWS CDK configuration for infrastructure deployment
@@ -12,11 +12,11 @@
 - **Implementation Summaries**: Multiple task implementation summaries documenting completed work
 
 ### `/automations`
-Backend automation scripts that orchestrate the complete analysis workflow:
+Backend automation scripts that orchestrate the complete analysis workflow with enhanced debugging:
 - `invokeBedrockQueryPrompt-v3.js`: Generates SQL queries using Bedrock Agent (AWS SDK v3)
 - `InvLamFilterAut-v3.js`: Executes SQL queries via Lambda with error handling (AWS SDK v3)
-- `finalBedAnalysisPrompt-v3.js`: Standard Bedrock Titan model analysis (AWS SDK v3)
-- `finalBedAnalysisPromptNovaPremier-v3.js`: Enhanced Nova Premier model analysis (AWS SDK v3)
+- `finalBedAnalysisPrompt-v3.js`: Standard Bedrock Titan model analysis with comprehensive debugging (AWS SDK v3)
+- `finalBedAnalysisPromptNovaPremier-v3.js`: Enhanced Nova Premier model analysis with debugging (AWS SDK v3)
 - `enhancedFundingAnalysis-v3.js`: Multi-tier funding analysis with ROI calculations
 - `enhancedFollowOnAnalysis-v3.js`: Strategic follow-on opportunity identification
 - (Legacy scripts without `-v3` suffix retained for reference)
@@ -44,12 +44,12 @@ AWS CDK infrastructure stacks and services:
 - **30+ specialized stacks** for different infrastructure components
 
 ### `/public` - Modern Frontend Architecture
-Multiple UI implementations with progressive enhancement:
+Multiple UI implementations with progressive enhancement and debugging capabilities:
 
 #### Core Application Files
 - `index-compact.html`: **Main application** (Option C - Modern Dashboard)
 - `styles-compact.css`: **Main stylesheet** (Option C styles)
-- `app-compact.js`: **Main JavaScript** (Option C functionality)
+- `app-compact.js`: **Main JavaScript** (Option C functionality with debug panels)
 
 #### Alternative UI Options
 - **Option A - Clean Professional**:
@@ -65,7 +65,7 @@ Multiple UI implementations with progressive enhancement:
 - **Option C - Modern Dashboard** (Active):
   - `index-compact-option-c.html`: Contemporary dashboard with rich visual elements
   - `styles-compact-option-c.css`: Modern styling with gradients and animations
-  - `app-compact-option-c.js`: Full-featured with real-time updates and advanced UX
+  - `app-compact-option-c.js`: Full-featured with real-time updates, advanced UX, and debug panels
 
 #### Legacy Files (Maintained for Reference)
 - `index.html`: Original application interface
@@ -88,12 +88,14 @@ Multiple UI implementations with progressive enhancement:
 - **Grid/List View Toggle**: Flexible analysis result viewing options
 - **Live Timestamps**: Real-time timestamp updates in header
 - **Sample Data Loading**: Quick-load functionality for testing and demonstrations
+- **Debug Information Panels**: Real-time display of SQL queries, query results, and Bedrock payloads for troubleshooting
 
 ### Enhanced Analysis Sections
 - **Six Core Analysis Areas**: Methodology, Findings, Risk Factors, Similar Projects, Rationale, Full Analysis
 - **Dedicated Funding Section**: Comprehensive funding options and investment strategies
 - **Dedicated Follow-On Section**: Future growth opportunities and expansion potential
 - **Interactive Content**: Rich formatting with visual elements, cards, and structured layouts
+- **Debug Data Display**: Real-time visibility into data flow and processing steps
 
 ## Code Patterns
 
@@ -104,29 +106,34 @@ Each UI option follows a consistent class-based pattern:
 3. **API Integration**: Async/await pattern for backend communication
 4. **Result Display**: Dynamic content generation with rich formatting
 5. **State Management**: localStorage integration for data persistence
+6. **Debug Integration**: Real-time display of backend data flow and processing
 
 ### Backend Integration Pattern
 - **Debug Mode**: Currently using `app-debug.js` for stable backend operation
 - **Mock Data**: Rich sample data generation for comprehensive testing
 - **Error Handling**: Graceful degradation with user-friendly error messages
 - **Loading States**: Visual feedback during analysis processing
+- **Enhanced Logging**: Comprehensive debug output for troubleshooting data flow issues
 
 ### AWS Integration Pattern
 - AWS services are accessed through the AWS SDK v3
 - Credentials and configuration are centralized in `config/aws-config-v3.js`
 - Environment variables are used for sensitive information
 - Bedrock prompt management is handled via prompt IDs in environment variables
+- Enhanced debugging provides visibility into data flow from frontend to Bedrock
 
 ### API Structure
 - RESTful API endpoints in backend server
 - Main endpoint: `/api/analyze` for opportunity analysis (supports both standard and Nova Premier flows)
 - Mock endpoint: `/api/analyze/mock` for development/testing
 - Frontend proxy: Port 3123 proxies API requests to backend on port 8123
+- Debug endpoints: Enhanced logging and payload inspection for troubleshooting
 
 ## Version Naming Convention
 - **UI Options**: `option-a`, `option-b`, `option-c` for different design approaches
 - **AWS SDK**: Files with `-v3` suffix use AWS SDK v3 and are the current standard
 - **Legacy Support**: Files without version suffix are retained for reference
+- **Debug Mode**: `app-debug.js` for stable operation, `app.js` for production (when fixed)
 
 ## Data Flow
 
@@ -135,14 +142,16 @@ Each UI option follows a consistent class-based pattern:
 2. **Auto-save**: Automatic data persistence to localStorage
 3. **Validation**: Client-side validation with visual feedback before submission
 4. **API Call**: Async request to backend with loading state management
-5. **Result Display**: Dynamic content generation with rich formatting and animations
-6. **Export Options**: Professional export and print capabilities
+5. **Debug Display**: Real-time display of SQL queries, query results, and Bedrock payloads
+6. **Result Display**: Dynamic content generation with rich formatting and animations
+7. **Export Options**: Professional export and print capabilities
 
 ### Backend Processing Flow
 1. Frontend collects user input with enhanced validation
-2. Backend processes the request through a series of automations:
+2. Backend processes the request through a series of automations with enhanced debugging:
    - `invokeBedrockQueryPrompt-v3` → `InvLamFilterAut-v3` → `finalBedAnalysisPrompt-v3` or `finalBedAnalysisPromptNovaPremier-v3`
-3. Results are returned to the frontend for enhanced display with rich formatting
+3. Debug information is captured and displayed in real-time
+4. Results are returned to the frontend for enhanced display with rich formatting
 
 ## Development Guidelines
 
@@ -151,15 +160,25 @@ Each UI option follows a consistent class-based pattern:
 - Maintain backward compatibility with Options A and B
 - Follow modern web standards with responsive design
 - Implement progressive enhancement for accessibility
+- Include debug panels for troubleshooting data flow issues
 
 ### Code Standards
 - Use ES6+ features with class-based architecture
 - Implement proper error handling and user feedback
 - Follow consistent naming conventions across all options
 - Maintain separation of concerns between HTML, CSS, and JavaScript
+- Include comprehensive debugging and logging for troubleshooting
 
 ### Performance Considerations
 - Optimize for fast loading with minimal dependencies
 - Implement efficient DOM manipulation and event handling
 - Use CSS animations for smooth user experience
 - Minimize API calls with intelligent caching
+- Ensure debug information doesn't impact performance
+
+### Debugging and Troubleshooting
+- **Frontend Debug Panels**: Real-time display of SQL queries, query results, and Bedrock payloads
+- **Backend Enhanced Logging**: Comprehensive debug output in automation scripts
+- **Data Flow Tracing**: End-to-end visibility from frontend input to Bedrock response
+- **Error Identification**: Clear identification of where data flow breaks down
+- **Operational Documentation**: Comprehensive guides for troubleshooting and maintenance

@@ -276,6 +276,16 @@
                         <div class="loading-state">Complete analysis will appear here...</div>
                     </div>
                 </div>
+
+                <div class="analysis-item bedrock-response">
+                    <div class="item-header">
+                        <h3>🤖 Complete Bedrock Response</h3>
+                        <div class="item-status">Raw Analysis</div>
+                    </div>
+                    <div class="item-content" id="bedrockResponse">
+                        <div class="loading-state">Complete Bedrock response will appear here...</div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -300,6 +310,31 @@
                     <div class="section-content" id="followOnOpportunities">
                         <div class="loading-state">Future opportunities will appear here...</div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Debug Section -->
+        <section class="debug-section" id="debugSection" style="display: none;">
+            <div class="debug-header">
+                <h2>🔧 Debug Information</h2>
+                <button class="debug-toggle" onclick="toggleDebugSection()">Toggle Debug</button>
+            </div>
+            
+            <div class="debug-content">
+                <div class="debug-item">
+                    <h3>1. SQL Query Generated</h3>
+                    <textarea id="debugSqlQuery" class="debug-textarea" readonly placeholder="SQL query will appear here after analysis..."></textarea>
+                </div>
+                
+                <div class="debug-item">
+                    <h3>2. Query Results</h3>
+                    <textarea id="debugQueryResults" class="debug-textarea" readonly placeholder="Query results will appear here after analysis..."></textarea>
+                </div>
+                
+                <div class="debug-item">
+                    <h3>3. Full Bedrock Analysis Response</h3>
+                    <textarea id="debugFullResponse" class="debug-textarea" readonly placeholder="Full Bedrock response will appear here after analysis..."></textarea>
                 </div>
             </div>
         </section>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Test</title>
+</head>
+<body>
+    <h1>Button Test</h1>
+    <button onclick="testAnalyze()">Test Analyze Button</button>
+    
+    <script>
+        function testAnalyze() {
+            console.log('Test button clicked');
+            
+            // Test the API endpoint
+            fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customerName: 'Test Customer',
+                    region: 'United States',
+                    closeDate: '2025-12-31',
+                    opportunityName: 'Test Opportunity',
+                    description: 'This is a test description with more than 50 characters to meet validation requirements.'
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                alert('API call successful! Check console for details.');
+            })
+            .catch(error => {
+                console.error('API call failed:', error);
+                alert('API call failed: ' + error.message);
+            });
+        }
+    </script>
+</body>
+</html>

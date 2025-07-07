@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode - No Whitespace Test</title>
+    <link rel="stylesheet" href="public/styles-compact-option-c.css">
+    <style>
+        .test-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .whitespace-check {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        [data-theme="dark"] .test-info,
+        [data-theme="dark"] .whitespace-check {
+            background: rgba(255,255,255,0.1);
+            color: #f7fafc;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <strong>Dark Mode Test</strong><br>
+        Current Theme: <span id="currentTheme">light</span><br>
+        Click the dark mode button to test
+    </div>
+    
+    <div class="whitespace-check">
+        <strong>Whitespace Check</strong><br>
+        <span id="whitespaceStatus">Checking...</span>
+    </div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Dark Mode - No Whitespace Test</h1>
+                <div class="header-meta">
+                    <span class="timestamp" id="currentTime"></span>
+                    <div class="header-actions">
+                        <button class="action-btn theme-toggle" onclick="toggleTheme()" title="Switch Theme">
+                            <span class="icon">🌙</span>
+                            <span class="theme-text">Dark</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="content-grid">
+                <!-- Input Panel -->
+                <div class="input-panel">
+                    <div class="panel-header">
+                        <h2>Test Input Panel</h2>
+                        <div class="completion-status">
+                            <span class="status-text">50% Complete</span>
+                            <div class="status-bar">
+                                <div class="status-fill" style="width: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="opportunity-form">
+                        <div class="input-group">
+                            <label class="input-label">Test Input</label>
+                            <input type="text" class="input-field" placeholder="Test placeholder">
+                        </div>
+                    </div>
+                    <div class="action-panel">
+                        <button class="primary-btn">Test Button</button>
+                        <div class="secondary-actions">
+                            <button class="secondary-btn">Secondary</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="results-panel">
+                    <div class="panel-header">
+                        <h2>Test Results Panel</h2>
+                        <div class="analysis-status">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="metrics-section">
+                        <div class="metrics-row">
+                            <div class="metric-box arr-metric">
+                                <div class="metric-label">Test Metric</div>
+                                <div class="metric-value">$100K</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="services-section">
+                        <h3 class="section-title">Test Services</h3>
+                        <div class="services-content">
+                            <div class="empty-state">
+                                <div class="empty-icon">☁️</div>
+                                <div class="empty-text">Test services content</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Detailed Analysis Section -->
+        <section class="detailed-analysis">
+            <div class="analysis-header">
+                <h2>Test Detailed Analysis</h2>
+                <div class="analysis-controls">
+                    <button class="control-btn active">Grid View</button>
+                    <button class="control-btn">List View</button>
+                </div>
+            </div>
+            <div class="analysis-content">
+                <div class="analysis-item">
+                    <div class="item-header">
+                        <h3>Test Analysis Item</h3>
+                        <div class="item-status">Complete</div>
+                    </div>
+                    <div class="item-content">
+                        <div class="loading-state">Test analysis content...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional Sections -->
+        <section class="additional-sections">
+            <div class="section-grid">
+                <div class="additional-section">
+                    <div class="section-header">
+                        <h2>Test Additional Section</h2>
+                        <div class="section-badge">Test Badge</div>
+                    </div>
+                    <div class="section-content">
+                        <div class="loading-state">Test additional content...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString();
+            document.getElementById('currentTime').textContent = timeString;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            const themeText = document.querySelector('.theme-text');
+            const icon = document.querySelector('.theme-toggle .icon');
+            const currentThemeSpan = document.getElementById('currentTheme');
+            
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            themeToggle.setAttribute('data-current-theme', newTheme);
+            
+            if (newTheme === 'dark') {
+                themeText.textContent = 'Light';
+                icon.textContent = '☀️';
+                currentThemeSpan.textContent = 'dark';
+            } else {
+                themeText.textContent = 'Dark';
+                icon.textContent = '🌙';
+                currentThemeSpan.textContent = 'light';
+            }
+            
+            // Check for whitespace after theme change
+            setTimeout(checkWhitespace, 100);
+        }
+
+        // Check for white spaces
+        function checkWhitespace() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const statusElement = document.getElementById('whitespaceStatus');
+            
+            if (currentTheme === 'dark') {
+                const computedStyle = window.getComputedStyle(body);
+                const backgroundColor = computedStyle.backgroundColor;
+                
+                // Check if background is dark
+                if (backgroundColor.includes('26, 32, 44') || // #1a202c
+                    backgroundColor.includes('45, 55, 72') || // #2d3748
+                    backgroundColor.includes('55, 65, 81')) { // #374151
+                    statusElement.textContent = '✅ No whitespace detected';
+                    statusElement.style.color = '#10b981';
+                } else {
+                    statusElement.textContent = '❌ Whitespace detected: ' + backgroundColor;
+                    statusElement.style.color = '#ef4444';
+                }
+            } else {
+                statusElement.textContent = 'Light mode active';
+                statusElement.style.color = '#f7fafc';
+            }
+        }
+
+        // Initialize theme and check
+        document.addEventListener('DOMContentLoaded', function() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            const currentTheme = body.getAttribute('data-theme') || 'light';
+            
+            body.setAttribute('data-theme', currentTheme);
+            themeToggle.setAttribute('data-current-theme', currentTheme);
+            
+            document.getElementById('currentTheme').textContent = currentTheme;
+            
+            // Initial whitespace check
+            setTimeout(checkWhitespace, 500);
+        });
+    </script>
+</body>
+</html> 

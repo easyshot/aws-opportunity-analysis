@@ -5,159 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Theme Toggle Test</title>
     <style>
-        :root {
-            --bg-primary: #fafbfc;
-            --bg-secondary: #ffffff;
-            --text-primary: #1a202c;
-            --text-secondary: #4a5568;
-            --border-color: #e2e8f0;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #1a202c;
-            --bg-secondary: #2d3748;
-            --text-primary: #f7fafc;
-            --text-secondary: #cbd5e1;
-            --border-color: #4a5568;
-        }
-
         body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
             font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
             padding: 20px;
+            background: #f5f5f5;
+            color: #333;
             transition: all 0.3s ease;
         }
-
-        .theme-toggle {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 10px 20px;
+        
+        [data-theme="dark"] body {
+            background: #1a202c;
+            color: #f7fafc;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
             border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        [data-theme="dark"] .test-section {
+            background: #2d3748;
+            color: #f7fafc;
+        }
+        
+        .theme-toggle {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            margin: 5px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-
+        
         .theme-toggle:hover {
-            opacity: 0.8;
+            background: #0056b3;
         }
-
-        .test-content {
-            margin-top: 20px;
-            padding: 20px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+        
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        [data-theme="dark"] .success {
+            background: #1a4d2e;
+            border: 1px solid #2d5a3d;
+            color: #d4edda;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        [data-theme="dark"] .info {
+            background: #1a3a3f;
+            border: 1px solid #2d5a5f;
+            color: #d1ecf1;
         }
     </style>
 </head>
 <body>
     <h1>Theme Toggle Test</h1>
     
-    <button class="theme-toggle" onclick="toggleTheme()" title="Switch to Dark Mode">
-        <span class="icon">🌙</span>
-        <span class="theme-text">Dark</span>
-    </button>
-    
-    <div class="test-content">
-        <h2>Test Content</h2>
-        <p>This content should change appearance when you toggle the theme.</p>
-        <p>Current theme: <span id="current-theme">light</span></p>
+    <div class="test-section">
+        <h2>Test Theme Toggle</h2>
+        <button class="theme-toggle" id="testThemeToggle">
+            <span class="icon">🌙</span>
+            <span class="theme-text">Dark</span>
+        </button>
+        <div id="themeResult" class="result info">Click the button to test theme toggle...</div>
     </div>
 
     <script>
-        // Clean implementation of toggleTheme global function
-        window.toggleTheme = function() {
-            // Get current theme or default to light
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        // Test theme toggle functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, setting up theme toggle test...');
             
-            // Apply the new theme
-            document.documentElement.setAttribute('data-theme', newTheme);
+            const themeToggle = document.getElementById('testThemeToggle');
+            const resultDiv = document.getElementById('themeResult');
             
-            // Update the toggle button if it exists
-            const themeToggle = document.querySelector('.theme-toggle');
             if (themeToggle) {
-                const themeIcon = themeToggle.querySelector('.icon');
-                const themeText = themeToggle.querySelector('.theme-text');
-                
-                if (newTheme === 'dark') {
-                    if (themeIcon) themeIcon.textContent = '☀️';
-                    if (themeText) themeText.textContent = 'Light';
-                    themeToggle.title = 'Switch to Light Mode';
-                } else {
-                    if (themeIcon) themeIcon.textContent = '🌙';
-                    if (themeText) themeText.textContent = 'Dark';
-                    themeToggle.title = 'Switch to Dark Mode';
-                }
-            }
-            
-            // Update the current theme display
-            const currentThemeSpan = document.getElementById('current-theme');
-            if (currentThemeSpan) {
-                currentThemeSpan.textContent = newTheme;
-            }
-            
-            // Save theme preference to localStorage
-            try {
-                localStorage.setItem('poi-theme-preference', newTheme);
-            } catch (error) {
-                console.warn('Failed to save theme preference:', error);
-            }
-            
-            // Add smooth transition effect
-            try {
-                document.body.style.transition = 'all 0.3s ease';
-                setTimeout(() => {
-                    document.body.style.transition = '';
-                }, 300);
-            } catch (error) {
-                console.warn('Failed to add theme transition:', error);
-            }
-        };
-
-        // Initialize theme on page load
-        (function() {
-            // Wait for DOM to be ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializeTheme);
-            } else {
-                initializeTheme();
-            }
-            
-            function initializeTheme() {
-                // Check for saved theme preference or default to light mode
-                const savedTheme = localStorage.getItem('poi-theme-preference') || 'light';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                
-                // Update the toggle button to match the current theme
-                const themeToggle = document.querySelector('.theme-toggle');
-                if (themeToggle) {
-                    const themeIcon = themeToggle.querySelector('.icon');
-                    const themeText = themeToggle.querySelector('.theme-text');
+                themeToggle.addEventListener('click', () => {
+                    console.log('🎨 Theme toggle clicked');
                     
-                    if (savedTheme === 'dark') {
-                        if (themeIcon) themeIcon.textContent = '☀️';
-                        if (themeText) themeText.textContent = 'Light';
-                        themeToggle.title = 'Switch to Light Mode';
+                    const isDark = document.body.getAttribute('data-theme') === 'dark';
+                    console.log('Current theme:', isDark ? 'dark' : 'light');
+                    
+                    if (isDark) {
+                        document.body.removeAttribute('data-theme');
+                        console.log('Switched to light theme');
+                        
+                        const icon = themeToggle.querySelector('.icon');
+                        const text = themeToggle.querySelector('.theme-text');
+                        icon.textContent = '🌙';
+                        text.textContent = 'Dark';
+                        
+                        resultDiv.className = 'result success';
+                        resultDiv.textContent = '✅ Switched to Light Theme\n\nBackground: Light\nText: Dark\nTheme attribute: Removed';
                     } else {
-                        if (themeIcon) themeIcon.textContent = '🌙';
-                        if (themeText) themeText.textContent = 'Dark';
-                        themeToggle.title = 'Switch to Dark Mode';
+                        document.body.setAttribute('data-theme', 'dark');
+                        console.log('Switched to dark theme');
+                        
+                        const icon = themeToggle.querySelector('.icon');
+                        const text = themeToggle.querySelector('.theme-text');
+                        icon.textContent = '☀️';
+                        text.textContent = 'Light';
+                        
+                        resultDiv.className = 'result success';
+                        resultDiv.textContent = '✅ Switched to Dark Theme\n\nBackground: Dark\nText: Light\nTheme attribute: dark';
                     }
-                }
+                });
                 
-                // Update the current theme display
-                const currentThemeSpan = document.getElementById('current-theme');
-                if (currentThemeSpan) {
-                    currentThemeSpan.textContent = savedTheme;
-                }
+                console.log('✅ Theme toggle test event listener attached');
+                resultDiv.textContent = '🎯 Theme toggle test ready! Click the button to test functionality.';
+            } else {
+                console.log('❌ Theme toggle button not found');
+                resultDiv.textContent = '❌ Theme toggle button not found';
             }
-        })();
+        });
     </script>
 </body>
 </html>

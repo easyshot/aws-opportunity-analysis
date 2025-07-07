@@ -596,6 +596,8 @@ app.post('/api/analyze', async (req, res) => {
     // Try AWS automation workflow with comprehensive fallback
     let analysisResult = null;
     let usedFallback = false;
+    let queryPromptResult = null;
+    let lambdaResult = null;
     
     try {
       if (!automationModules.invokebedrockqueryprompt || 
@@ -605,7 +607,7 @@ app.post('/api/analyze', async (req, res) => {
       }
 
       productionLogger.info('Step 1: Generating SQL query', { requestId: req.requestId });
-      const queryPromptResult = await automationModules.invokebedrockqueryprompt.execute({
+      queryPromptResult = await automationModules.invokebedrockqueryprompt.execute({
         CustomerName, region, closeDate, oppName, oppDescription,
         industry, customerSegment, partnerName,
         activityFocus, businessDescription, migrationPhase,
@@ -617,9 +619,9 @@ app.post('/api/analyze', async (req, res) => {
       }
 
       productionLogger.info('Step 2: Executing SQL query', { requestId: req.requestId });
-      const lambdaResult = await automationModules.invlamfilteraut.execute({
-        query: queryPromptResult.processResults
-      });
+      lambdaResult = await automationModules.invlamfilteraut.execute(
+        queryPromptResult.processResults
+      );
       
       if (lambdaResult.status === 'error') {
         throw new Error(`SQL query execution failed: ${lambdaResult.message}`);
@@ -704,14 +706,43 @@ app.post('/api/analyze', async (req, res) => {
     
     productionLogger.logAnalysisSuccess(formattedResult, req.requestId, duration);
     
+    // Prepare debug information
+    let debugInfo = {
+      sqlQuery: 'SQL query not captured',
+      queryResults: 'Query results not captured',
+      bedrockPayload: 'Bedrock payload not captured',
+      fullResponse: 'Full response not captured'
+    };
+
+    // Only include debug info if we have the actual results
+    if (!usedFallback && queryPromptResult && lambdaResult && analysisResult) {
+      debugInfo = {
+        sqlQuery: queryPromptResult.processResults || 'SQL query not captured',
+        queryResults: lambdaResult.processResults || 'Query results not captured',
+        bedrockPayload: global.debugInfo?.bedrockPayload || 'Bedrock payload not captured',
+        fullResponse: analysisResult.formattedSummaryText || analysisResult.processResults || 'Full response not captured'
+      };
+    }
+
     // Return the analysis results
     res.json({
       ...formattedResult,
+      // Include individual sections from the automation result
+      methodology: analysisResult?.methodology || formattedResult?.methodology,
+      findings: analysisResult?.findings || formattedResult?.findings,
+      riskFactors: analysisResult?.riskFactors || formattedResult?.riskFactors,
+      similarProjects: analysisResult?.similarProjects || formattedResult?.similarProjects,
+      rationale: analysisResult?.rationale || formattedResult?.rationale,
+      fullAnalysis: analysisResult?.fullAnalysis || formattedResult?.fullAnalysis,
+      fundingOptions: analysisResult?.fundingOptions || formattedResult?.fundingOptions,
+      followOnOpportunities: analysisResult?.followOnOpportunities || formattedResult?.followOnOpportunities,
+      formattedSummaryText: analysisResult?.formattedSummaryText || formattedResult?.formattedSummaryText,
       sessionId: sessionId,
       opportunityId: opportunityId,
       fallbackMode: usedFallback,
       timestamp: new Date().toISOString(),
-      processingMode: usedFallback ? 'fallback' : 'aws-services'
+      processingMode: usedFallback ? 'fallback' : 'aws-services',
+      debug: debugInfo
     });
     
   } catch (error) {

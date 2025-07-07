@@ -1,7 +1,7 @@
 # AWS Bedrock Partner Management System - Technical Stack
 
 ## Technology Stack
-- **Backend**: Node.js 18.x with Express (production-ready with full AWS integration)
+- **Backend**: Node.js 18.x with Express (production-ready with full AWS integration, currently using app-debug.js for stability)
 - **Frontend**: Modern HTML5, CSS3, JavaScript (ES6+) with class-based architecture and PWA capabilities
 - **UI Framework**: Vanilla JavaScript with modern web standards (no external frameworks)
 - **Infrastructure**: AWS CDK (TypeScript) for Infrastructure as Code
@@ -58,7 +58,7 @@
 ### UI Options Available
 - **Option A**: Clean Professional Layout (minimal, closest to legacy)
 - **Option B**: Enhanced Interactive Layout (modern with tabs and animations)
-- **Option C**: Modern Dashboard Layout (active - full-featured with real-time updates)
+- **Option C**: Modern Dashboard Layout (active - full-featured with real-time updates and debug panels)
 
 ### Frontend Features (Option C - Active)
 - **Real-time Form Validation**: Instant feedback with visual indicators
@@ -69,6 +69,7 @@
 - **Responsive Design**: Mobile-first approach with flexible layouts
 - **Modern CSS**: CSS Grid, Flexbox, custom properties, and animations
 - **Accessibility**: ARIA labels, keyboard navigation, and screen reader support
+- **Debug Information Panels**: Real-time display of SQL queries, query results, and Bedrock payloads
 
 ### JavaScript Architecture
 - **Class-based Structure**: ES6+ classes for organized code architecture
@@ -77,6 +78,7 @@
 - **State Management**: localStorage for client-side state persistence
 - **Error Handling**: Comprehensive error handling with user-friendly messages
 - **Loading States**: Visual feedback during processing with animated indicators
+- **Debug Integration**: Real-time data flow tracing and payload inspection
 
 ## Build & Run Commands
 ```bash
@@ -85,7 +87,7 @@ npm install
 
 # Development (Local with Mock Data)
 npm run dev-all                    # Start both backend and frontend servers (recommended)
-npm run dev                        # Backend only (port 8123)
+npm run dev                        # Backend only (port 8123) - currently using app-debug.js
 npm run dev-frontend               # Frontend only (port 3123)
 npm run debug                      # Backend in debug mode with comprehensive mock data
 
@@ -106,6 +108,11 @@ npm run validate:all              # Complete system validation
 npm run validate:aws              # AWS connectivity validation
 npm run validate:bedrock          # Bedrock service validation
 npm run validate:infrastructure   # Infrastructure health check
+
+# Debugging and Troubleshooting
+npm run debug:data-flow           # Trace data flow from frontend to Bedrock
+npm run debug:payload-inspection  # Inspect Bedrock payloads and responses
+npm run debug:query-validation    # Validate SQL queries and results
 ```
 
 ## Environment Configuration
@@ -127,16 +134,23 @@ CATAPULT_GET_DATASET_LAMBDA=catapult_get_dataset
 # Athena Configuration
 ATHENA_DATABASE=default
 ATHENA_OUTPUT_LOCATION=s3://aws-athena-query-results/
+
+# Debug Configuration
+ENABLE_DEBUG_PANELS=true
+ENABLE_ENHANCED_LOGGING=true
+DEBUG_LOG_LEVEL=info
 ```
 
 - Ensure all prompt IDs are correct and match those configured in AWS Bedrock.
 - Lambda function must have permissions for Athena and S3 as described in the README.
+- Debug configuration enables enhanced troubleshooting capabilities.
 
 ## Server Configuration
 - **Backend server**: Runs on port 8123 by default (using app-debug.js for stability)
 - **Frontend server**: Runs on port 3123 by default with proxy configuration
 - **API Proxy**: Frontend automatically proxies `/api/*` requests to backend
 - **Static Assets**: Frontend server serves static files from `/public` directory
+- **Debug Mode**: Enhanced logging and payload inspection for troubleshooting
 
 ## Application URLs
 - **Main Application**: `http://localhost:3123/index-compact.html` (Option C - Modern Dashboard)
@@ -159,6 +173,7 @@ ATHENA_OUTPUT_LOCATION=s3://aws-athena-query-results/
 - **Dedicated Sections**: Separate Funding Options and Follow-On Opportunities sections
 - **Top AWS Services**: Interactive service cards with icons, costs, and descriptions
 - **Confidence Assessment**: Animated gauge with color-coded confidence levels (0-100%)
+- **Debug Information**: Real-time display of data flow and processing steps
 
 ## Performance Optimizations
 - **Minimal Dependencies**: Streamlined package.json for faster installation and startup
@@ -166,6 +181,7 @@ ATHENA_OUTPUT_LOCATION=s3://aws-athena-query-results/
 - **CSS Animations**: Hardware-accelerated CSS transitions and transforms
 - **Lazy Loading**: Progressive content loading for better perceived performance
 - **Caching Strategy**: localStorage for form data and intelligent API caching
+- **Debug Performance**: Optimized debug information display without impacting user experience
 
 ## Browser Compatibility
 - **Modern Browsers**: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
@@ -176,5 +192,34 @@ ATHENA_OUTPUT_LOCATION=s3://aws-athena-query-results/
 ## Development Workflow
 - **Primary Interface**: Option C (Modern Dashboard) for all new development
 - **Testing**: All three UI options maintained for comparison and testing
-- **Debugging**: app-debug.js provides stable backend with comprehensive mock data
+- **Debugging**: app-debug.js provides stable backend with comprehensive mock data and enhanced debugging
 - **Hot Reload**: nodemon for automatic server restart during development
+- **Data Flow Tracing**: Real-time visibility into SQL queries, query results, and Bedrock payloads
+
+## Debugging and Troubleshooting
+
+### Frontend Debug Features
+- **Real-time Debug Panels**: Display SQL queries, query results, and Bedrock payloads
+- **Data Flow Visualization**: End-to-end tracing from user input to analysis results
+- **Error Identification**: Clear identification of where data flow breaks down
+- **Payload Inspection**: Detailed view of what data is sent to and received from Bedrock
+
+### Backend Debug Features
+- **Enhanced Logging**: Comprehensive debug output in automation scripts
+- **Payload Capture**: Complete capture of data sent to and received from AWS services
+- **Error Tracing**: Detailed error tracking with context and stack traces
+- **Performance Monitoring**: Real-time performance metrics and bottlenecks
+
+### Operational Debugging
+- **Health Checks**: Automated service health monitoring and diagnostics
+- **Connectivity Validation**: AWS service connectivity testing and validation
+- **Performance Analytics**: Real-time performance metrics and optimization insights
+- **Cost Monitoring**: Resource utilization tracking and cost optimization
+- **Business Intelligence**: Custom dashboards and reporting capabilities
+
+## Current Development Focus
+- **Backend Stability**: Using app-debug.js for stable operation while fixing app.js corruption
+- **Data Flow Debugging**: Enhanced debugging to trace query results and Bedrock payload injection
+- **Mock Data Resolution**: Investigating why Bedrock generates mock data instead of using real query results
+- **Production Readiness**: Preparing for full AWS integration with live services
+- **Operational Excellence**: Comprehensive monitoring, alerting, and troubleshooting capabilities

@@ -678,50 +678,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Mock analysis request handler
-  function handleAnalysisRequest(useNovaPremier) {
-    // Mock data for testing
-    const mockResults = {
-      sections: {
-        similarProjectsRaw: `--- Project 1 ---
-Project Name: Cloud Migration Initiative
-Customer: TechCorp Solutions
-Industry: Technology
-Region: us-east-1
-ARR: 850000
-MRR: 70833
-Services: EC2, S3, RDS, Lambda
-Close Date: 2023-08-15
-Description: Complete infrastructure migration to AWS with modernization
-
---- Project 2 ---
-Project Name: Digital Transformation
-Customer: Healthcare Plus
-Industry: Healthcare
-Region: us-west-2
-ARR: 1200000
-MRR: 100000
-Services: EC2, S3, RDS, CloudFront, Route53
-Close Date: 2023-11-22
-Description: Legacy system modernization and cloud adoption
-
---- Project 3 ---
-Project Name: Analytics Platform
-Customer: Financial Services Inc
-Industry: Financial Services
-Region: eu-west-1
-ARR: 650000
-MRR: 54167
-Services: Redshift, S3, Lambda, API Gateway
-Close Date: 2024-01-10
-Description: Data analytics platform implementation`
+  // Real analysis request handler
+  async function handleAnalysisRequest(useNovaPremier) {
+    try {
+      // Get form data
+      const formData = getFormData();
+      
+      // Validate form data
+      const validationResult = validateFormData(formData);
+      if (!validationResult.isValid) {
+        showNotification('Please fix validation errors before proceeding.', 'error');
+        return;
       }
-    };
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      populateUI(mockResults);
-    }, 1000);
+
+      // Show loading state
+      updateButtonStates('analyzing');
+      showAnalysisProgress('standard');
+
+      // Make API call
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          useNovaPremier: useNovaPremier
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const results = await response.json();
+      console.log('API response received:', results);
+      
+      // Populate UI with real results
+      populateUI(results);
+      
+      // Update button states
+      updateButtonStates('completed');
+      hideAnalysisProgress();
+      showNotification('Analysis completed successfully!', 'success');
+      
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      updateButtonStates('error');
+      hideAnalysisProgress();
+      showNotification(`Analysis failed: ${error.message}`, 'error');
+    }
   }
 
   // Event listeners
@@ -731,8 +737,7 @@ Description: Data analytics platform implementation`
   if (oppDetQueryButtonV4) {
     oppDetQueryButtonV4.addEventListener('click', () => handleAnalysisRequest(true));
   }
-});// Task 6
-.1: Real-time validation system - Added after DOMContentLoaded
+}); // Task 6.1: Real-time validation system - Added after DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
   const validationState = {
     isValid: false,
@@ -1146,8 +1151,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initial validation state update
   updateFormValidationState();
-});// 
-Additional form submission prevention for validation
+}); // Additional form submission prevention for validation
+
 document.addEventListener('DOMContentLoaded', () => {
   const opportunityForm = document.getElementById('opportunityForm');
   if (opportunityForm) {
@@ -1166,8 +1171,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-/
-/ Task 6.2: Enhanced form data collection function
+
+// Task 6.2: Enhanced form data collection function
 function getFormData() {
   // Get industry value (handle "Other" option)
   const industrySelect = document.getElementById('industry');
@@ -1321,8 +1326,8 @@ function validateFormData(formData) {
 // Make functions globally available
 window.getFormData = getFormData;
 window.validateFormData = validateFormData;
-// Enhance
-d UI Population Functions for Task 6.3
+
+// Enhanced UI Population Functions for Task 6.3
 
 // Clear error states
 function clearErrorStates() {

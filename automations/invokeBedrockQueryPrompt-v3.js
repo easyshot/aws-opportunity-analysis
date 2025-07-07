@@ -128,6 +128,12 @@ function processConverseApiResponse(response) {
     const parsedJson = JSON.parse(messageContentText);
     if (parsedJson && typeof parsedJson.sql_query === 'string') {
       console.log("PROCESS_RESULTS (SQL Query): Successfully extracted SQL query from JSON within message content:", parsedJson.sql_query);
+      console.log("PROCESS_RESULTS (SQL Query): SQL Query Details - Length:", parsedJson.sql_query.length, "Contains WHERE clauses:", parsedJson.sql_query.includes('WHERE'));
+      
+      // Store the SQL query for debug purposes
+      if (!global.debugInfo) global.debugInfo = {};
+      global.debugInfo.sqlQuery = parsedJson.sql_query;
+      
       return JSON.stringify(parsedJson);
     } else {
       console.error("PROCESS_RESULTS (SQL Query): Parsed JSON does not contain a 'sql_query' string property. Parsed JSON:", JSON.stringify(parsedJson, null, 2));
