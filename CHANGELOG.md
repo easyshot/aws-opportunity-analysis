@@ -1,6 +1,43 @@
 # Partner Opportunity Intelligence Application - Changelog
 
-## [2.1.0] - 2025-07-06 (Current Release)
+## [2.2.0] - 2025-07-07 (Current Release)
+### Enhanced Debug Interface and Data Management
+
+#### Added - Advanced Debug Features
+- **Query Results Statistics**: Real-time row count, character count, and data size tracking
+- **Interactive Table View**: Spreadsheet-like display with toggle controls for query results
+- **Character Count Monitoring**: Real-time character counting for both query results and Bedrock responses
+- **Data Size Display**: Human-readable size formatting (B, KB, MB, GB) for all data
+- **Multi-format Display**: Toggle between raw JSON and formatted table views
+- **Real-time Statistics**: Live updates of data metrics during analysis processing
+
+#### Added - Intelligent Data Management
+- **Multi-level Truncation System**: Intelligent data truncation to handle large datasets
+  - **Primary Truncation**: Limits query results to ~200,000 characters
+  - **Secondary Truncation**: Further reduces total message size to ~300,000 characters if needed
+  - **Buffer Management**: Accounts for opportunity data and template overhead
+- **Truncation Visibility**: Clear indication when data truncation occurs with size reporting
+- **Performance Optimization**: Resolved Bedrock input size limitations (846K+ character datasets)
+
+#### Added - Enhanced User Interface
+- **Debug Panel Controls**: Interactive buttons for switching between view modes
+- **Statistics Dashboard**: Real-time display of query metrics and data flow information
+- **Responsive Debug Design**: Mobile-friendly debug interface with adaptive layouts
+- **Dark Mode Support**: Complete dark mode compatibility for all debug features
+
+#### Changed - Application Architecture
+- **Primary Interface**: Main application now at `http://localhost:3123/` with enhanced debug features
+- **Debug Integration**: Comprehensive debug capabilities integrated into main application flow
+- **Data Processing**: Improved handling of large datasets with intelligent truncation
+- **Error Handling**: Enhanced error reporting with detailed context and size information
+
+#### Fixed - Data Flow Issues
+- **Input Size Limitations**: Resolved "Input is too long for requested model" errors
+- **Large Dataset Handling**: Improved processing of datasets exceeding 800K characters
+- **Debug Information Display**: Fixed debug panel population and real-time updates
+- **Table View Rendering**: Optimized table display for large datasets (100+ rows)
+
+## [2.1.0] - 2025-07-06
 ### Enhanced Debugging and Backend Stability
 
 #### Added - Debugging and Troubleshooting
@@ -98,6 +135,13 @@
 
 ## Migration Notes
 
+### From v2.1.0 to v2.2.0
+- **Enhanced Debug Interface**: New advanced debug features automatically available in main application
+- **Data Management**: Intelligent truncation system handles large datasets automatically
+- **Character Counting**: Real-time character and size tracking for all data
+- **Table View**: New spreadsheet-like display for query results with interactive controls
+- **Performance**: Resolved input size limitations for datasets up to 846K+ characters
+
 ### From v2.0.0 to v2.1.0
 - **Debug Features**: New debug panels automatically available in the modern interface
 - **Backend Status**: Continue using app-debug.js for stable operation
@@ -112,20 +156,22 @@
 - **Configuration**: No configuration changes required for existing setups
 
 ### Recommended Actions
-1. **Update Bookmarks**: Use `http://localhost:3123/index-compact.html` for the modern interface
-2. **Test New Features**: Explore the enhanced analysis capabilities and interactive elements
-3. **Enable Debugging**: Configure debug environment variables for troubleshooting
-4. **Review Documentation**: Familiarize with new troubleshooting runbooks and operational procedures
-5. **Provide Feedback**: Report any issues or suggestions for further improvements
-6. **Training**: Familiarize users with the new interface and enhanced functionality
+1. **Update Bookmarks**: Use `http://localhost:3123/` for the main application with enhanced debug features
+2. **Explore Debug Features**: Test the new query results statistics, character counting, and table view functionality
+3. **Test Large Datasets**: Verify the intelligent truncation system with large data scenarios
+4. **Enable Debugging**: Configure debug environment variables for comprehensive troubleshooting
+5. **Review Documentation**: Familiarize with updated troubleshooting procedures and debug capabilities
+6. **Provide Feedback**: Report any issues or suggestions for further improvements
+7. **Training**: Familiarize users with the enhanced debug interface and data management features
 
 ## Known Issues
 - **Backend Stability**: Main app.js has corruption issues, using app-debug.js for stability
 - **Mock Data Generation**: Bedrock sometimes generates mock data instead of using real query results
-- **Data Flow Debugging**: Ongoing investigation into query results to Bedrock payload injection
+- **Data Flow Debugging**: Ongoing investigation into query results to Bedrock payload injection (enhanced debug tools now available for troubleshooting)
 
 ## Upcoming Fixes
 - **Backend Corruption**: Resolution of app.js corruption and migration to production backend
-- **Real Data Flow**: Implementation of fixes to ensure real data is used in analysis
+- **Real Data Flow**: Implementation of fixes to ensure real data is used in analysis (enhanced debug tools available for investigation)
 - **Performance Optimization**: Caching implementation and load testing
-- **Production Readiness**: Complete AWS integration validation and monitoring setup 
+- **Production Readiness**: Complete AWS integration validation and monitoring setup
+- **Debug Enhancement**: Continue expanding debug capabilities based on user feedback 

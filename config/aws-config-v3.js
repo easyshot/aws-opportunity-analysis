@@ -121,7 +121,7 @@ module.exports = {
     promptIds: {
       queryPrompt: process.env.CATAPULT_QUERY_PROMPT_ID,
       analysisPrompt: process.env.CATAPULT_ANALYSIS_PROMPT_ID,
-      analysisPromptNovaPremier: process.env.CATAPULT_ANALYSIS_PROMPT_NOVA_PREMIER_ID
+      analysisPromptNovaPremier: process.env.CATAPULT_ANALYSIS_PROMPT_NOVA_PREMIER_ID  // Not used - kept for compatibility
     },
     lambda: {
       catapultGetDataset: process.env.CATAPULT_GET_DATASET_LAMBDA

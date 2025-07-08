@@ -29,7 +29,12 @@ The AWS Bedrock Partner Management System is **fully implemented and production-
 - **Sample Data Loading**: Quick-load functionality for testing and demonstrations
 - **Export Capabilities**: Professional export and print functionality with formatted reports
 - **Three UI Options**: Clean Professional, Enhanced Interactive, and Modern Dashboard layouts
-- **Debug Information Panels**: Real-time display of SQL queries, query results, and Bedrock payloads
+- **Enhanced Debug Information Panels**: Comprehensive debugging interface featuring:
+  - **Query Results Statistics**: Row count, character count, and data size tracking
+  - **Interactive Table View**: Spreadsheet-like display with toggle controls
+  - **Real-time Data Monitoring**: Live updates of query metrics and payload sizes
+  - **Truncation Management**: Intelligent data truncation with size visibility
+  - **Multi-format Display**: Toggle between raw JSON and formatted table views
 
 ### 🤖 AI-Powered Analysis Engine
 - **Multi-Model AI Integration**: AWS Bedrock Titan and Nova Premier models with intelligent selection
@@ -92,11 +97,12 @@ npm run dev-frontend  # Frontend only (port 3123)
 ```
 
 **Access the Application:**
-- **Primary Interface**: `http://localhost:3123/index-compact.html` (Modern Dashboard with Debug Panels)
+- **Primary Interface**: `http://localhost:3123/` (Main application with enhanced debug features)
 - **Alternative Options**:
   - Clean Professional: `http://localhost:3123/index-compact-option-a.html`
   - Enhanced Interactive: `http://localhost:3123/index-compact-option-b.html`
-  - Legacy Interface: `http://localhost:3123/` (original)
+  - Modern Dashboard: `http://localhost:3123/index-compact-option-c.html`
+  - Compact Interface: `http://localhost:3123/index-compact.html`
 
 ### 2. Using the Modern Interface with Debugging
 
@@ -145,10 +151,14 @@ npm run knowledge-base:deploy     # RAG enhancement
 
 ## Current Development Focus
 
-### Backend Stability
+### Backend Stability & Enhanced Debugging
 - **Current Status**: Using `app-debug.js` for stable operation (main `app.js` has corruption issues)
-- **Enhanced Debugging**: Comprehensive logging and payload inspection for troubleshooting
-- **Data Flow Analysis**: Real-time tracing of query results and Bedrock payload injection
+- **Enhanced Debug Infrastructure**: Implemented comprehensive debugging capabilities including:
+  - **Query Results Analysis**: Row counting, character tracking, and data size monitoring
+  - **Table View Functionality**: Spreadsheet-like display with interactive controls
+  - **Truncation Management**: Intelligent data truncation system resolving input size limitations
+  - **Real-time Statistics**: Live tracking of data flow metrics and payload sizes
+- **Data Flow Optimization**: Resolved Bedrock input size errors with multi-level truncation system
 - **Mock Data Resolution**: Investigating why Bedrock generates mock data instead of using real query results
 
 ### Production Readiness
@@ -160,7 +170,8 @@ npm run knowledge-base:deploy     # RAG enhancement
 ## Application Structure
 
 ### Frontend Architecture (Modern)
-- **Primary Interface**: `public/index-compact.html` (Option C - Modern Dashboard with Debug Panels)
+- **Primary Interface**: `public/index.html` (Main application with enhanced debug features)
+- **Primary JavaScript**: `public/app-clean.js` (Main functionality with comprehensive debug integration)
 - **Alternative Options**: 
   - `public/index-compact-option-a.html` (Clean Professional)
   - `public/index-compact-option-b.html` (Enhanced Interactive)
@@ -318,12 +329,21 @@ The application now includes a comprehensive, always-visible interface with:
 - **Risk Factors**: Comprehensive risk assessment with mitigation strategies
 - **Architecture Recommendations**: Complete technical architecture guidance
 
-### Debug Information
-- **SQL Query Display**: Real-time display of generated SQL queries
-- **Query Results**: Live view of database query results
-- **Bedrock Payload**: Complete payload sent to Bedrock for analysis
-- **Full Response**: Complete response received from Bedrock
-- **Data Flow Tracing**: End-to-end visibility into the analysis process
+### Enhanced Debug Information
+- **SQL Query Display**: Real-time display of generated SQL queries with syntax highlighting
+- **Advanced Query Results**: Comprehensive query results analysis featuring:
+  - **Row Count Tracking**: Exact count of data rows returned from queries
+  - **Character Count Monitoring**: Real-time character count for all data
+  - **Data Size Display**: Human-readable size formatting (B, KB, MB, GB)
+  - **Table View Toggle**: Switch between raw JSON and spreadsheet-like display
+  - **Interactive Controls**: User-friendly debugging interface
+- **Bedrock Payload**: Complete payload sent to Bedrock for analysis with size tracking
+- **Full Response Analysis**: Complete response received from Bedrock with character counts
+- **Truncation Management**: Intelligent data truncation system with multi-level size management:
+  - **Primary Truncation**: Limits query results to ~200,000 characters
+  - **Secondary Truncation**: Further reduces total message size to ~300,000 characters if needed
+  - **Buffer Management**: Accounts for opportunity data and template overhead
+- **Data Flow Tracing**: End-to-end visibility into the complete analysis process
 
 ### Advanced Features
 - **Real-Time Validation**: Immediate feedback on data entry

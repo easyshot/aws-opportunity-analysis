@@ -47,15 +47,16 @@ let automationModules = {};
 const requiredAutomations = [
   'invokeBedrockQueryPrompt-v3',
   'InvLamFilterAut-v3', 
-  'finalBedAnalysisPrompt-v3',
-  'finalBedAnalysisPromptNovaPremier-v3'
+  'finalBedAnalysisPrompt-v3'
+  // 'finalBedAnalysisPromptNovaPremier-v3' - Removed: Using standard prompt only
 ];
 
 const optionalAutomations = [
   'enhancedBedrockQueryPrompt-v3',
   'enhancedAnalysisWithRAG-v3',
   'enhancedFundingAnalysis-v3',
-  'enhancedFollowOnAnalysis-v3'
+  'enhancedFollowOnAnalysis-v3',
+  'finalBedAnalysisPromptNovaPremier-v3'  // Moved to optional - not used by default
 ];
 
 // Load required automations
@@ -316,6 +317,11 @@ function generateMockResponse(inputData) {
         ]
       }
     },
+    findings: "**Key Findings (Fallback Mode)**\n\nBased on cached patterns for similar cloud migration projects:\n\n• **Market Opportunity**: Strong potential for AWS adoption in this sector\n• **Technical Feasibility**: Standard migration approach recommended\n• **Timeline**: 6-month implementation timeline is realistic\n• **Investment**: Moderate initial investment with good ROI potential",
+    riskFactors: "**Risk Assessment (Fallback Mode)**\n\n**Medium Risk Factors:**\n• Limited real-time data analysis due to service connectivity\n• Estimates based on historical patterns only\n• Actual costs may vary based on specific requirements\n\n**Mitigation Strategies:**\n• Conduct detailed technical assessment when services are available\n• Plan for 15-20% cost variance\n• Implement phased approach to reduce risk",
+    similarProjects: "**Similar Projects (Fallback Mode)**\n\n**Project 1: Enterprise Cloud Migration**\n• Customer: Large Manufacturing Company\n• ARR: $115,000\n• Timeline: 5 months\n• Services: EC2, RDS, S3, CloudFront\n\n**Project 2: Digital Transformation**\n• Customer: Financial Services Firm\n• ARR: $135,000\n• Timeline: 7 months\n• Services: EC2, RDS, Lambda, API Gateway",
+    rationale: "**Analysis Rationale (Fallback Mode)**\n\nThis analysis is based on cached historical patterns due to limited AWS service connectivity. The projections use:\n\n• **Historical Data**: Similar projects from the past 12 months\n• **Industry Benchmarks**: Standard cloud migration metrics\n• **Conservative Estimates**: Lower-bound projections to account for uncertainty\n\nFor more accurate analysis, full AWS service connectivity is recommended.",
+    fullAnalysis: "**Complete Analysis Summary (Fallback Mode)**\n\nThis opportunity shows strong potential based on historical patterns. The projected ARR of $120,000 aligns with similar cloud migration projects. The 6-month timeline is realistic for this scope of work.\n\n**Recommendations:**\n• Proceed with opportunity development\n• Conduct detailed technical assessment\n• Plan for phased implementation\n• Monitor actual vs. projected metrics",
     formattedSummaryText: "=== FALLBACK MODE ===\nLimited AWS service connectivity\n\n=== ANALYSIS ===\nUsing cached patterns for estimation",
     fallbackMode: true,
     timestamp: new Date().toISOString()
@@ -636,11 +642,8 @@ app.post('/api/analyze', async (req, res) => {
         queryResults: lambdaResult.processResults
       };
       
-      if (useNovaPremier && automationModules.finalbedanalysispromptnovapremier) {
-        analysisResult = await automationModules.finalbedanalysispromptnovapremier.execute(analysisParams);
-      } else {
-        analysisResult = await automationModules.finalbedanalysisprompt.execute(analysisParams);
-      }
+      // Always use standard analysis prompt (Nova Premier disabled)
+      analysisResult = await automationModules.finalbedanalysisprompt.execute(analysisParams);
       
       if (analysisResult.status === 'error') {
         throw new Error(`Analysis failed: ${analysisResult.message}`);

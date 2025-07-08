@@ -72,6 +72,34 @@ async function fetchPrompt(promptId) {
 }
 
 /**
+ * Truncate query results to fit within model limits while preserving most relevant data
+ */
+function truncateQueryResults(queryResults, maxLength = 200000) {
+  try {
+    // Convert to string if needed
+    const queryString = typeof queryResults === 'string' ? queryResults : JSON.stringify(queryResults);
+    
+    // Return as-is if already small enough
+    if (queryString.length <= maxLength) {
+      return queryString;
+    }
+    
+    console.log(`PROCESS_RESULTS (Analysis Nova Premier): Truncating query results from ${queryString.length} to ~${maxLength} characters`);
+    
+    // Simple truncation - more reliable and faster
+    const truncated = queryString.substring(0, maxLength);
+    console.log(`PROCESS_RESULTS (Analysis Nova Premier): Truncation applied: ${truncated.length} characters`);
+    return truncated;
+    
+  } catch (error) {
+    console.error("PROCESS_RESULTS (Analysis Nova Premier): Error truncating query results:", error);
+    // Fallback to simple string conversion and truncation
+    const fallback = String(queryResults).substring(0, maxLength);
+    return fallback;
+  }
+}
+
+/**
  * Prepare payload for Bedrock Converse API
  */
 function preparePayload(params, promptData) {
@@ -80,18 +108,92 @@ function preparePayload(params, promptData) {
     const userMessageTemplate = promptData.variants[0].templateConfiguration.chat.messages[0].content[0].text;
     const systemInstructions = promptData.variants[0].templateConfiguration.chat.system[0].text;
 
-    // Format query results for the template
-    const queryResults = typeof params.queryResults === 'string' 
+    // Format and truncate query results for the template
+    const rawQueryResults = typeof params.queryResults === 'string' 
       ? params.queryResults 
       : JSON.stringify(params.queryResults);
+    
+    // Truncate query results to prevent model input limits
+    const queryResults = truncateQueryResults(rawQueryResults);
 
-    const filledUserMessage = userMessageTemplate
-      .replace('{{CustomerName}}', params.CustomerName || 'Not specified')
-      .replace('{{region}}', params.region || 'Not specified')
-      .replace('{{closeDate}}', params.closeDate || 'Not specified')
-      .replace('{{oppName}}', params.oppName || 'Not specified')
-      .replace('{{oppDescription}}', params.oppDescription || 'Not specified')
-      .replace('{{queryResults}}', queryResults);
+    console.log("PROCESS_RESULTS (Analysis Nova Premier): Raw query results length:", rawQueryResults.length);
+    console.log("PROCESS_RESULTS (Analysis Nova Premier): Truncated query results length:", queryResults.length);
+
+    // Create enhanced payload with both template and actual data
+    const enhancedUserMessage = `
+<opp_details>
+New Opportunity Information:
+- Customer Name: ${params.CustomerName || 'Not specified'}
+- Region: ${params.region || 'Not specified'}
+- Close Date: ${params.closeDate || 'Not specified'}
+- Opportunity Name: ${params.oppName || 'Not specified'}
+- Description: ${params.oppDescription || 'Not specified'}
+- Industry: ${params.industry || 'Not specified'}
+- Customer Segment: ${params.customerSegment || 'Not specified'}
+- Partner Name: ${params.partnerName || 'Not specified'}
+- Activity Focus: ${params.activityFocus || 'Not specified'}
+- Business Description: ${params.businessDescription || 'Not specified'}
+- Migration Phase: ${params.migrationPhase || 'Not specified'}
+</opp_details>
+
+<project_data>
+Historical Project Dataset:
+${queryResults}
+</project_data>
+
+${userMessageTemplate
+  .replace('{{CustomerName}}', params.CustomerName || 'Not specified')
+  .replace('{{region}}', params.region || 'Not specified')
+  .replace('{{closeDate}}', params.closeDate || 'Not specified')
+  .replace('{{oppName}}', params.oppName || 'Not specified')
+  .replace('{{oppDescription}}', params.oppDescription || 'Not specified')
+  .replace('{{queryResults}}', queryResults)}`;
+
+    // Check final message size and truncate further if needed
+    const maxTotalSize = 300000; // Conservative limit for Nova Premier
+    let finalUserMessage = enhancedUserMessage;
+    
+    if (finalUserMessage.length > maxTotalSize) {
+      console.log(`PROCESS_RESULTS (Analysis Nova Premier): Final message too large (${finalUserMessage.length}), applying additional truncation`);
+      
+      // Further truncate query results if needed
+      const oppDetailsSize = enhancedUserMessage.indexOf('<project_data>');
+      const templateSize = userMessageTemplate.length;
+      const availableForData = maxTotalSize - oppDetailsSize - templateSize - 1000; // Buffer
+      
+      const furtherTruncatedResults = truncateQueryResults(queryResults, Math.max(50000, availableForData));
+      
+      finalUserMessage = `
+<opp_details>
+New Opportunity Information:
+- Customer Name: ${params.CustomerName || 'Not specified'}
+- Region: ${params.region || 'Not specified'}
+- Close Date: ${params.closeDate || 'Not specified'}
+- Opportunity Name: ${params.oppName || 'Not specified'}
+- Description: ${params.oppDescription || 'Not specified'}
+- Industry: ${params.industry || 'Not specified'}
+- Customer Segment: ${params.customerSegment || 'Not specified'}
+- Partner Name: ${params.partnerName || 'Not specified'}
+- Activity Focus: ${params.activityFocus || 'Not specified'}
+- Business Description: ${params.businessDescription || 'Not specified'}
+- Migration Phase: ${params.migrationPhase || 'Not specified'}
+</opp_details>
+
+<project_data>
+Historical Project Dataset:
+${furtherTruncatedResults}
+</project_data>
+
+${userMessageTemplate
+  .replace('{{CustomerName}}', params.CustomerName || 'Not specified')
+  .replace('{{region}}', params.region || 'Not specified')
+  .replace('{{closeDate}}', params.closeDate || 'Not specified')
+  .replace('{{oppName}}', params.oppName || 'Not specified')
+  .replace('{{oppDescription}}', params.oppDescription || 'Not specified')
+  .replace('{{queryResults}}', furtherTruncatedResults)}`;
+    }
+
+    console.log("PROCESS_RESULTS (Analysis Nova Premier): Final message length:", finalUserMessage.length);
 
     return {
       modelId: modelId,
@@ -99,7 +201,7 @@ function preparePayload(params, promptData) {
       messages: [
         {
           role: "user",
-          content: [{ text: filledUserMessage }]
+          content: [{ text: finalUserMessage }]
         }
       ],
       inferenceConfig: {

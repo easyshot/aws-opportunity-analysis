@@ -277,15 +277,7 @@
                     </div>
                 </div>
 
-                <div class="analysis-item bedrock-response">
-                    <div class="item-header">
-                        <h3>🤖 Complete Bedrock Response</h3>
-                        <div class="item-status">Raw Analysis</div>
-                    </div>
-                    <div class="item-content" id="bedrockResponse">
-                        <div class="loading-state">Complete Bedrock response will appear here...</div>
-                    </div>
-                </div>
+
             </div>
         </section>
 
@@ -329,7 +321,31 @@
                 
                 <div class="debug-item">
                     <h3>2. Query Results</h3>
-                    <textarea id="debugQueryResults" class="debug-textarea" readonly placeholder="Query results will appear here after analysis..."></textarea>
+                    <div class="debug-query-info">
+                        <div class="query-stats">
+                            <span class="stat-item">
+                                <strong>Row Count:</strong> <span id="queryRowCount">-</span>
+                            </span>
+                            <span class="stat-item">
+                                <strong>Data Size:</strong> <span id="queryDataSize">-</span>
+                            </span>
+                            <span class="stat-item">
+                                <strong>Characters:</strong> <span id="queryCharCount">-</span>
+                            </span>
+                        </div>
+                        <div class="debug-view-controls">
+                            <button class="debug-view-btn active" onclick="showQueryView('raw')" id="rawViewBtn">Raw JSON</button>
+                            <button class="debug-view-btn" onclick="showQueryView('table')" id="tableViewBtn">Table View</button>
+                        </div>
+                    </div>
+                    <div id="debugQueryRaw" class="debug-view active">
+                        <textarea id="debugQueryResults" class="debug-textarea" readonly placeholder="Query results will appear here after analysis..."></textarea>
+                    </div>
+                    <div id="debugQueryTable" class="debug-view" style="display: none;">
+                        <div id="queryTableContainer" class="query-table-container">
+                            <div class="table-placeholder">Table view will appear here after analysis...</div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="debug-item">
@@ -339,6 +355,16 @@
                 
                 <div class="debug-item">
                     <h3>4. Full Bedrock Analysis Response</h3>
+                    <div class="debug-response-info">
+                        <div class="response-stats">
+                            <span class="stat-item">
+                                <strong>Characters:</strong> <span id="responseCharCount">-</span>
+                            </span>
+                            <span class="stat-item">
+                                <strong>Size:</strong> <span id="responseDataSize">-</span>
+                            </span>
+                        </div>
+                    </div>
                     <textarea id="debugFullResponse" class="debug-textarea" readonly placeholder="Full Bedrock response will appear here after analysis..."></textarea>
                 </div>
             </div>

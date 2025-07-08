@@ -69,7 +69,12 @@
 - **Responsive Design**: Mobile-first approach with flexible layouts
 - **Modern CSS**: CSS Grid, Flexbox, custom properties, and animations
 - **Accessibility**: ARIA labels, keyboard navigation, and screen reader support
-- **Debug Information Panels**: Real-time display of SQL queries, query results, and Bedrock payloads
+- **Enhanced Debug Information Panels**: Comprehensive debugging interface featuring:
+  - **Query Results Statistics**: Row count, character count, and data size tracking
+  - **Interactive Table View**: Spreadsheet-like display with toggle controls
+  - **Real-time Data Monitoring**: Live updates of query metrics and payload sizes
+  - **Truncation Visibility**: Clear indication of data truncation with size management
+  - **Multi-format Display**: Toggle between raw JSON and formatted table views
 
 ### JavaScript Architecture
 - **Class-based Structure**: ES6+ classes for organized code architecture
@@ -153,12 +158,12 @@ DEBUG_LOG_LEVEL=info
 - **Debug Mode**: Enhanced logging and payload inspection for troubleshooting
 
 ## Application URLs
-- **Main Application**: `http://localhost:3123/index-compact.html` (Option C - Modern Dashboard)
+- **Main Application**: `http://localhost:3123/` (Primary interface with enhanced debug features)
 - **Alternative Options**:
-  - Option A: `http://localhost:3123/index-compact-option-a.html`
-  - Option B: `http://localhost:3123/index-compact-option-b.html`
-  - Option C: `http://localhost:3123/index-compact-option-c.html`
-- **Legacy Interface**: `http://localhost:3123/` (original interface)
+  - Option A: `http://localhost:3123/index-compact-option-a.html` (Clean Professional)
+  - Option B: `http://localhost:3123/index-compact-option-b.html` (Enhanced Interactive)
+  - Option C: `http://localhost:3123/index-compact-option-c.html` (Modern Dashboard)
+- **Compact Interface**: `http://localhost:3123/index-compact.html` (Alternative modern interface)
 
 ## Data Processing Specifications
 
@@ -199,7 +204,12 @@ DEBUG_LOG_LEVEL=info
 ## Debugging and Troubleshooting
 
 ### Frontend Debug Features
-- **Real-time Debug Panels**: Display SQL queries, query results, and Bedrock payloads
+- **Enhanced Debug Panels**: Comprehensive debugging interface with advanced capabilities:
+  - **Query Results Analysis**: Row count, character count, and data size tracking
+  - **Interactive Table View**: Spreadsheet-like display with sortable columns and pagination
+  - **Real-time Statistics**: Live monitoring of data metrics and payload sizes
+  - **Truncation Management**: Intelligent data truncation with visibility into size limits
+  - **Multi-format Display**: Toggle between raw JSON and formatted table views
 - **Data Flow Visualization**: End-to-end tracing from user input to analysis results
 - **Error Identification**: Clear identification of where data flow breaks down
 - **Payload Inspection**: Detailed view of what data is sent to and received from Bedrock
@@ -219,7 +229,11 @@ DEBUG_LOG_LEVEL=info
 
 ## Current Development Focus
 - **Backend Stability**: Using app-debug.js for stable operation while fixing app.js corruption
-- **Data Flow Debugging**: Enhanced debugging to trace query results and Bedrock payload injection
-- **Mock Data Resolution**: Investigating why Bedrock generates mock data instead of using real query results
-- **Production Readiness**: Preparing for full AWS integration with live services
+- **Enhanced Debug Infrastructure**: Implemented comprehensive debugging capabilities including:
+  - **Query Results Analysis**: Row counting, character tracking, and data size monitoring
+  - **Table View Functionality**: Spreadsheet-like display with interactive controls
+  - **Truncation Management**: Intelligent data truncation system with multi-level size management
+  - **Real-time Statistics**: Live tracking of data flow metrics and payload sizes
+- **Data Flow Optimization**: Resolved input size limitations with intelligent truncation system
+- **Production Readiness**: Preparing for full AWS integration with enhanced monitoring and debugging
 - **Operational Excellence**: Comprehensive monitoring, alerting, and troubleshooting capabilities

@@ -1139,17 +1139,169 @@ class CompactOpportunityAnalyzerC {
             sqlQueryElement.value = data.debug?.sqlQuery || 'SQL query not available in response';
         }
 
-        // Update Query Results (this will be populated from backend)
+        // Update Query Results with enhanced features
         const queryResultsElement = document.getElementById('debugQueryResults');
+        const queryResults = data.debug?.queryResults || 'Query results not available in response';
+        
         if (queryResultsElement) {
-            queryResultsElement.value = data.debug?.queryResults || 'Query results not available in response';
+            queryResultsElement.value = queryResults;
         }
+        
+        // Update query statistics and table view
+        this.updateQueryDebugInfo(queryResults);
 
         // Update Full Bedrock Response
         const fullResponseElement = document.getElementById('debugFullResponse');
         if (fullResponseElement) {
             fullResponseElement.value = data.formattedSummaryText || data.debug?.fullResponse || 'Full response not available';
         }
+    }
+
+    updateQueryDebugInfo(queryResults) {
+        try {
+            let rowCount = 0;
+            let dataSize = 0;
+            let parsedData = null;
+
+            if (queryResults && queryResults !== 'Query results not available in response') {
+                dataSize = queryResults.length;
+                
+                // Try to parse the query results
+                try {
+                    parsedData = JSON.parse(queryResults);
+                    if (parsedData && parsedData.Rows && Array.isArray(parsedData.Rows)) {
+                        rowCount = parsedData.Rows.length - 1; // Subtract 1 for header row
+                    }
+                } catch (parseError) {
+                    console.log('Could not parse query results for analysis:', parseError);
+                }
+            }
+
+            // Update statistics
+            const rowCountElement = document.getElementById('queryRowCount');
+            const dataSizeElement = document.getElementById('queryDataSize');
+            
+            if (rowCountElement) {
+                rowCountElement.textContent = rowCount > 0 ? rowCount.toLocaleString() : '-';
+            }
+            
+            if (dataSizeElement) {
+                dataSizeElement.textContent = dataSize > 0 ? this.formatDataSize(dataSize) : '-';
+            }
+
+            // Generate table view if we have parsed data
+            if (parsedData && parsedData.Rows && Array.isArray(parsedData.Rows)) {
+                this.generateQueryTable(parsedData);
+            } else {
+                this.clearQueryTable();
+            }
+
+        } catch (error) {
+            console.error('Error updating query debug info:', error);
+        }
+    }
+
+    formatDataSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    generateQueryTable(data) {
+        const tableContainer = document.getElementById('queryTableContainer');
+        if (!tableContainer || !data.Rows || data.Rows.length === 0) {
+            this.clearQueryTable();
+            return;
+        }
+
+        const rows = data.Rows;
+        const headerRow = rows[0];
+        const dataRows = rows.slice(1);
+
+        // Extract column headers
+        const headers = [];
+        if (headerRow && headerRow.Data) {
+            headerRow.Data.forEach(cell => {
+                if (cell && cell.VarCharValue) {
+                    headers.push(cell.VarCharValue);
+                }
+            });
+        }
+
+        if (headers.length === 0) {
+            this.clearQueryTable();
+            return;
+        }
+
+        // Create table HTML
+        let tableHTML = '<table class="query-table">';
+        
+        // Add header
+        tableHTML += '<thead><tr>';
+        headers.forEach(header => {
+            tableHTML += `<th>${this.escapeHtml(header)}</th>`;
+        });
+        tableHTML += '</tr></thead>';
+
+        // Add data rows (limit to first 100 rows for performance)
+        tableHTML += '<tbody>';
+        const maxRows = Math.min(dataRows.length, 100);
+        
+        for (let i = 0; i < maxRows; i++) {
+            const row = dataRows[i];
+            tableHTML += '<tr>';
+            
+            if (row && row.Data) {
+                for (let j = 0; j < headers.length; j++) {
+                    const cell = row.Data[j];
+                    let cellValue = '';
+                    
+                    if (cell && cell.VarCharValue !== undefined) {
+                        cellValue = cell.VarCharValue;
+                    }
+                    
+                    // Truncate long values for display
+                    if (cellValue && cellValue.length > 100) {
+                        cellValue = cellValue.substring(0, 100) + '...';
+                    }
+                    
+                    tableHTML += `<td>${this.escapeHtml(cellValue)}</td>`;
+                }
+            } else {
+                // Empty row
+                for (let j = 0; j < headers.length; j++) {
+                    tableHTML += '<td></td>';
+                }
+            }
+            
+            tableHTML += '</tr>';
+        }
+        
+        if (dataRows.length > 100) {
+            tableHTML += `<tr><td colspan="${headers.length}" style="text-align: center; font-style: italic; color: #666; padding: 16px;">... and ${(dataRows.length - 100).toLocaleString()} more rows</td></tr>`;
+        }
+        
+        tableHTML += '</tbody></table>';
+
+        tableContainer.innerHTML = tableHTML;
+    }
+
+    clearQueryTable() {
+        const tableContainer = document.getElementById('queryTableContainer');
+        if (tableContainer) {
+            tableContainer.innerHTML = '<div class="table-placeholder">Table view will appear here after analysis...</div>';
+        }
+    }
+
+    escapeHtml(text) {
+        if (typeof text !== 'string') {
+            return String(text || '');
+        }
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 }
 
@@ -1159,6 +1311,26 @@ function toggleDebugSection() {
     if (debugSection) {
         const isVisible = debugSection.style.display !== 'none';
         debugSection.style.display = isVisible ? 'none' : 'block';
+    }
+}
+
+function showQueryView(viewType) {
+    // Update button states
+    const rawBtn = document.getElementById('rawViewBtn');
+    const tableBtn = document.getElementById('tableViewBtn');
+    
+    if (rawBtn && tableBtn) {
+        rawBtn.classList.toggle('active', viewType === 'raw');
+        tableBtn.classList.toggle('active', viewType === 'table');
+    }
+    
+    // Update view visibility
+    const rawView = document.getElementById('debugQueryRaw');
+    const tableView = document.getElementById('debugQueryTable');
+    
+    if (rawView && tableView) {
+        rawView.style.display = viewType === 'raw' ? 'block' : 'none';
+        tableView.style.display = viewType === 'table' ? 'block' : 'none';
     }
 }
 

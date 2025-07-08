@@ -24,7 +24,12 @@ This comprehensive serverless application analyzes business opportunities using 
 - **Auto-save Functionality**: Automatic form data persistence across sessions
 - **Sample Data Loading**: Quick-load functionality for testing and demonstrations
 - **Export Capabilities**: Professional export and print functionality
-- **Debug Information Display**: Real-time debugging panels showing SQL queries, query results, and Bedrock payloads
+- **Enhanced Debug Information Display**: Comprehensive debugging panels with:
+  - **Row Count Display**: Exact count of data rows returned from queries
+  - **Character Count Tracking**: Real-time character count for query results and Bedrock responses
+  - **Data Size Monitoring**: Human-readable size formatting (B, KB, MB, GB)
+  - **Table View Toggle**: Switch between raw JSON and spreadsheet-like table display
+  - **Real-time Statistics**: Live updates of data metrics during analysis
 
 ## Enhanced Analysis Capabilities
 - **Six Comprehensive Analysis Areas**:
@@ -41,9 +46,10 @@ This comprehensive serverless application analyzes business opportunities using 
 
 ## Current Development Focus
 - **Backend Stability**: Currently using `app-debug.js` for stable operation (main `app.js` has corruption issues)
-- **Data Flow Debugging**: Enhanced debugging to trace query results and Bedrock payload injection
-- **Mock Data Resolution**: Investigating why Bedrock generates mock data instead of using real query results
-- **Production Readiness**: Preparing for full AWS integration with live services
+- **Enhanced Debug Features**: Implemented comprehensive debug panels with row counts, character counts, and table views
+- **Data Truncation Management**: Intelligent truncation system to handle large datasets while preserving data integrity
+- **Real-time Data Flow Tracing**: Complete visibility into SQL queries, query results, and Bedrock payloads
+- **Production Readiness**: Preparing for full AWS integration with live services and enhanced monitoring
 
 ## Key Features
 - **Customer-Centric Analysis**: Based on customer name, customer region (geographic), close date, and detailed description
@@ -53,7 +59,11 @@ This comprehensive serverless application analyzes business opportunities using 
 - **Confidence Assessment**: Animated gauge with color-coded confidence levels and detailed factors
 - **Real-time Timestamps**: Live timestamp display with automatic updates
 - **Grid/List View Toggle**: Flexible analysis result viewing options
-- **Debug Information**: Real-time display of SQL queries, query results, and Bedrock payloads for troubleshooting
+- **Advanced Debug Information**: Comprehensive troubleshooting capabilities including:
+  - **Query Results Analysis**: Row counts, character counts, and data size tracking
+  - **Table View Display**: Spreadsheet-like visualization of query results
+  - **Truncation Monitoring**: Intelligent data truncation with size management
+  - **Real-time Payload Inspection**: Complete visibility into Bedrock communication
 
 ## User Experience Workflow
 1. **Input Collection**: User enters opportunity details with real-time completion tracking

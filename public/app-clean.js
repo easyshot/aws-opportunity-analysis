@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const riskFactors = document.getElementById('riskFactors');
   const similarProjects = document.getElementById('similarProjects');
   const fullAnalysis = document.getElementById('fullAnalysis');
-  const bedrockResponse = document.getElementById('bedrockResponse');
+
   
   // Additional sections
   const fundingOptions = document.getElementById('fundingOptions');
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (riskFactors) riskFactors.innerHTML = '<div class="loading-state">Risk assessment will appear here...</div>';
     if (similarProjects) similarProjects.innerHTML = '<div class="loading-state">Historical matches will appear here...</div>';
     if (fullAnalysis) fullAnalysis.innerHTML = '<div class="loading-state">Complete analysis will appear here...</div>';
-    if (bedrockResponse) bedrockResponse.innerHTML = '<div class="loading-state">Complete Bedrock response will appear here...</div>';
+
     
     // Clear additional sections
     if (fundingOptions) fundingOptions.innerHTML = '<div class="loading-state">Funding recommendations will appear here...</div>';
@@ -194,6 +194,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (debugQueryResults) debugQueryResults.value = '';
     if (debugBedrockPayload) debugBedrockPayload.value = '';
     if (debugFullResponse) debugFullResponse.value = '';
+    
+    // Clear enhanced debug statistics
+    const queryRowCount = document.getElementById('queryRowCount');
+    const queryDataSize = document.getElementById('queryDataSize');
+    const queryCharCount = document.getElementById('queryCharCount');
+    const responseCharCount = document.getElementById('responseCharCount');
+    const responseDataSize = document.getElementById('responseDataSize');
+    
+    if (queryRowCount) queryRowCount.textContent = '-';
+    if (queryDataSize) queryDataSize.textContent = '-';
+    if (queryCharCount) queryCharCount.textContent = '-';
+    if (responseCharCount) responseCharCount.textContent = '-';
+    if (responseDataSize) responseDataSize.textContent = '-';
+    
+    // Clear table view
+    clearQueryTable();
   }
 
   // Get form data
@@ -454,9 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
           fullAnalysis.innerHTML = formatSectionContent(fullResponse);
         }
         
-        if (bedrockResponse) {
-          bedrockResponse.innerHTML = formatSectionContent(fullResponse);
-        }
+
         
         // Populate debug sections
         if (debugFullResponse) {
@@ -498,16 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fullAnalysis.innerHTML = formatSectionContent(fullText);
       }
       
-      if (bedrockResponse && (results.methodology || results.findings || results.rationale || results.riskFactors || results.similarProjects)) {
-        const fullText = [
-          results.methodology ? `===ANALYSIS METHODOLOGY===\n${results.methodology}` : '',
-          results.findings ? `===DETAILED FINDINGS===\n${results.findings}` : '',
-          results.rationale ? `===PREDICTION RATIONALE===\n${results.rationale}` : '',
-          results.riskFactors ? `===RISK FACTORS===\n${results.riskFactors}` : '',
-          results.similarProjects ? `===SIMILAR PROJECTS===\n${results.similarProjects}` : ''
-        ].filter(Boolean).join('\n\n');
-        bedrockResponse.innerHTML = formatSectionContent(fullText);
-      }
+
       
       // Show the detailed analysis section
       if (resultsSection) {
@@ -577,6 +582,31 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatSectionContent(content) {
     if (!content) return '<div class="empty-state">No content available</div>';
     
+    // Handle methodology object structure
+    if (typeof content === 'object' && content.analysisApproach) {
+      let html = '<div class="methodology-content">';
+      html += `<h4>Analysis Approach</h4>`;
+      html += `<p>${content.analysisApproach.summary}</p>`;
+      if (content.analysisApproach.steps && content.analysisApproach.steps.length > 0) {
+        html += '<h5>Analysis Steps:</h5><ol>';
+        content.analysisApproach.steps.forEach(step => {
+          html += `<li>${step}</li>`;
+        });
+        html += '</ol>';
+      }
+      html += '</div>';
+      return html;
+    }
+    
+    // Ensure content is a string
+    if (typeof content !== 'string') {
+      if (typeof content === 'object') {
+        content = JSON.stringify(content, null, 2);
+      } else {
+        content = String(content);
+      }
+    }
+    
     // Convert markdown-like formatting to HTML
     let formatted = content
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -622,25 +652,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Populate debug information
   function populateDebugInfo(results) {
+    console.log('Debug info received:', results.debug);
+    
     const debugSqlQuery = document.getElementById('debugSqlQuery');
     const debugQueryResults = document.getElementById('debugQueryResults');
     const debugBedrockPayload = document.getElementById('debugBedrockPayload');
     const debugFullResponse = document.getElementById('debugFullResponse');
     
     if (debugSqlQuery) {
-      debugSqlQuery.value = results.debug?.sqlQuery || 'No SQL query found in response';
+      const sqlQuery = results.debug?.sqlQuery || 'No SQL query found in response';
+      debugSqlQuery.value = sqlQuery;
+      console.log('SQL Query length:', sqlQuery.length);
     }
     
     if (debugQueryResults) {
-      debugQueryResults.value = results.debug?.queryResults || 'No query results found in response';
+      const queryResults = results.debug?.queryResults || 'No query results found in response';
+      debugQueryResults.value = queryResults;
+      console.log('Query Results length:', queryResults.length);
+      
+      // Update enhanced debug info
+      updateQueryDebugInfo(queryResults);
     }
     
     if (debugBedrockPayload) {
-      debugBedrockPayload.value = results.debug?.bedrockPayload || 'No Bedrock payload found in response';
+      const bedrockPayload = results.debug?.bedrockPayload || 'No Bedrock payload found in response';
+      debugBedrockPayload.value = bedrockPayload;
+      console.log('Bedrock Payload length:', bedrockPayload.length);
+      console.log('Bedrock Payload preview (first 500 chars):', bedrockPayload.substring(0, 500));
     }
     
     if (debugFullResponse) {
-      debugFullResponse.value = results.debug?.fullResponse || 'No full response found in response';
+      const fullResponse = results.debug?.fullResponse || 'No full response found in response';
+      debugFullResponse.value = fullResponse;
+      console.log('Full Response length:', fullResponse.length);
+      
+      // Update response character count
+      updateResponseDebugInfo(fullResponse);
     }
   }
 
@@ -877,6 +924,201 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Enhanced debug functions
+  function updateQueryDebugInfo(queryResults) {
+    try {
+      let rowCount = 0;
+      let dataSize = 0;
+      let parsedData = null;
+
+      if (queryResults && queryResults !== 'No query results found in response') {
+        dataSize = queryResults.length;
+        
+        // Try to parse the query results
+        try {
+          parsedData = JSON.parse(queryResults);
+          if (parsedData && parsedData.Rows && Array.isArray(parsedData.Rows)) {
+            rowCount = parsedData.Rows.length - 1; // Subtract 1 for header row
+          }
+        } catch (parseError) {
+          console.log('Could not parse query results for analysis:', parseError);
+        }
+      }
+
+      // Update statistics
+      const rowCountElement = document.getElementById('queryRowCount');
+      const dataSizeElement = document.getElementById('queryDataSize');
+      const charCountElement = document.getElementById('queryCharCount');
+      
+      if (rowCountElement) {
+        rowCountElement.textContent = rowCount > 0 ? rowCount.toLocaleString() : '-';
+      }
+      
+      if (dataSizeElement) {
+        dataSizeElement.textContent = dataSize > 0 ? formatDataSize(dataSize) : '-';
+      }
+      
+      if (charCountElement) {
+        charCountElement.textContent = dataSize > 0 ? dataSize.toLocaleString() : '-';
+      }
+
+      // Generate table view if we have parsed data
+      if (parsedData && parsedData.Rows && Array.isArray(parsedData.Rows)) {
+        generateQueryTable(parsedData);
+      } else {
+        clearQueryTable();
+      }
+
+    } catch (error) {
+      console.error('Error updating query debug info:', error);
+    }
+  }
+
+  function formatDataSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  function generateQueryTable(data) {
+    const tableContainer = document.getElementById('queryTableContainer');
+    if (!tableContainer || !data.Rows || data.Rows.length === 0) {
+      clearQueryTable();
+      return;
+    }
+
+    const rows = data.Rows;
+    const headerRow = rows[0];
+    const dataRows = rows.slice(1);
+
+    // Extract column headers
+    const headers = [];
+    if (headerRow && headerRow.Data) {
+      headerRow.Data.forEach(cell => {
+        if (cell && cell.VarCharValue) {
+          headers.push(cell.VarCharValue);
+        }
+      });
+    }
+
+    if (headers.length === 0) {
+      clearQueryTable();
+      return;
+    }
+
+    // Create table HTML
+    let tableHTML = '<table class="query-table">';
+    
+    // Add header
+    tableHTML += '<thead><tr>';
+    headers.forEach(header => {
+      tableHTML += `<th>${escapeHtml(header)}</th>`;
+    });
+    tableHTML += '</tr></thead>';
+
+    // Add data rows (limit to first 100 rows for performance)
+    tableHTML += '<tbody>';
+    const maxRows = Math.min(dataRows.length, 100);
+    
+    for (let i = 0; i < maxRows; i++) {
+      const row = dataRows[i];
+      tableHTML += '<tr>';
+      
+      if (row && row.Data) {
+        for (let j = 0; j < headers.length; j++) {
+          const cell = row.Data[j];
+          let cellValue = '';
+          
+          if (cell && cell.VarCharValue !== undefined) {
+            cellValue = cell.VarCharValue;
+          }
+          
+          // Truncate long values for display
+          if (cellValue && cellValue.length > 100) {
+            cellValue = cellValue.substring(0, 100) + '...';
+          }
+          
+          tableHTML += `<td>${escapeHtml(cellValue)}</td>`;
+        }
+      } else {
+        // Empty row
+        for (let j = 0; j < headers.length; j++) {
+          tableHTML += '<td></td>';
+        }
+      }
+      
+      tableHTML += '</tr>';
+    }
+    
+    if (dataRows.length > 100) {
+      tableHTML += `<tr><td colspan="${headers.length}" style="text-align: center; font-style: italic; color: #666; padding: 16px;">... and ${(dataRows.length - 100).toLocaleString()} more rows</td></tr>`;
+    }
+    
+    tableHTML += '</tbody></table>';
+
+    tableContainer.innerHTML = tableHTML;
+  }
+
+  function clearQueryTable() {
+    const tableContainer = document.getElementById('queryTableContainer');
+    if (tableContainer) {
+      tableContainer.innerHTML = '<div class="table-placeholder">Table view will appear here after analysis...</div>';
+    }
+  }
+
+  function escapeHtml(text) {
+    if (typeof text !== 'string') {
+      return String(text || '');
+    }
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function updateResponseDebugInfo(responseText) {
+    try {
+      const charCount = responseText ? responseText.length : 0;
+      const dataSize = charCount;
+
+      // Update response statistics
+      const responseCharCountElement = document.getElementById('responseCharCount');
+      const responseDataSizeElement = document.getElementById('responseDataSize');
+      
+      if (responseCharCountElement) {
+        responseCharCountElement.textContent = charCount > 0 ? charCount.toLocaleString() : '-';
+      }
+      
+      if (responseDataSizeElement) {
+        responseDataSizeElement.textContent = dataSize > 0 ? formatDataSize(dataSize) : '-';
+      }
+
+    } catch (error) {
+      console.error('Error updating response debug info:', error);
+    }
+  }
+
+  function showQueryView(viewType) {
+    // Update button states
+    const rawBtn = document.getElementById('rawViewBtn');
+    const tableBtn = document.getElementById('tableViewBtn');
+    
+    if (rawBtn && tableBtn) {
+      rawBtn.classList.toggle('active', viewType === 'raw');
+      tableBtn.classList.toggle('active', viewType === 'table');
+    }
+    
+    // Update view visibility
+    const rawView = document.getElementById('debugQueryRaw');
+    const tableView = document.getElementById('debugQueryTable');
+    
+    if (rawView && tableView) {
+      rawView.style.display = viewType === 'raw' ? 'block' : 'none';
+      tableView.style.display = viewType === 'table' ? 'block' : 'none';
+    }
+  }
+
   // Make functions globally available for debugging
   window.analyzeOpportunity = analyzeOpportunity;
   window.clearForm = clearForm;
@@ -885,6 +1127,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.exportData = exportData;
   window.printReport = printReport;
   window.toggleDebugSection = toggleDebugSection;
+  window.showQueryView = showQueryView;
 
   // Initialize the application
   initializeApp();

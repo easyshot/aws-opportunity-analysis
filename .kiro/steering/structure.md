@@ -47,9 +47,11 @@ AWS CDK infrastructure stacks and services:
 Multiple UI implementations with progressive enhancement and debugging capabilities:
 
 #### Core Application Files
-- `index-compact.html`: **Main application** (Option C - Modern Dashboard)
-- `styles-compact.css`: **Main stylesheet** (Option C styles)
-- `app-compact.js`: **Main JavaScript** (Option C functionality with debug panels)
+- `index.html`: **Main application** (Primary interface with enhanced debug features)
+- `app-clean.js`: **Main JavaScript** (Primary functionality with comprehensive debug integration)
+- `styles-compact-option-c.css`: **Main stylesheet** (Modern styling with debug panel support)
+- `index-compact.html`: **Alternative interface** (Option C - Modern Dashboard)
+- `app-compact-option-c.js`: **Alternative JavaScript** (Option C functionality)
 
 #### Alternative UI Options
 - **Option A - Clean Professional**:
@@ -88,7 +90,12 @@ Multiple UI implementations with progressive enhancement and debugging capabilit
 - **Grid/List View Toggle**: Flexible analysis result viewing options
 - **Live Timestamps**: Real-time timestamp updates in header
 - **Sample Data Loading**: Quick-load functionality for testing and demonstrations
-- **Debug Information Panels**: Real-time display of SQL queries, query results, and Bedrock payloads for troubleshooting
+- **Enhanced Debug Information Panels**: Comprehensive debugging capabilities including:
+  - **Query Results Statistics**: Row count, character count, and data size tracking
+  - **Table View Toggle**: Switch between raw JSON and spreadsheet-like display
+  - **Real-time Data Monitoring**: Live updates of query metrics and payload sizes
+  - **Truncation Visibility**: Clear indication when data truncation occurs
+  - **Interactive Debug Controls**: User-friendly interface for debugging data flow
 
 ### Enhanced Analysis Sections
 - **Six Core Analysis Areas**: Methodology, Findings, Risk Factors, Similar Projects, Rationale, Full Analysis
@@ -177,7 +184,12 @@ Each UI option follows a consistent class-based pattern:
 - Ensure debug information doesn't impact performance
 
 ### Debugging and Troubleshooting
-- **Frontend Debug Panels**: Real-time display of SQL queries, query results, and Bedrock payloads
+- **Enhanced Frontend Debug Panels**: Comprehensive debugging interface featuring:
+  - **Query Results Analysis**: Row counts, character counts, and data size monitoring
+  - **Table View Display**: Spreadsheet-like visualization of query results with sortable columns
+  - **Real-time Statistics**: Live tracking of data metrics and payload sizes
+  - **Truncation Management**: Intelligent data truncation with visibility into size limits
+  - **Interactive Debug Controls**: Toggle between raw JSON and formatted table views
 - **Backend Enhanced Logging**: Comprehensive debug output in automation scripts
 - **Data Flow Tracing**: End-to-end visibility from frontend input to Bedrock response
 - **Error Identification**: Clear identification of where data flow breaks down

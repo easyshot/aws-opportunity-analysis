@@ -76,6 +76,34 @@ function preparePayload(params, promptData) {
       .replace('{{oppName}}', params.oppName || 'Not specified')
       .replace('{{oppDescription}}', params.oppDescription || 'Not specified');
 
+    // Debug: Show what's being sent to Bedrock for SQL generation
+    console.log("\n" + "=".repeat(60));
+    console.log("🤖 BEDROCK SQL QUERY GENERATION PAYLOAD");
+    console.log("=".repeat(60));
+    console.log("📋 MODEL CONFIGURATION:");
+    console.log("   Model ID:", modelId);
+    console.log("   Max Tokens: 4096");
+    console.log("   Temperature: 0.0");
+    console.log("   Purpose: SQL Query Generation");
+    console.log("\n📝 PROMPT CONFIGURATION:");
+    console.log("   Prompt ID:", PROMPT_ID);
+    console.log("   System Instructions Length:", systemInstructions.length, "characters");
+    console.log("   User Template Length:", userMessageTemplate.length, "characters");
+    console.log("\n📊 INPUT PARAMETERS:");
+    console.log("   Customer Name:", params.CustomerName || 'Not specified');
+    console.log("   Region:", params.region || 'Not specified');
+    console.log("   Close Date:", params.closeDate || 'Not specified');
+    console.log("   Opportunity Name:", params.oppName || 'Not specified');
+    console.log("   Description Length:", (params.oppDescription || '').length, "characters");
+    console.log("\n🔧 COMPLETE BEDROCK PAYLOAD:");
+    console.log(JSON.stringify({
+      modelId: modelId,
+      system: [{ text: systemInstructions.substring(0, 200) + "..." }],
+      messages: [{ role: "user", content: [{ text: filledUserMessage.substring(0, 500) + "..." }] }],
+      inferenceConfig: { maxTokens: 4096, temperature: 0.0 }
+    }, null, 2));
+    console.log("=".repeat(60) + "\n");
+
     return {
       modelId: modelId,
       system: [{ text: systemInstructions }],

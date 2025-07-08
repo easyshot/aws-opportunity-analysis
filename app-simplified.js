@@ -148,13 +148,9 @@ app.post('/api/analyze', async (req, res) => {
     
     let analysisResult;
     
-    if (useNovaPremier) {
-      console.log('🚀 Using Nova Premier model...');
-      analysisResult = await finalBedAnalysisPromptNovaPremier.execute(analysisParams);
-    } else {
-      console.log('🔧 Using standard Titan model...');
-      analysisResult = await finalBedAnalysisPrompt.execute(analysisParams);
-    }
+    // Always use standard analysis prompt (Nova Premier disabled)
+    console.log('🔧 Using standard analysis model (FDUHITJIME)...');
+    analysisResult = await finalBedAnalysisPrompt.execute(analysisParams);
     
     if (analysisResult.status === 'error') {
       console.log('❌ Bedrock analysis failed:', analysisResult.message);

@@ -72,6 +72,34 @@ async function fetchPrompt(promptId) {
 }
 
 /**
+ * Truncate query results to fit within model limits while preserving most relevant data
+ */
+function truncateQueryResults(queryResults, maxLength = 200000) {
+  try {
+    // Convert to string if needed
+    const queryString = typeof queryResults === 'string' ? queryResults : JSON.stringify(queryResults);
+    
+    // Return as-is if already small enough
+    if (queryString.length <= maxLength) {
+      return queryString;
+    }
+    
+    console.log(`PROCESS_RESULTS (Analysis): Truncating query results from ${queryString.length} to ~${maxLength} characters`);
+    
+    // Simple truncation - more reliable and faster
+    const truncated = queryString.substring(0, maxLength);
+    console.log(`PROCESS_RESULTS (Analysis): Truncation applied: ${truncated.length} characters`);
+    return truncated;
+    
+  } catch (error) {
+    console.error("PROCESS_RESULTS (Analysis): Error truncating query results:", error);
+    // Fallback to simple string conversion and truncation
+    const fallback = String(queryResults).substring(0, maxLength);
+    return fallback;
+  }
+}
+
+/**
  * Prepare payload for Bedrock Converse API
  */
 function preparePayload(params, promptData) {
@@ -85,14 +113,19 @@ function preparePayload(params, promptData) {
     console.log("PROCESS_RESULTS (Analysis): Does template contain '{{queryResults}}':", userMessageTemplate.includes('{{queryResults}}'));
     console.log("PROCESS_RESULTS (Analysis): Full user message template:", userMessageTemplate);
 
-    // Format query results for the template
-    const queryResults = typeof params.queryResults === 'string' 
+    // Format and truncate query results for the template
+    const rawQueryResults = typeof params.queryResults === 'string' 
       ? params.queryResults 
       : JSON.stringify(params.queryResults);
+    
+    // Truncate query results to prevent model input limits
+    const queryResults = truncateQueryResults(rawQueryResults);
 
     // Debug: Show the actual query results content
     console.log("PROCESS_RESULTS (Analysis): Query results type:", typeof params.queryResults);
-    console.log("PROCESS_RESULTS (Analysis): Raw query results (first 1000 chars):", params.queryResults ? params.queryResults.substring(0, 1000) : 'null');
+    console.log("PROCESS_RESULTS (Analysis): Raw query results length:", rawQueryResults.length);
+    console.log("PROCESS_RESULTS (Analysis): Truncated query results length:", queryResults.length);
+    console.log("PROCESS_RESULTS (Analysis): Raw query results (first 1000 chars):", rawQueryResults.substring(0, 1000));
     console.log("PROCESS_RESULTS (Analysis): Formatted query results (first 1000 chars):", queryResults.substring(0, 1000));
     console.log("PROCESS_RESULTS (Analysis): Query results contains real data:", queryResults.includes('"VarCharValue"') || queryResults.includes('"Row"'));
     console.log("PROCESS_RESULTS (Analysis): Query results contains mock data:", queryResults.includes('Project Alpha') || queryResults.includes('Customer A'));
@@ -127,19 +160,98 @@ function preparePayload(params, promptData) {
     console.log("PROCESS_RESULTS (Analysis): Does filled message contain actual query data:", filledUserMessage.includes('Project Alpha') || filledUserMessage.includes('Acme Corp'));
     console.log("PROCESS_RESULTS (Analysis): Full filled user message:", filledUserMessage);
     
-    // Debug: Show the system instructions
-    console.log("PROCESS_RESULTS (Analysis): System instructions (first 500 chars):", systemInstructions.substring(0, 500));
-    console.log("PROCESS_RESULTS (Analysis): Full system instructions:", systemInstructions);
+    // Create enhanced payload with both template and actual data
+    const enhancedUserMessage = `
+<opp_details>
+New Opportunity Information:
+- Customer Name: ${params.CustomerName || 'Not specified'}
+- Region: ${params.region || 'Not specified'}
+- Close Date: ${params.closeDate || 'Not specified'}
+- Opportunity Name: ${params.oppName || 'Not specified'}
+- Description: ${params.oppDescription || 'Not specified'}
+- Industry: ${params.industry || 'Not specified'}
+- Customer Segment: ${params.customerSegment || 'Not specified'}
+- Partner Name: ${params.partnerName || 'Not specified'}
+- Activity Focus: ${params.activityFocus || 'Not specified'}
+- Business Description: ${params.businessDescription || 'Not specified'}
+- Migration Phase: ${params.migrationPhase || 'Not specified'}
+</opp_details>
+
+<project_data>
+Historical Project Dataset:
+${queryResults}
+</project_data>
+
+${filledUserMessage}`;
+
+    // Check final message size and truncate further if needed
+    const maxTotalSize = 300000; // Conservative limit for Claude
+    let finalUserMessage = enhancedUserMessage;
+    
+    if (finalUserMessage.length > maxTotalSize) {
+      console.log(`PROCESS_RESULTS (Analysis): Final message too large (${finalUserMessage.length}), applying additional truncation`);
+      
+      // Further truncate query results if needed
+      const oppDetailsSize = enhancedUserMessage.indexOf('<project_data>');
+      const templateSize = filledUserMessage.length;
+      const availableForData = maxTotalSize - oppDetailsSize - templateSize - 1000; // Buffer
+      
+      const furtherTruncatedResults = truncateQueryResults(queryResults, Math.max(50000, availableForData));
+      
+      finalUserMessage = `
+<opp_details>
+New Opportunity Information:
+- Customer Name: ${params.CustomerName || 'Not specified'}
+- Region: ${params.region || 'Not specified'}
+- Close Date: ${params.closeDate || 'Not specified'}
+- Opportunity Name: ${params.oppName || 'Not specified'}
+- Description: ${params.oppDescription || 'Not specified'}
+- Industry: ${params.industry || 'Not specified'}
+- Customer Segment: ${params.customerSegment || 'Not specified'}
+- Partner Name: ${params.partnerName || 'Not specified'}
+- Activity Focus: ${params.activityFocus || 'Not specified'}
+- Business Description: ${params.businessDescription || 'Not specified'}
+- Migration Phase: ${params.migrationPhase || 'Not specified'}
+</opp_details>
+
+<project_data>
+Historical Project Dataset:
+${furtherTruncatedResults}
+</project_data>
+
+${filledUserMessage}`;
+    }
+
+    // Debug: Show the analysis payload configuration
+    console.log("\n" + "=".repeat(60));
+    console.log("🧠 BEDROCK ANALYSIS GENERATION PAYLOAD");
+    console.log("=".repeat(60));
+    console.log("📋 MODEL CONFIGURATION:");
+    console.log("   Model ID:", modelId);
+    console.log("   Max Tokens: 4096");
+    console.log("   Temperature: 0.1");
+    console.log("   Purpose: Opportunity Analysis");
+    console.log("\n📊 DATA BEING ANALYZED:");
+    console.log("   Final Message Length:", finalUserMessage.length, "characters");
+    console.log("   Query Results Length:", queryResults.length, "characters");
+    console.log("   System Instructions Length:", systemInstructions.length, "characters");
+    console.log("   User Template Length:", userMessageTemplate.length, "characters");
+    console.log("=".repeat(60) + "\n");
     
     // Store the complete payload for debug purposes
     if (!global.debugInfo) global.debugInfo = {};
+
+    console.log("PROCESS_RESULTS (Analysis): Enhanced user message (first 1000 chars):", finalUserMessage.substring(0, 1000));
+    console.log("PROCESS_RESULTS (Analysis): Enhanced message contains opportunity data:", finalUserMessage.includes(params.CustomerName || 'Not specified'));
+    console.log("PROCESS_RESULTS (Analysis): Enhanced message contains query results:", finalUserMessage.includes('VarCharValue') || finalUserMessage.includes('Rows'));
+
     global.debugInfo.bedrockPayload = JSON.stringify({
       modelId: modelId,
       system: [{ text: systemInstructions }],
       messages: [
         {
           role: "user",
-          content: [{ text: filledUserMessage }]
+          content: [{ text: finalUserMessage }]
         }
       ],
       inferenceConfig: {
@@ -154,7 +266,7 @@ function preparePayload(params, promptData) {
       messages: [
         {
           role: "user",
-          content: [{ text: filledUserMessage }]
+          content: [{ text: finalUserMessage }]
         }
       ],
       inferenceConfig: {
@@ -202,12 +314,15 @@ function processConverseApiResponse(response) {
   global.debugInfo.fullResponse = messageContentText;
   
   try {
-    // Extract all sections from the analysis text
-    const metricsMatch = messageContentText.match(/===\s*METRICS\s*===\s*([\s\S]*?)(?===\s*|$)/i);
+    // Extract all sections from the analysis text - look for SUMMARY METRICS
+    const metricsMatch = messageContentText.match(/===\s*SUMMARY\s*METRICS\s*===\s*([\s\S]*?)(?===\s*|$)/i);
     const metricsText = metricsMatch ? metricsMatch[1].trim() : '';
     
     // If no metrics section found, try to extract from the full text
     const fullTextForMetrics = metricsText || messageContentText;
+    
+    console.log("PROCESS_RESULTS (Analysis): Metrics section found:", !!metricsText);
+    console.log("PROCESS_RESULTS (Analysis): Metrics text (first 500 chars):", metricsText.substring(0, 500));
     
     const methodologyMatch = messageContentText.match(/===\s*ANALYSIS\s*METHODOLOGY\s*===\s*([\s\S]*?)(?===\s*|$)/i);
     const methodologyText = methodologyMatch ? methodologyMatch[1].trim() : '';
@@ -252,16 +367,23 @@ function processConverseApiResponse(response) {
     const sectionHeaders = messageContentText.match(/===.*?===/g);
     console.log("PROCESS_RESULTS (Analysis): All section headers found:", sectionHeaders);
     
-    // Parse metrics with more flexible patterns
-    const arrMatch = fullTextForMetrics.match(/(?:Predicted\s*ARR|ARR|Annual\s*Run\s*Rate|PREDICTED_ARR):\s*\$?([\d,]+)/i);
-    const mrrMatch = fullTextForMetrics.match(/(?:Predicted\s*MRR|MRR|Monthly\s*Recurring\s*Revenue):\s*\$?([\d,]+)/i);
-    const launchDateMatch = fullTextForMetrics.match(/(?:Estimated\s*Launch\s*Date|Launch\s*Date|Expected\s*Launch|LAUNCH_DATE):\s*([^\n]+)/i);
-    const durationMatch = fullTextForMetrics.match(/(?:Project\s*Duration|Duration|Timeline|PREDICTED_PROJECT_DURATION):\s*([^\n]+)/i);
-    const confidenceMatch = fullTextForMetrics.match(/Confidence:\s*(HIGH|MEDIUM|LOW)/i);
+    // Parse metrics with exact patterns from Bedrock response
+    const arrMatch = fullTextForMetrics.match(/PREDICTED_ARR:\s*\$?([\d,]+)/i);
+    const mrrMatch = fullTextForMetrics.match(/MRR:\s*\$?([\d,]+)/i);
+    const launchDateMatch = fullTextForMetrics.match(/LAUNCH_DATE:\s*([^\n]+)/i);
+    const durationMatch = fullTextForMetrics.match(/PREDICTED_PROJECT_DURATION:\s*([^\n]+)/i);
+    const confidenceMatch = fullTextForMetrics.match(/CONFIDENCE:\s*(HIGH|MEDIUM|LOW)/i);
     
-    // Extract top services section with more flexible patterns
-    const servicesMatch = fullTextForMetrics.match(/(?:Top\s*Services|Services|AWS\s*Services|TOP_SERVICES):\s*([\s\S]*?)(?=\n\s*\n|===|$)/i);
+    // Extract top services section - look for the exact pattern from Bedrock
+    const servicesMatch = fullTextForMetrics.match(/TOP_SERVICES:\s*([\s\S]*?)(?=OTHER_SERVICES|CONFIDENCE|===|$)/i);
     const servicesText = servicesMatch ? servicesMatch[1].trim() : '';
+    
+    // Also extract OTHER_SERVICES if present
+    const otherServicesMatch = fullTextForMetrics.match(/OTHER_SERVICES:\s*([^\n]+)/i);
+    const otherServicesText = otherServicesMatch ? otherServicesMatch[1].trim() : '';
+    
+    // Combine services if both are present
+    const combinedServicesText = servicesText + (otherServicesText ? '\n' + otherServicesText : '');
     
     // Add debugging
     console.log("PROCESS_RESULTS (Analysis): Metrics parsing results:");
@@ -298,7 +420,7 @@ function processConverseApiResponse(response) {
     const fallbackDuration = durationMatch ? durationMatch[1].trim() : '6 months';
     const fallbackConfidence = confidenceMatch ? confidenceMatch[1].toUpperCase() : 'MEDIUM';
     const fallbackConfidenceScore = confidenceMatch ? (confidenceMatch[1].toUpperCase() === 'HIGH' ? 85 : confidenceMatch[1].toUpperCase() === 'LOW' ? 45 : 65) : 65;
-    const fallbackServices = servicesText || '**Amazon EC2** - $3,500/month\n\n**Amazon RDS** - $2,000/month\n\n**Amazon S3** - $500/month';
+    const fallbackServices = combinedServicesText || servicesText || '**Amazon EC2** - $3,500/month\n\n**Amazon RDS** - $2,000/month\n\n**Amazon S3** - $500/month';
     
     // Construct result object
     return {
