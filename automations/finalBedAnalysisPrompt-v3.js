@@ -255,7 +255,7 @@ ${filledUserMessage}`;
         }
       ],
       inferenceConfig: {
-        maxTokens: 4096,
+        maxTokens: 8192,
         temperature: 0.1
       }
     }, null, 2);
@@ -270,7 +270,7 @@ ${filledUserMessage}`;
         }
       ],
       inferenceConfig: {
-        maxTokens: 4096,
+        maxTokens: 8192,
         temperature: 0.1
       }
     };

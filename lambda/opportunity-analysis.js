@@ -85,7 +85,7 @@ exports.handler = async (event, context) => {
         }],
         system: systemPrompt ? [{ text: systemPrompt }] : undefined,
         inferenceConfig: {
-          maxTokens: 4000,
+          maxTokens: 5120,
           temperature: 0.1,
         },
       });
@@ -189,6 +189,7 @@ exports.handler = async (event, context) => {
       
       const getAnalysisPromptCommand = new GetPromptCommand({
         promptIdentifier: analysisPromptId,
+        promptVersion: analysisPromptId === process.env.CATAPULT_ANALYSIS_PROMPT_ID ? "$LATEST" : undefined,
       });
       
       const analysisPromptResponse = await bedrockAgent.send(getAnalysisPromptCommand);
@@ -229,7 +230,7 @@ Please provide a comprehensive analysis including predictions for ARR, MRR, laun
         }],
         system: analysisSystemPrompt ? [{ text: analysisSystemPrompt }] : undefined,
         inferenceConfig: {
-          maxTokens: 8000,
+          maxTokens: 8192,
           temperature: 0.2,
         },
       });

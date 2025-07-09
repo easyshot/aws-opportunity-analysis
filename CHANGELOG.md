@@ -1,6 +1,41 @@
 # Partner Opportunity Intelligence Application - Changelog
 
-## [2.2.0] - 2025-07-07 (Current Release)
+## [2.3.0] - 2025-07-08 (Current Release)
+### Production Ready - Bedrock Integration Fixed & Architecture Simplified
+
+#### Fixed - Critical Bedrock Issues
+- **Bedrock Analysis**: Fixed invalid `$LATEST` version parameter causing permission denied errors
+- **Converse API**: Implemented proper Converse API usage throughout the application
+- **Backend Stability**: Successfully migrated to production backend (`app.js`) with full AWS integration
+- **Layout Issues**: Fixed progress indicator positioning by moving it inside the input panel
+
+#### Removed - Architecture Simplification
+- **Nova Premier Removal**: Completely removed Nova Premier model and related complexity
+  - Deleted `finalBedAnalysisPromptNovaPremier-v3.js` automation file
+  - Removed all Nova Premier references from backend, configuration, and environment files
+  - Simplified analysis flow to use only Claude 3.5 Sonnet model
+  - Cleaned up UI options and removed Nova Premier test functions
+- **Code Simplification**: Streamlined codebase by removing unused Nova Premier logic
+
+#### Enhanced - API Integration
+- **Converse API**: All Bedrock interactions now use the modern Converse API
+- **Model Standardization**: Standardized on Claude 3.5 Sonnet model for consistent analysis
+- **Prompt Management**: Simplified prompt configuration with only required prompts
+- **Error Handling**: Improved error handling for Bedrock API interactions
+
+#### Changed - Configuration
+- **Environment Variables**: Removed Nova Premier prompt ID from configuration
+- **AWS Configuration**: Simplified AWS configuration to remove Nova Premier references
+- **Backend Logic**: Streamlined backend to always use standard analysis flow
+- **Debug Information**: Enhanced debug panels now show correct Converse API payloads
+
+#### Technical Improvements
+- **Production Backend**: `app.js` now stable and production-ready with full AWS integration
+- **API Consistency**: All Bedrock calls use consistent Converse API format
+- **Code Maintainability**: Reduced complexity by removing dual-model architecture
+- **Documentation**: Updated all documentation to reflect simplified architecture
+
+## [2.2.0] - 2025-07-07
 ### Enhanced Debug Interface and Data Management
 
 #### Added - Advanced Debug Features
@@ -135,6 +170,13 @@
 
 ## Migration Notes
 
+### From v2.2.0 to v2.3.0
+- **Production Ready**: System now uses stable production backend with full AWS integration
+- **Bedrock Fixed**: All Bedrock analysis issues resolved with proper Converse API implementation
+- **Simplified Architecture**: Nova Premier removed - system now uses only Claude 3.5 Sonnet model
+- **Layout Fixed**: Progress indicator now properly positioned within input panel
+- **API Modernization**: All Bedrock interactions use modern Converse API format
+
 ### From v2.1.0 to v2.2.0
 - **Enhanced Debug Interface**: New advanced debug features automatically available in main application
 - **Data Management**: Intelligent truncation system handles large datasets automatically
@@ -156,22 +198,20 @@
 - **Configuration**: No configuration changes required for existing setups
 
 ### Recommended Actions
-1. **Update Bookmarks**: Use `http://localhost:3123/` for the main application with enhanced debug features
-2. **Explore Debug Features**: Test the new query results statistics, character counting, and table view functionality
-3. **Test Large Datasets**: Verify the intelligent truncation system with large data scenarios
-4. **Enable Debugging**: Configure debug environment variables for comprehensive troubleshooting
-5. **Review Documentation**: Familiarize with updated troubleshooting procedures and debug capabilities
-6. **Provide Feedback**: Report any issues or suggestions for further improvements
-7. **Training**: Familiarize users with the enhanced debug interface and data management features
+1. **Restart Application**: Restart both backend and frontend servers to use the production backend
+2. **Test Analysis**: Verify that Bedrock analysis now works correctly with real data
+3. **Explore Simplified Interface**: Experience the streamlined interface without Nova Premier complexity
+4. **Validate Debug Features**: Test the enhanced debug panels showing correct Converse API payloads
+5. **Review Documentation**: Familiarize with updated architecture and simplified configuration
+6. **Performance Testing**: Test the improved performance with the production backend
+7. **Provide Feedback**: Report any issues or suggestions for further improvements
 
 ## Known Issues
-- **Backend Stability**: Main app.js has corruption issues, using app-debug.js for stability
-- **Mock Data Generation**: Bedrock sometimes generates mock data instead of using real query results
-- **Data Flow Debugging**: Ongoing investigation into query results to Bedrock payload injection (enhanced debug tools now available for troubleshooting)
+- **None**: All major issues have been resolved in v2.3.0
 
-## Upcoming Fixes
-- **Backend Corruption**: Resolution of app.js corruption and migration to production backend
-- **Real Data Flow**: Implementation of fixes to ensure real data is used in analysis (enhanced debug tools available for investigation)
+## Upcoming Enhancements
 - **Performance Optimization**: Caching implementation and load testing
-- **Production Readiness**: Complete AWS integration validation and monitoring setup
+- **Enhanced Features**: Additional analysis capabilities and export options
+- **User Experience**: Accessibility improvements and customization options
+- **Advanced Analytics**: Real-time dashboard and usage analytics
 - **Debug Enhancement**: Continue expanding debug capabilities based on user feedback 

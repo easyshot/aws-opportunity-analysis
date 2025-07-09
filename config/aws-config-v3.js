@@ -94,8 +94,7 @@ async function getConfig() {
         bedrock: {
           prompts: {
             queryPromptId: process.env.CATAPULT_QUERY_PROMPT_ID || 'Y6T66EI3GZ',
-            analysisPromptId: process.env.CATAPULT_ANALYSIS_PROMPT_ID || 'FDUHITJIME',
-            analysisPromptNovaPremierId: process.env.CATAPULT_ANALYSIS_PROMPT_NOVA_PREMIER_ID || 'P03B9TO1Q1'
+            analysisPromptId: process.env.CATAPULT_ANALYSIS_PROMPT_ID || 'FDUHITJIME'
           }
         }
       };
@@ -120,8 +119,7 @@ module.exports = {
   config: {
     promptIds: {
       queryPrompt: process.env.CATAPULT_QUERY_PROMPT_ID,
-      analysisPrompt: process.env.CATAPULT_ANALYSIS_PROMPT_ID,
-      analysisPromptNovaPremier: process.env.CATAPULT_ANALYSIS_PROMPT_NOVA_PREMIER_ID  // Not used - kept for compatibility
+      analysisPrompt: process.env.CATAPULT_ANALYSIS_PROMPT_ID
     },
     lambda: {
       catapultGetDataset: process.env.CATAPULT_GET_DATASET_LAMBDA

@@ -1,12 +1,12 @@
 # AWS Bedrock Partner Management System - Technical Stack
 
 ## Technology Stack
-- **Backend**: Node.js 18.x with Express (production-ready with full AWS integration, currently using app-debug.js for stability)
+- **Backend**: Node.js 18.x with Express (production-ready with full AWS integration using Converse API)
 - **Frontend**: Modern HTML5, CSS3, JavaScript (ES6+) with class-based architecture and PWA capabilities
 - **UI Framework**: Vanilla JavaScript with modern web standards (no external frameworks)
 - **Infrastructure**: AWS CDK (TypeScript) for Infrastructure as Code
 - **AWS Services** (Complete Integration):
-  - **AWS Bedrock**: AI/ML capabilities with Titan and Nova Premier models, Agent orchestration
+  - **AWS Bedrock**: AI/ML capabilities with Claude 3.5 Sonnet model using Converse API, Agent orchestration
   - **AWS Lambda**: Serverless compute with specialized functions and shared utilities layer
   - **Amazon Athena**: SQL queries against historical data with performance optimization
   - **Amazon DynamoDB**: NoSQL database with Global Tables and Streams
@@ -92,7 +92,7 @@ npm install
 
 # Development (Local with Mock Data)
 npm run dev-all                    # Start both backend and frontend servers (recommended)
-npm run dev                        # Backend only (port 8123) - currently using app-debug.js
+npm run dev                        # Backend only (port 8123) - production backend
 npm run dev-frontend               # Frontend only (port 3123)
 npm run debug                      # Backend in debug mode with comprehensive mock data
 
@@ -131,7 +131,6 @@ AWS_SECRET_ACCESS_KEY=your-secret-key
 # Bedrock Prompt IDs
 CATAPULT_QUERY_PROMPT_ID=Y6T66EI3GZ
 CATAPULT_ANALYSIS_PROMPT_ID=FDUHITJIME
-CATAPULT_ANALYSIS_PROMPT_NOVA_PREMIER_ID=P03B9TO1Q1
 
 # Lambda Function
 CATAPULT_GET_DATASET_LAMBDA=catapult_get_dataset
@@ -151,7 +150,7 @@ DEBUG_LOG_LEVEL=info
 - Debug configuration enables enhanced troubleshooting capabilities.
 
 ## Server Configuration
-- **Backend server**: Runs on port 8123 by default (using app-debug.js for stability)
+- **Backend server**: Runs on port 8123 by default (using app.js for production)
 - **Frontend server**: Runs on port 3123 by default with proxy configuration
 - **API Proxy**: Frontend automatically proxies `/api/*` requests to backend
 - **Static Assets**: Frontend server serves static files from `/public` directory
@@ -197,7 +196,7 @@ DEBUG_LOG_LEVEL=info
 ## Development Workflow
 - **Primary Interface**: Option C (Modern Dashboard) for all new development
 - **Testing**: All three UI options maintained for comparison and testing
-- **Debugging**: app-debug.js provides stable backend with comprehensive mock data and enhanced debugging
+- **Debugging**: app-debug.js provides development backend with comprehensive mock data for testing
 - **Hot Reload**: nodemon for automatic server restart during development
 - **Data Flow Tracing**: Real-time visibility into SQL queries, query results, and Bedrock payloads
 
@@ -228,12 +227,13 @@ DEBUG_LOG_LEVEL=info
 - **Business Intelligence**: Custom dashboards and reporting capabilities
 
 ## Current Development Focus
-- **Backend Stability**: Using app-debug.js for stable operation while fixing app.js corruption
-- **Enhanced Debug Infrastructure**: Implemented comprehensive debugging capabilities including:
+- **Production Ready**: Successfully migrated to stable production backend with full AWS integration
+- **Bedrock Integration**: Fixed Bedrock analysis issues and implemented proper Converse API usage
+- **Simplified Architecture**: Removed Nova Premier complexity and standardized on Claude 3.5 Sonnet
+- **Enhanced Debug Infrastructure**: Comprehensive debugging capabilities including:
   - **Query Results Analysis**: Row counting, character tracking, and data size monitoring
   - **Table View Functionality**: Spreadsheet-like display with interactive controls
   - **Truncation Management**: Intelligent data truncation system with multi-level size management
   - **Real-time Statistics**: Live tracking of data flow metrics and payload sizes
 - **Data Flow Optimization**: Resolved input size limitations with intelligent truncation system
-- **Production Readiness**: Preparing for full AWS integration with enhanced monitoring and debugging
 - **Operational Excellence**: Comprehensive monitoring, alerting, and troubleshooting capabilities

@@ -75,7 +75,7 @@ async function generateOpportunityQuery(parameters) {
                 }
             ],
             inferenceConfig: {
-                maxTokens: 4096,
+                maxTokens: 5120,
                 temperature: 0.0
             }
         };

@@ -7,8 +7,8 @@ This comprehensive serverless application analyzes business opportunities using 
 The AWS Bedrock Partner Management System is **fully implemented and production-ready** with comprehensive features including:
 
 - ✅ **Complete Frontend Interface**: Modern dashboard with three UI options and real-time features
-- ✅ **Comprehensive Backend**: Express.js API with full AWS service integration (using app-debug.js for stability)
-- ✅ **AI/ML Integration**: AWS Bedrock with Titan and Nova Premier models, RAG enhancement
+- ✅ **Comprehensive Backend**: Express.js API with full AWS service integration using Converse API
+- ✅ **AI/ML Integration**: AWS Bedrock with Claude 3.5 Sonnet model using Converse API, RAG enhancement
 - ✅ **Advanced Analytics**: Six analysis areas, funding analysis, and follow-on opportunities
 - ✅ **Serverless Infrastructure**: Complete CDK implementation with multi-environment support
 - ✅ **Enterprise Security**: IAM roles, encryption, secrets management, and compliance controls
@@ -37,7 +37,7 @@ The AWS Bedrock Partner Management System is **fully implemented and production-
   - **Multi-format Display**: Toggle between raw JSON and formatted table views
 
 ### 🤖 AI-Powered Analysis Engine
-- **Multi-Model AI Integration**: AWS Bedrock Titan and Nova Premier models with intelligent selection
+- **AI-Powered Analysis**: AWS Bedrock Claude 3.5 Sonnet model with Converse API integration
 - **Six Comprehensive Analysis Areas**:
   - **Methodology**: Detailed analysis approach and data sources
   - **Findings**: Key insights and market intelligence with visual indicators
@@ -92,7 +92,7 @@ npm install
 npm run dev-all
 
 # Or start separately:
-npm run dev           # Backend only (port 8123) - using app-debug.js for stability
+npm run dev           # Backend only (port 8123) - production backend
 npm run dev-frontend  # Frontend only (port 3123)
 ```
 
@@ -151,21 +151,23 @@ npm run knowledge-base:deploy     # RAG enhancement
 
 ## Current Development Focus
 
-### Backend Stability & Enhanced Debugging
-- **Current Status**: Using `app-debug.js` for stable operation (main `app.js` has corruption issues)
-- **Enhanced Debug Infrastructure**: Implemented comprehensive debugging capabilities including:
+### Production Ready & Enhanced Debugging
+- **Production Status**: Successfully migrated to stable production backend (`app.js`) with full AWS integration
+- **Bedrock Integration**: Fixed Bedrock analysis issues by resolving invalid prompt version parameters
+- **Simplified Architecture**: Removed Nova Premier complexity and standardized on Claude 3.5 Sonnet model
+- **Enhanced Debug Infrastructure**: Comprehensive debugging capabilities including:
   - **Query Results Analysis**: Row counting, character tracking, and data size monitoring
   - **Table View Functionality**: Spreadsheet-like display with interactive controls
   - **Truncation Management**: Intelligent data truncation system resolving input size limitations
   - **Real-time Statistics**: Live tracking of data flow metrics and payload sizes
 - **Data Flow Optimization**: Resolved Bedrock input size errors with multi-level truncation system
-- **Mock Data Resolution**: Investigating why Bedrock generates mock data instead of using real query results
+- **Converse API**: All Bedrock interactions now use the modern Converse API for consistent communication
 
-### Production Readiness
-- **AWS Integration**: Preparing for full integration with live AWS services
-- **Operational Excellence**: Comprehensive monitoring, alerting, and troubleshooting capabilities
-- **Performance Optimization**: Ensuring debug features don't impact user experience
+### Operational Excellence
+- **AWS Integration**: Full integration with live AWS services using proper API versions
+- **Performance Optimization**: Debug features optimized to not impact user experience
 - **Documentation**: Complete operational procedures and troubleshooting guides
+- **Monitoring**: Comprehensive monitoring, alerting, and troubleshooting capabilities
 
 ## Application Structure
 
@@ -180,15 +182,15 @@ npm run knowledge-base:deploy     # RAG enhancement
 - **JavaScript**: ES6+ class-based architecture with real-time features and debug integration
 
 ### Backend Architecture
-- `app-debug.js`: Main application entry point (currently active for stability)
-- `app.js`: Original application entry point (currently has corruption issues)
+- `app.js`: Main application entry point (production ready with full AWS integration)
+- `app-debug.js`: Debug application entry point (for development and testing)
 - `frontend-server.js`: Frontend proxy server (port 3123)
 - `public/`: Modern frontend files with multiple UI options and debug panels
 - `automations/`: Backend automation scripts (v3 versions are current standard)
   - `invokeBedrockQueryPrompt-v3.js`: Generates SQL queries using Bedrock
   - `InvLamFilterAut-v3.js`: Executes SQL queries via Lambda
   - `finalBedAnalysisPrompt-v3.js`: Analyzes data using standard Bedrock model
-  - `finalBedAnalysisPromptNovaPremier-v3.js`: Analyzes data using Nova Premier model
+
 - `lambda/`: AWS Lambda functions
   - `catapult_get_dataset-v3.js`: Executes SQL against Athena
 - `config/`: Configuration files
@@ -198,9 +200,8 @@ npm run knowledge-base:deploy     # RAG enhancement
 
 The application now supports two orchestration modes with enhanced debugging:
 
-### Traditional Automation Flow
-- **Standard Flow**: Uses Titan Bedrock model and the original analysis prompt for predictions.
-- **Nova Premier Flow**: Uses Amazon Nova Premier model and enhanced prompt for robust date handling and improved analysis.
+### Analysis Flow
+- **Standard Flow**: Uses Claude 3.5 Sonnet model with Converse API for comprehensive analysis and predictions.
 - **Enhanced Debugging**: Real-time visibility into SQL queries, query results, and Bedrock payloads.
 
 ### Bedrock Agent Orchestration (Recommended)
@@ -223,8 +224,7 @@ Request body:
   "closeDate": "2025-12-20",
   "opportunityName": "Autonomous Vehicle Data Platform",
   "description": "Revolutionary autonomous vehicle data processing and analytics platform...",
-  "useBedrockAgent": true,  // Enable intelligent orchestration
-  "useNovaPremier": false   // Optional: use Nova Premier model
+  "useBedrockAgent": true  // Enable intelligent orchestration
 }
 ```
 

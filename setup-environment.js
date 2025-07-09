@@ -43,7 +43,7 @@ console.log('');
 console.log('⚙️ Required Service Configuration:');
 console.log('   CATAPULT_QUERY_PROMPT_ID - Bedrock prompt ID for SQL queries');
 console.log('   CATAPULT_ANALYSIS_PROMPT_ID - Bedrock prompt ID for analysis');
-console.log('   CATAPULT_ANALYSIS_PROMPT_NOVA_PREMIER_ID - Bedrock prompt ID for Nova Premier analysis');
+
 console.log('   CATAPULT_GET_DATASET_LAMBDA - Lambda function name for data retrieval');
 console.log('   ATHENA_DATABASE - Athena database name');
 console.log('   ATHENA_OUTPUT_LOCATION - S3 location for Athena query results');
@@ -73,7 +73,7 @@ console.log('');
 console.log('   # Bedrock Prompts');
 console.log('   CATAPULT_QUERY_PROMPT_ID=Y6T66EI3GZ');
 console.log('   CATAPULT_ANALYSIS_PROMPT_ID=FDUHITJIME');
-console.log('   CATAPULT_ANALYSIS_PROMPT_NOVA_PREMIER_ID=P03B9TO1Q1');
+
 console.log('');
 console.log('   # Lambda Functions');
 console.log('   CATAPULT_GET_DATASET_LAMBDA=catapult_get_dataset');

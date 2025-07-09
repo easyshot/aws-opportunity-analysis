@@ -16,19 +16,19 @@ const PROMPT_ID = config.promptIds.queryPrompt;
 exports.execute = async (params) => {
   try {
     console.log('Starting invokeBedrockQueryPrompt with params:', JSON.stringify(params));
-    
+
     // Step 1: Fetch the Bedrock Prompt resource
     const promptData = await fetchPrompt(PROMPT_ID);
-    
+
     // Step 2: Prepare payload for Bedrock Converse API
     const payload = preparePayload(params, promptData);
-    
+
     // Step 3: Invoke Bedrock Converse API
     const converseResponse = await invokeBedrockConverse(payload);
-    
+
     // Step 4: Process results
     const processedResults = processConverseApiResponse(converseResponse);
-    
+
     return {
       status: 'success',
       processResults: processedResults
@@ -51,7 +51,7 @@ async function fetchPrompt(promptId) {
     const command = new GetPromptCommand({
       promptIdentifier: promptId
     });
-    
+
     const response = await bedrockAgent.send(command);
     return response;
   } catch (error) {
@@ -114,7 +114,7 @@ function preparePayload(params, promptData) {
         }
       ],
       inferenceConfig: {
-        maxTokens: 4096,
+        maxTokens: 5120,
         temperature: 0.0
       }
     };
@@ -142,26 +142,26 @@ async function invokeBedrockConverse(payload) {
  * Process Converse API response
  */
 function processConverseApiResponse(response) {
-  console.log("PROCESS_RESULTS (SQL Query): Starting. Input response object (first 1000 chars):", JSON.stringify(response, null, 2).substring(0,1000));
-  
+  console.log("PROCESS_RESULTS (SQL Query): Starting. Input response object (first 1000 chars):", JSON.stringify(response, null, 2).substring(0, 1000));
+
   if (!response || !response.output || !response.output.message || !response.output.message.content || !response.output.message.content[0] || !response.output.message.content[0].text) {
     console.error("PROCESS_RESULTS (SQL Query): Invalid or incomplete Bedrock Converse API response structure. Full response:", JSON.stringify(response, null, 2));
     throw new Error("Invalid or incomplete Bedrock Converse API response structure for SQL query generation.");
   }
-  
+
   const messageContentText = response.output.message.content[0].text;
   console.log("PROCESS_RESULTS (SQL Query): Extracted message content (should be a JSON string):", messageContentText);
-  
+
   try {
     const parsedJson = JSON.parse(messageContentText);
     if (parsedJson && typeof parsedJson.sql_query === 'string') {
       console.log("PROCESS_RESULTS (SQL Query): Successfully extracted SQL query from JSON within message content:", parsedJson.sql_query);
       console.log("PROCESS_RESULTS (SQL Query): SQL Query Details - Length:", parsedJson.sql_query.length, "Contains WHERE clauses:", parsedJson.sql_query.includes('WHERE'));
-      
+
       // Store the SQL query for debug purposes
       if (!global.debugInfo) global.debugInfo = {};
       global.debugInfo.sqlQuery = parsedJson.sql_query;
-      
+
       return JSON.stringify(parsedJson);
     } else {
       console.error("PROCESS_RESULTS (SQL Query): Parsed JSON does not contain a 'sql_query' string property. Parsed JSON:", JSON.stringify(parsedJson, null, 2));
@@ -169,7 +169,7 @@ function processConverseApiResponse(response) {
     }
   } catch (error) {
     console.error("PROCESS_RESULTS (SQL Query): Error parsing message content as JSON or extracting sql_query. Error:", error.message, ". Message content was:", messageContentText);
-    
+
     const jsonMatch = messageContentText.match(/{\s*"sql_query"\s*:/);
     if (jsonMatch && jsonMatch[0]) {
       try {
@@ -182,7 +182,7 @@ function processConverseApiResponse(response) {
         console.error("PROCESS_RESULTS (SQL Query): Fallback parsing also failed. Error:", fallbackError.message);
       }
     }
-    
+
     throw new Error("Failed to extract a valid SQL query from the LLM's response. Response was not the expected clean JSON object: " + messageContentText.substring(0, 200) + "...");
   }
 }

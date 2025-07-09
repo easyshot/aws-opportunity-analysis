@@ -51,7 +51,8 @@ async function analyzeOpportunityData(parameters) {
             : process.env.CATAPULT_ANALYSIS_PROMPT_ID;
             
         const promptCommand = new GetPromptCommand({
-            promptIdentifier: promptId
+            promptIdentifier: promptId,
+            promptVersion: promptId === process.env.CATAPULT_ANALYSIS_PROMPT_ID ? "$LATEST" : undefined
         });
         
         const promptResponse = await bedrockAgent.send(promptCommand);

@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const resultsSection = document.getElementById('detailedAnalysis');
   const additionalSections = document.getElementById('additionalSections');
   const debugSection = document.getElementById('debugSection');
+  const progressSection = document.getElementById('progressSection');
   
   // Output elements for projections
   const predictedArr = document.getElementById('predictedArr');
@@ -202,11 +203,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const responseCharCount = document.getElementById('responseCharCount');
     const responseDataSize = document.getElementById('responseDataSize');
     
+    // Clear payload debug statistics
+    const payloadDataSize = document.getElementById('payloadDataSize');
+    const payloadCharCount = document.getElementById('payloadCharCount');
+    const payloadRowCount = document.getElementById('payloadRowCount');
+    const payloadTokenEstimate = document.getElementById('payloadTokenEstimate');
+    
     if (queryRowCount) queryRowCount.textContent = '-';
     if (queryDataSize) queryDataSize.textContent = '-';
     if (queryCharCount) queryCharCount.textContent = '-';
     if (responseCharCount) responseCharCount.textContent = '-';
     if (responseDataSize) responseDataSize.textContent = '-';
+    
+    if (payloadDataSize) payloadDataSize.textContent = '-';
+    if (payloadCharCount) payloadCharCount.textContent = '-';
+    if (payloadRowCount) payloadRowCount.textContent = '-';
+    if (payloadTokenEstimate) payloadTokenEstimate.textContent = '-';
     
     // Clear table view
     clearQueryTable();
@@ -650,14 +662,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return `<div class="service-item">${services}</div>`;
   }
 
-  // Populate debug information
+  // Populate debug information with enhanced data points
   function populateDebugInfo(results) {
+    console.log('populateDebugInfo called with results:', results);
     console.log('Debug info received:', results.debug);
+    console.log('Full results object keys:', Object.keys(results));
     
     const debugSqlQuery = document.getElementById('debugSqlQuery');
     const debugQueryResults = document.getElementById('debugQueryResults');
     const debugBedrockPayload = document.getElementById('debugBedrockPayload');
     const debugFullResponse = document.getElementById('debugFullResponse');
+    
+    let queryResults = '';
+    let bedrockPayload = '';
     
     if (debugSqlQuery) {
       const sqlQuery = results.debug?.sqlQuery || 'No SQL query found in response';
@@ -666,19 +683,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     if (debugQueryResults) {
-      const queryResults = results.debug?.queryResults || 'No query results found in response';
+      queryResults = results.debug?.queryResults || 'No query results found in response';
       debugQueryResults.value = queryResults;
       console.log('Query Results length:', queryResults.length);
       
-      // Update enhanced debug info
+      // Update enhanced debug info for query results
       updateQueryDebugInfo(queryResults);
     }
     
     if (debugBedrockPayload) {
-      const bedrockPayload = results.debug?.bedrockPayload || 'No Bedrock payload found in response';
+      bedrockPayload = results.debug?.bedrockPayload || 'No Bedrock payload found in response';
       debugBedrockPayload.value = bedrockPayload;
       console.log('Bedrock Payload length:', bedrockPayload.length);
-      console.log('Bedrock Payload preview (first 500 chars):', bedrockPayload.substring(0, 500));
+      
+      // Update enhanced debug info for payload
+      updatePayloadDebugInfo(bedrockPayload, queryResults);
     }
     
     if (debugFullResponse) {
@@ -686,8 +705,20 @@ document.addEventListener('DOMContentLoaded', () => {
       debugFullResponse.value = fullResponse;
       console.log('Full Response length:', fullResponse.length);
       
-      // Update response character count
+      // Update response debug info
       updateResponseDebugInfo(fullResponse);
+    }
+    
+    // Check for truncation information
+    if (results.debug?.truncated) {
+      showTruncationNotification(results.debug.truncationReason || 'Data was truncated due to size limits');
+    } else {
+      hideTruncationNotification();
+    }
+    
+    // Show fallback mode notification if applicable
+    if (results.fallbackMode) {
+      showFallbackNotification(results.debug?.fallbackReason || 'Using fallback analysis due to service limitations');
     }
   }
 
@@ -789,7 +820,256 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Main analysis function
+  // Progress tracking functions
+  function showProgress() {
+    console.log('showProgress called');
+    const progressSection = document.getElementById('progressSection');
+    console.log('progressSection element:', progressSection);
+    if (progressSection) {
+      progressSection.style.display = 'block';
+      console.log('Progress section display set to block');
+      resetProgressSteps();
+      updateProgressTime('Starting analysis...');
+    } else {
+      console.error('Progress section not found!');
+    }
+  }
+
+  function hideProgress() {
+    const progressSection = document.getElementById('progressSection');
+    if (progressSection) {
+      setTimeout(() => {
+        progressSection.style.display = 'none';
+      }, 2000); // Keep visible for 2 seconds after completion
+    }
+  }
+
+  function resetProgressSteps() {
+    for (let i = 1; i <= 4; i++) {
+      const step = document.getElementById(`step${i}`);
+      if (step) {
+        step.classList.remove('active', 'completed');
+        const spinner = step.querySelector('.step-spinner');
+        const check = step.querySelector('.step-check');
+        
+        if (spinner) spinner.style.display = 'none';
+        if (check) check.style.display = 'none';
+      }
+    }
+    
+    const progressFill = document.getElementById('progressFill');
+    if (progressFill) {
+      progressFill.style.width = '0%';
+    }
+  }
+
+  function updateProgressStep(stepNumber, status = 'active') {
+    const step = document.getElementById(`step${stepNumber}`);
+    if (!step) return;
+
+    const spinner = step.querySelector('.step-spinner');
+    const check = step.querySelector('.step-check');
+
+    // Remove previous states
+    step.classList.remove('active', 'completed');
+
+    if (status === 'active') {
+      step.classList.add('active', 'animate-in');
+      if (spinner) spinner.style.display = 'block';
+      if (check) check.style.display = 'none';
+    } else if (status === 'completed') {
+      step.classList.add('completed');
+      if (spinner) spinner.style.display = 'none';
+      if (check) check.style.display = 'block';
+    }
+
+    // Update progress bar
+    const progressFill = document.getElementById('progressFill');
+    if (progressFill) {
+      const percentage = (stepNumber / 4) * 100;
+      progressFill.style.width = `${percentage}%`;
+    }
+  }
+
+  function updateProgressTime(message) {
+    const progressTime = document.getElementById('progressTime');
+    if (progressTime) {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString();
+      progressTime.textContent = `${timeString} - ${message}`;
+    }
+  }
+
+  // Enhanced debug information functions
+  function updateQueryDebugInfo(queryResults) {
+    try {
+      let rowCount = 0;
+      let dataSize = 0;
+      let charCount = 0;
+
+      if (queryResults && queryResults !== 'No query results found in response') {
+        charCount = queryResults.length;
+        dataSize = new Blob([queryResults]).size;
+
+        // Try to parse as JSON to count rows
+        try {
+          const parsed = JSON.parse(queryResults);
+          if (Array.isArray(parsed)) {
+            rowCount = parsed.length;
+          } else if (parsed && typeof parsed === 'object') {
+            // If it's an object, check for common array properties
+            if (parsed.results && Array.isArray(parsed.results)) {
+              rowCount = parsed.results.length;
+            } else if (parsed.data && Array.isArray(parsed.data)) {
+              rowCount = parsed.data.length;
+            } else {
+              rowCount = 1; // Single object
+            }
+          }
+        } catch (e) {
+          // If not JSON, try to count lines
+          rowCount = queryResults.split('\n').filter(line => line.trim()).length;
+        }
+      }
+
+      // Update UI elements
+      const queryRowCount = document.getElementById('queryRowCount');
+      const queryDataSize = document.getElementById('queryDataSize');
+      const queryCharCount = document.getElementById('queryCharCount');
+
+      if (queryRowCount) queryRowCount.textContent = rowCount.toLocaleString();
+      if (queryDataSize) queryDataSize.textContent = formatBytes(dataSize);
+      if (queryCharCount) queryCharCount.textContent = charCount.toLocaleString();
+
+    } catch (error) {
+      console.error('Error updating query debug info:', error);
+    }
+  }
+
+  function updatePayloadDebugInfo(payload, queryResults) {
+    try {
+      let dataSize = 0;
+      let charCount = 0;
+      let rowCount = 0;
+      let tokenEstimate = 0;
+
+      if (payload) {
+        charCount = payload.length;
+        dataSize = new Blob([payload]).size;
+        
+        // Estimate tokens (rough approximation: 1 token ≈ 4 characters)
+        tokenEstimate = Math.ceil(charCount / 4);
+
+        // Extract row count from query results if available
+        if (queryResults) {
+          try {
+            const parsed = JSON.parse(queryResults);
+            if (Array.isArray(parsed)) {
+              rowCount = parsed.length;
+            } else if (parsed && parsed.results && Array.isArray(parsed.results)) {
+              rowCount = parsed.results.length;
+            }
+          } catch (e) {
+            // Fallback to line counting
+            rowCount = queryResults.split('\n').filter(line => line.trim()).length;
+          }
+        }
+      }
+
+      // Update UI elements
+      const payloadDataSize = document.getElementById('payloadDataSize');
+      const payloadCharCount = document.getElementById('payloadCharCount');
+      const payloadRowCount = document.getElementById('payloadRowCount');
+      const payloadTokenEstimate = document.getElementById('payloadTokenEstimate');
+
+      if (payloadDataSize) payloadDataSize.textContent = formatBytes(dataSize);
+      if (payloadCharCount) payloadCharCount.textContent = charCount.toLocaleString();
+      if (payloadRowCount) payloadRowCount.textContent = rowCount.toLocaleString();
+      if (payloadTokenEstimate) payloadTokenEstimate.textContent = tokenEstimate.toLocaleString();
+
+    } catch (error) {
+      console.error('Error updating payload debug info:', error);
+    }
+  }
+
+  function updateResponseDebugInfo(response) {
+    try {
+      let charCount = 0;
+      let dataSize = 0;
+
+      if (response) {
+        charCount = response.length;
+        dataSize = new Blob([response]).size;
+      }
+
+      // Update UI elements
+      const responseCharCount = document.getElementById('responseCharCount');
+      const responseDataSize = document.getElementById('responseDataSize');
+
+      if (responseCharCount) responseCharCount.textContent = charCount.toLocaleString();
+      if (responseDataSize) responseDataSize.textContent = formatBytes(dataSize);
+
+    } catch (error) {
+      console.error('Error updating response debug info:', error);
+    }
+  }
+
+  function showTruncationNotification(reason) {
+    const truncationStatus = document.getElementById('truncationStatus');
+    const truncationReason = document.getElementById('truncationReason');
+    
+    if (truncationStatus && truncationReason) {
+      truncationStatus.style.display = 'block';
+      truncationReason.textContent = reason;
+    }
+  }
+
+  function hideTruncationNotification() {
+    const truncationStatus = document.getElementById('truncationStatus');
+    if (truncationStatus) {
+      truncationStatus.style.display = 'none';
+    }
+  }
+
+  function showFallbackNotification(reason) {
+    // Create or update fallback notification
+    let fallbackNotification = document.getElementById('fallbackNotification');
+    if (!fallbackNotification) {
+      fallbackNotification = document.createElement('div');
+      fallbackNotification.id = 'fallbackNotification';
+      fallbackNotification.className = 'fallback-notification';
+      fallbackNotification.innerHTML = `
+        <div class="fallback-alert">
+          <span class="alert-icon">ℹ️</span>
+          <span class="alert-text">Fallback Mode Active</span>
+          <span class="alert-reason" id="fallbackReason">-</span>
+        </div>
+      `;
+      
+      // Insert after progress section
+      const progressSection = document.getElementById('progressSection');
+      if (progressSection && progressSection.parentNode) {
+        progressSection.parentNode.insertBefore(fallbackNotification, progressSection.nextSibling);
+      }
+    }
+    
+    const fallbackReason = document.getElementById('fallbackReason');
+    if (fallbackReason) {
+      fallbackReason.textContent = reason;
+    }
+    
+    fallbackNotification.style.display = 'block';
+  }
+
+  function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  // Main analysis function with progress tracking
   async function analyzeOpportunity() {
     try {
       const formData = getFormData();
@@ -800,8 +1080,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
+      // Show loading and progress
       showLoading();
+      showProgress();
+      updateProgressStep(1, 'active');
+      updateProgressTime('Generating SQL query...');
       
+      // Simulate progress steps (in real implementation, these would be triggered by backend responses)
+      setTimeout(() => {
+        updateProgressStep(1, 'completed');
+        updateProgressStep(2, 'active');
+        updateProgressTime('Retrieving historical data...');
+      }, 1000);
+
+      setTimeout(() => {
+        updateProgressStep(2, 'completed');
+        updateProgressStep(3, 'active');
+        updateProgressTime('Processing with AI...');
+      }, 2000);
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
@@ -813,17 +1110,31 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      updateProgressStep(3, 'completed');
+      updateProgressStep(4, 'active');
+      updateProgressTime('Formatting results...');
       
       const results = await response.json();
       console.log('Analysis results:', results);
       
       populateUI(results);
       
+      updateProgressStep(4, 'completed');
+      updateProgressTime('Analysis complete!');
+      
     } catch (error) {
       console.error('Analysis error:', error);
       showError('Analysis failed: ' + error.message);
+      
+      // Reset progress on error
+      const progressSection = document.getElementById('progressSection');
+      if (progressSection) {
+        progressSection.style.display = 'none';
+      }
     } finally {
       hideLoading();
+      hideProgress();
     }
   }
 
@@ -839,6 +1150,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resultsSection) resultsSection.style.display = 'none';
     if (additionalSections) additionalSections.style.display = 'none';
     if (debugSection) debugSection.style.display = 'none';
+    if (progressSection) progressSection.style.display = 'none';
+    
+    // Reset debug info
+    hideTruncationNotification();
   }
 
   // Load sample data

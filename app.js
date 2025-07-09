@@ -48,15 +48,13 @@ const requiredAutomations = [
   'invokeBedrockQueryPrompt-v3',
   'InvLamFilterAut-v3', 
   'finalBedAnalysisPrompt-v3'
-  // 'finalBedAnalysisPromptNovaPremier-v3' - Removed: Using standard prompt only
 ];
 
 const optionalAutomations = [
   'enhancedBedrockQueryPrompt-v3',
   'enhancedAnalysisWithRAG-v3',
   'enhancedFundingAnalysis-v3',
-  'enhancedFollowOnAnalysis-v3',
-  'finalBedAnalysisPromptNovaPremier-v3'  // Moved to optional - not used by default
+  'enhancedFollowOnAnalysis-v3'
 ];
 
 // Load required automations
@@ -474,7 +472,7 @@ app.post('/api/analyze', async (req, res) => {
       industry, customerSegment, partnerName,
       activityFocus, businessDescription, migrationPhase, 
       salesforceLink, awsCalculatorLink,
-      useNovaPremier, useBedrockAgent, sessionId: providedSessionId 
+      useBedrockAgent, sessionId: providedSessionId 
     } = req.body;
     
     // Enhanced validation
@@ -529,7 +527,7 @@ app.post('/api/analyze', async (req, res) => {
           CustomerName, region, closeDate, oppName, oppDescription,
           industry, customerSegment, partnerName,
           activityFocus, businessDescription, migrationPhase,
-          salesforceLink, awsCalculatorLink, useNovaPremier, useBedrockAgent
+          salesforceLink, awsCalculatorLink, useBedrockAgent
         }, {
           forceRefresh: req.body.forceRefresh,
           sessionId: sessionId
@@ -563,7 +561,7 @@ app.post('/api/analyze', async (req, res) => {
     let cachedResult = null;
     if (cachingService) {
       try {
-        const analysisType = useNovaPremier ? 'nova-premier' : 'standard';
+        const analysisType = 'standard';
         cachedResult = await cachingService.getCachedAnalysis({
           CustomerName, region, closeDate, oppName, oppDescription
         }, analysisType);
@@ -593,7 +591,7 @@ app.post('/api/analyze', async (req, res) => {
       try {
         await eventBridgeService.publishAnalysisStarted({
           CustomerName, region, closeDate, oppName, oppDescription
-        }, useNovaPremier ? 'nova-premier' : 'standard');
+        }, 'standard');
       } catch (error) {
         console.warn('⚠️  Event publishing failed:', error.message);
       }
@@ -642,7 +640,7 @@ app.post('/api/analyze', async (req, res) => {
         queryResults: lambdaResult.processResults
       };
       
-      // Always use standard analysis prompt (Nova Premier disabled)
+      // Use standard analysis prompt
       analysisResult = await automationModules.finalbedanalysisprompt.execute(analysisParams);
       
       if (analysisResult.status === 'error') {
@@ -675,7 +673,7 @@ app.post('/api/analyze', async (req, res) => {
     // Cache the result if caching is available (enhanced caching for performance optimization)
     if (cachingService && !usedFallback) {
       try {
-        const analysisType = useNovaPremier ? 'nova-premier' : 'standard';
+        const analysisType = 'standard';
         await cachingService.cacheAnalysis({
           CustomerName, region, closeDate, oppName, oppDescription
         }, analysisType, formattedResult);
@@ -689,7 +687,7 @@ app.post('/api/analyze', async (req, res) => {
       try {
         await eventBridgeService.publishAnalysisCompleted({
           CustomerName, region, closeDate, oppName, oppDescription
-        }, formattedResult, useNovaPremier ? 'nova-premier' : 'standard');
+        }, formattedResult, 'standard');
       } catch (error) {
         console.warn('⚠️  Completion event publishing failed:', error.message);
       }
@@ -717,14 +715,26 @@ app.post('/api/analyze', async (req, res) => {
       fullResponse: 'Full response not captured'
     };
 
-    // Only include debug info if we have the actual results
-    if (!usedFallback && queryPromptResult && lambdaResult && analysisResult) {
+    console.log('Debug info preparation:');
+    console.log('- usedFallback:', usedFallback);
+    console.log('- queryPromptResult exists:', !!queryPromptResult);
+    console.log('- lambdaResult exists:', !!lambdaResult);
+    console.log('- analysisResult exists:', !!analysisResult);
+    console.log('- global.debugInfo exists:', !!global.debugInfo);
+    console.log('- global.debugInfo contents:', global.debugInfo);
+
+    // Include debug info even in fallback mode if we have partial results
+    if (queryPromptResult && lambdaResult) {
       debugInfo = {
-        sqlQuery: queryPromptResult.processResults || 'SQL query not captured',
-        queryResults: lambdaResult.processResults || 'Query results not captured',
-        bedrockPayload: global.debugInfo?.bedrockPayload || 'Bedrock payload not captured',
-        fullResponse: analysisResult.formattedSummaryText || analysisResult.processResults || 'Full response not captured'
+        sqlQuery: queryPromptResult.processResults || global.debugInfo?.sqlQuery || 'SQL query not captured',
+        queryResults: lambdaResult.processResults || global.debugInfo?.queryResults || 'Query results not captured',
+        bedrockPayload: global.debugInfo?.bedrockPayload || 'Bedrock payload not captured (permission denied)',
+        fullResponse: analysisResult?.formattedSummaryText || analysisResult?.processResults || 'Full response not captured',
+        fallbackReason: usedFallback ? 'AWS Bedrock permission denied - using fallback analysis' : null
       };
+      console.log('Debug info populated (with fallback):', debugInfo);
+    } else {
+      console.log('Using minimal debug info due to missing results');
     }
 
     // Return the analysis results

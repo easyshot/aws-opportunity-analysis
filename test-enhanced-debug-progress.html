@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Debug & Progress Test</title>
+    <link rel="stylesheet" href="public/styles.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .test-button {
+            padding: 10px 20px;
+            margin: 10px;
+            background: #ff9900;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Enhanced Debug Information & Progress Indicator Test</h1>
+
+    <div class="test-section">
+        <h2>Progress Indicator Test</h2>
+        <button class="test-button" onclick="testProgress()">Test Progress Flow</button>
+        <button class="test-button" onclick="resetProgress()">Reset Progress</button>
+
+        <!-- Progress Section -->
+        <div class="progress-section" id="progressSection" style="display: none;">
+            <div class="progress-header">
+                <h3>Analysis Progress</h3>
+                <div class="progress-time" id="progressTime">Starting...</div>
+            </div>
+            <div class="progress-steps">
+                <div class="progress-step" id="step1">
+                    <div class="step-indicator">
+                        <div class="step-spinner" style="display: none;"></div>
+                        <div class="step-check" style="display: none;">✓</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Query Generation</div>
+                        <div class="step-description">Generating SQL query using AI models...</div>
+                    </div>
+                </div>
+                <div class="progress-step" id="step2">
+                    <div class="step-indicator">
+                        <div class="step-spinner" style="display: none;"></div>
+                        <div class="step-check" style="display: none;">✓</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Data Retrieval</div>
+                        <div class="step-description">Fetching historical project data sets...</div>
+                    </div>
+                </div>
+                <div class="progress-step" id="step3">
+                    <div class="step-indicator">
+                        <div class="step-spinner" style="display: none;"></div>
+                        <div class="step-check" style="display: none;">✓</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">AI Analysis</div>
+                        <div class="step-description">Processing data with Bedrock AI models...</div>
+                    </div>
+                </div>
+                <div class="progress-step" id="step4">
+                    <div class="step-indicator">
+                        <div class="step-spinner" style="display: none;"></div>
+                        <div class="step-check" style="display: none;">✓</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Results Processing</div>
+                        <div class="step-description">Formatting and displaying final results...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Enhanced Debug Information Test</h2>
+        <button class="test-button" onclick="testDebugInfo()">Test Debug Info</button>
+        <button class="test-button" onclick="testTruncation()">Test Truncation Alert</button>
+
+        <!-- Debug Section -->
+        <div class="debug-section">
+            <div class="debug-header">
+                <h2>🔧 Debug Information</h2>
+            </div>
+
+            <div class="debug-content">
+                <div class="debug-item">
+                    <h3>3. Complete Payload Sent to Bedrock</h3>
+                    <div class="debug-payload-info">
+                        <div class="payload-stats">
+                            <span class="stat-item">
+                                <strong>Data Size:</strong> <span id="payloadDataSize">-</span>
+                            </span>
+                            <span class="stat-item">
+                                <strong>Characters:</strong> <span id="payloadCharCount">-</span>
+                            </span>
+                            <span class="stat-item">
+                                <strong>Query Rows:</strong> <span id="payloadRowCount">-</span>
+                            </span>
+                            <span class="stat-item">
+                                <strong>Token Estimate:</strong> <span id="payloadTokenEstimate">-</span>
+                            </span>
+                        </div>
+                        <div class="truncation-status" id="truncationStatus" style="display: none;">
+                            <div class="truncation-alert">
+                                <span class="alert-icon">⚠️</span>
+                                <span class="alert-text">Data Truncation Applied</span>
+                                <span class="alert-reason" id="truncationReason">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="debugBedrockPayload" class="debug-textarea" readonly
+                        placeholder="Complete payload sent to Bedrock will appear here after analysis..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Progress functions
+        function updateProgressStep(stepNumber, status = 'active') {
+            const step = document.getElementById(`step${stepNumber}`);
+            if (!step) return;
+
+            const spinner = step.querySelector('.step-spinner');
+            const check = step.querySelector('.step-check');
+
+            step.classList.remove('active', 'completed');
+
+            if (status === 'active') {
+                step.classList.add('active', 'animate-in');
+                if (spinner) spinner.style.display = 'block';
+                if (check) check.style.display = 'none';
+            } else if (status === 'completed') {
+                step.classList.add('completed');
+                if (spinner) spinner.style.display = 'none';
+                if (check) check.style.display = 'block';
+            }
+
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+                const percentage = (stepNumber / 4) * 100;
+                progressFill.style.width = `${percentage}%`;
+            }
+        }
+
+        function updateProgressTime(message) {
+            const progressTime = document.getElementById('progressTime');
+            if (progressTime) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString();
+                progressTime.textContent = `${timeString} - ${message}`;
+            }
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Test functions
+        function testProgress() {
+            const progressSection = document.getElementById('progressSection');
+            progressSection.style.display = 'block';
+
+            // Reset all steps
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+                const spinner = step.querySelector('.step-spinner');
+                const check = step.querySelector('.step-check');
+                if (spinner) spinner.style.display = 'none';
+                if (check) check.style.display = 'none';
+            }
+
+            // Simulate progress
+            updateProgressStep(1, 'active');
+            updateProgressTime('Generating SQL query...');
+
+            setTimeout(() => {
+                updateProgressStep(1, 'completed');
+                updateProgressStep(2, 'active');
+                updateProgressTime('Retrieving historical data...');
+            }, 1500);
+
+            setTimeout(() => {
+                updateProgressStep(2, 'completed');
+                updateProgressStep(3, 'active');
+                updateProgressTime('Processing with AI...');
+            }, 3000);
+
+            setTimeout(() => {
+                updateProgressStep(3, 'completed');
+                updateProgressStep(4, 'active');
+                updateProgressTime('Formatting results...');
+            }, 4500);
+
+            setTimeout(() => {
+                updateProgressStep(4, 'completed');
+                updateProgressTime('Analysis complete!');
+            }, 6000);
+        }
+
+        function resetProgress() {
+            const progressSection = document.getElementById('progressSection');
+            progressSection.style.display = 'none';
+        }
+
+        function testDebugInfo() {
+            // Simulate payload data
+            const samplePayload = JSON.stringify({
+                modelId: "amazon.titan-text-express-v1",
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            {
+                                text: "Analyze this opportunity data with historical context..."
+                            }
+                        ]
+                    }
+                ],
+                system: [
+                    {
+                        text: "You are an AWS opportunity analysis expert..."
+                    }
+                ],
+                inferenceConfig: {
+                    maxTokens: 8192,
+                    temperature: 0.1
+                }
+            }, null, 2);
+
+            const sampleQueryResults = JSON.stringify([
+                { project: "Migration A", customer: "Corp 1", arr: 50000 },
+                { project: "Migration B", customer: "Corp 2", arr: 75000 },
+                { project: "Migration C", customer: "Corp 3", arr: 100000 }
+            ], null, 2);
+
+            // Update debug info
+            document.getElementById('debugBedrockPayload').value = samplePayload;
+
+            // Calculate stats
+            const charCount = samplePayload.length;
+            const dataSize = new Blob([samplePayload]).size;
+            const rowCount = 3; // From sample query results
+            const tokenEstimate = Math.ceil(charCount / 4);
+
+            document.getElementById('payloadDataSize').textContent = formatBytes(dataSize);
+            document.getElementById('payloadCharCount').textContent = charCount.toLocaleString();
+            document.getElementById('payloadRowCount').textContent = rowCount.toLocaleString();
+            document.getElementById('payloadTokenEstimate').textContent = tokenEstimate.toLocaleString();
+        }
+
+        function testTruncation() {
+            const truncationStatus = document.getElementById('truncationStatus');
+            const truncationReason = document.getElementById('truncationReason');
+
+            truncationStatus.style.display = 'block';
+            truncationReason.textContent = 'Query results exceeded 50MB limit, truncated to first 10,000 rows';
+        }
+    </script>
+</body>
+
+</html>

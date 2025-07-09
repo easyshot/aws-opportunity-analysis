@@ -3,8 +3,8 @@
 ## Directory Organization
 
 ### Root Level
-- `app.js`: Main application entry point for production backend server with full AWS integration (currently has corruption issues)
-- `app-debug.js`: Debug version with comprehensive mock data and enhanced debugging (currently active for stable operation)
+- `app.js`: Main application entry point for production backend server with full AWS integration (production ready)
+- `app-debug.js`: Debug version with comprehensive mock data for development and testing
 - `frontend-server.js`: Separate server for serving the frontend on port 3123 with API proxy
 - `package.json`: Complete project dependencies and scripts for all functionality
 - `cdk.json`: AWS CDK configuration for infrastructure deployment
@@ -16,7 +16,7 @@ Backend automation scripts that orchestrate the complete analysis workflow with 
 - `invokeBedrockQueryPrompt-v3.js`: Generates SQL queries using Bedrock Agent (AWS SDK v3)
 - `InvLamFilterAut-v3.js`: Executes SQL queries via Lambda with error handling (AWS SDK v3)
 - `finalBedAnalysisPrompt-v3.js`: Standard Bedrock Titan model analysis with comprehensive debugging (AWS SDK v3)
-- `finalBedAnalysisPromptNovaPremier-v3.js`: Enhanced Nova Premier model analysis with debugging (AWS SDK v3)
+
 - `enhancedFundingAnalysis-v3.js`: Multi-tier funding analysis with ROI calculations
 - `enhancedFollowOnAnalysis-v3.js`: Strategic follow-on opportunity identification
 - (Legacy scripts without `-v3` suffix retained for reference)
@@ -116,8 +116,8 @@ Each UI option follows a consistent class-based pattern:
 6. **Debug Integration**: Real-time display of backend data flow and processing
 
 ### Backend Integration Pattern
-- **Debug Mode**: Currently using `app-debug.js` for stable backend operation
-- **Mock Data**: Rich sample data generation for comprehensive testing
+- **Production Mode**: Using `app.js` for stable backend operation with full AWS integration
+- **Converse API**: All Bedrock interactions use the modern Converse API for consistent communication
 - **Error Handling**: Graceful degradation with user-friendly error messages
 - **Loading States**: Visual feedback during analysis processing
 - **Enhanced Logging**: Comprehensive debug output for troubleshooting data flow issues
@@ -131,7 +131,7 @@ Each UI option follows a consistent class-based pattern:
 
 ### API Structure
 - RESTful API endpoints in backend server
-- Main endpoint: `/api/analyze` for opportunity analysis (supports both standard and Nova Premier flows)
+- Main endpoint: `/api/analyze` for opportunity analysis using Claude 3.5 Sonnet model
 - Mock endpoint: `/api/analyze/mock` for development/testing
 - Frontend proxy: Port 3123 proxies API requests to backend on port 8123
 - Debug endpoints: Enhanced logging and payload inspection for troubleshooting
@@ -140,7 +140,7 @@ Each UI option follows a consistent class-based pattern:
 - **UI Options**: `option-a`, `option-b`, `option-c` for different design approaches
 - **AWS SDK**: Files with `-v3` suffix use AWS SDK v3 and are the current standard
 - **Legacy Support**: Files without version suffix are retained for reference
-- **Debug Mode**: `app-debug.js` for stable operation, `app.js` for production (when fixed)
+- **Production Mode**: `app.js` for production operation, `app-debug.js` for development and testing
 
 ## Data Flow
 
@@ -156,7 +156,7 @@ Each UI option follows a consistent class-based pattern:
 ### Backend Processing Flow
 1. Frontend collects user input with enhanced validation
 2. Backend processes the request through a series of automations with enhanced debugging:
-   - `invokeBedrockQueryPrompt-v3` → `InvLamFilterAut-v3` → `finalBedAnalysisPrompt-v3` or `finalBedAnalysisPromptNovaPremier-v3`
+   - `invokeBedrockQueryPrompt-v3` → `InvLamFilterAut-v3` → `finalBedAnalysisPrompt-v3`
 3. Debug information is captured and displayed in real-time
 4. Results are returned to the frontend for enhanced display with rich formatting
 
