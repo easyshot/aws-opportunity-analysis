@@ -3,7 +3,7 @@
 ## Product Overview
 This comprehensive serverless application analyzes business opportunities using AWS Bedrock AI models, Lambda functions, and other AWS services. The system provides intelligent opportunity analysis, funding recommendations, and follow-on opportunity identification through a modern web interface with real-time analytics, interactive visualizations, and comprehensive analysis capabilities.
 
-**Current Status: Production Ready with Professional Debug Suite** - Fully implemented with complete AWS integration, simplified architecture using Claude 3.5 Sonnet model, enterprise security, comprehensive monitoring, disaster recovery capabilities, and professional-grade debugging infrastructure featuring real-time data flow tracing, user-configurable settings, SQL query generation monitoring, and advanced troubleshooting capabilities with professional UX design.
+**Current Status: Production Ready with Timeout Fix & Professional Debug Suite** - Fully implemented with complete AWS integration, simplified architecture using Claude 3.5 Sonnet model, resolved Lambda timeout issues, comprehensive settings management system, enterprise security, comprehensive monitoring, disaster recovery capabilities, and professional-grade debugging infrastructure featuring real-time data flow tracing, user-configurable settings, SQL query generation monitoring, and advanced troubleshooting capabilities with professional UX design.
 
 ## Core Functionality
 - **AI-Powered Analysis**: AWS Bedrock with Claude 3.5 Sonnet model using Converse API for intelligent analysis
@@ -49,11 +49,14 @@ This comprehensive serverless application analyzes business opportunities using 
 
 ## Current Development Focus
 - **Production Backend**: Successfully migrated to stable production backend (`app.js`) with full AWS integration
+- **Lambda Timeout Resolution**: Fixed Lambda execution timeouts by extending timeout from 10s to 30s and improving error handling
 - **Bedrock Integration**: Fixed Bedrock analysis issues and implemented proper Converse API usage
 - **Simplified Architecture**: Removed Nova Premier complexity and standardized on Claude 3.5 Sonnet model
+- **Settings System Integration**: Properly integrated with comprehensive settings management system for all data manipulation
 - **Enhanced Debug Features**: Comprehensive debug panels with row counts, character counts, and table views
 - **Data Truncation Management**: Intelligent truncation system to handle large datasets while preserving data integrity
 - **Real-time Data Flow Tracing**: Complete visibility into SQL queries, query results, and Bedrock payloads
+- **Performance Monitoring**: Added `/api/debug/performance` endpoint for real-time system health monitoring
 
 ## Key Features
 - **Customer-Centric Analysis**: Based on customer name, customer region (geographic), close date, and detailed description

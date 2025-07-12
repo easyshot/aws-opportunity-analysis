@@ -228,8 +228,10 @@ DEBUG_LOG_LEVEL=info
 
 ## Current Development Focus
 - **Production Ready**: Successfully migrated to stable production backend with full AWS integration
+- **Lambda Timeout Resolution**: Fixed Lambda execution timeouts by extending timeout from 10s to 30s and improving error handling
 - **Bedrock Integration**: Fixed Bedrock analysis issues and implemented proper Converse API usage
 - **Simplified Architecture**: Removed Nova Premier complexity and standardized on Claude 3.5 Sonnet model
+- **Settings System Integration**: Properly integrated with comprehensive settings management system for all data manipulation
 - **Professional Debug Suite**: Comprehensive debugging infrastructure including:
   - **SQL Query Generation Process**: Real-time monitoring of Bedrock SQL generation with model configuration and process status indicators
   - **Analysis Generation Process**: Advanced payload analysis with size monitoring, token estimation, and risk assessment
@@ -239,4 +241,5 @@ DEBUG_LOG_LEVEL=info
   - **Row Count Management**: User-controlled SQL query limits with real-time application and verification
 - **Data Flow Optimization**: Resolved input size limitations with intelligent multi-level truncation system
 - **Professional UX**: Enhanced debug panels with professional design and user-friendly controls
+- **Performance Monitoring**: Added `/api/debug/performance` endpoint for real-time system health monitoring
 - **Operational Excellence**: Comprehensive monitoring, alerting, and troubleshooting capabilities

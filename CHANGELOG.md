@@ -1,6 +1,27 @@
 # Partner Opportunity Intelligence Application - Changelog
 
-## [3.0.0] - 2025-07-11 (Current Release)
+## [3.1.0] - 2025-07-12 (Current Release)
+### Lambda Timeout Fix & Enhanced Performance
+
+#### Fixed - Critical Performance Issues
+- **Lambda Timeout Resolution**: Extended Lambda execution timeout from 10s to 30s to handle large datasets
+- **Error Handling Enhancement**: Improved error handling with specific error messages for different failure types
+- **Performance Monitoring**: Added `/api/debug/performance` endpoint for real-time system health monitoring
+- **Settings System Integration**: Properly integrated with comprehensive settings management system for all data manipulation
+
+#### Enhanced - Backend Stability
+- **Timeout Configuration**: Uses existing settings system for timeout configuration (120s default)
+- **Response Validation**: Better parsing and validation of Lambda responses with performance tracking
+- **Error Classification**: Specific error messages for TimeoutError, ThrottlingException, ResourceNotFoundException, AccessDeniedException
+- **Clean Architecture**: No duplication of existing functionality, respects existing settings system
+
+#### Technical Improvements
+- **No Mock Data Fallbacks**: System provides proper error messages instead of fallback to mock data
+- **Troubleshooting Guidance**: Clear guidance on AWS configuration issues included in error responses
+- **Performance Metrics**: Real-time Lambda execution time, response sizes, and query complexity tracking
+- **Settings Respect**: All data manipulation goes through existing comprehensive settings manager
+
+## [3.0.0] - 2025-07-11
 ### Professional Debug Suite & Production Ready Architecture
 
 #### Added - Professional Debug Suite

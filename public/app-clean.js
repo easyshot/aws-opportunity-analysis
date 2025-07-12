@@ -412,27 +412,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (timeToLaunch && metrics.timeToLaunch) {
-          timeToLaunch.textContent = `${metrics.timeToLaunch} months`;
+          // Just set the number, the HTML already has "months" in a separate element
+          timeToLaunch.textContent = metrics.timeToLaunch;
           console.log('Set timeToLaunch to:', metrics.timeToLaunch);
         } else if (timeToLaunch && metrics.predictedProjectDuration) {
           // Remove "months" if it's already in the string to avoid duplication
           const duration = metrics.predictedProjectDuration.replace(/\s*months?\s*$/i, '');
-          timeToLaunch.textContent = `${duration} months`;
-          console.log('Set timeToLaunch to:', duration + ' months (from:', metrics.predictedProjectDuration + ')');
+          timeToLaunch.textContent = duration;
+          console.log('Set timeToLaunch to:', duration + ' (from:', metrics.predictedProjectDuration + ')');
         }
         
-        if (confidenceScore && metrics.confidence) {
-          confidenceScore.textContent = metrics.confidence;
-          console.log('Set confidence to:', metrics.confidence);
+        if (confidenceScore && (metrics.confidence || metrics.confidenceScore)) {
+          // Use numeric score if available, otherwise use confidence string
+          const scoreValue = metrics.confidenceScore || metrics.confidence;
+          confidenceScore.textContent = typeof scoreValue === 'number' ? scoreValue : metrics.confidence;
+          console.log('Set confidence to:', scoreValue);
         }
         
-        if (confidenceLabel && metrics.confidence) {
-          confidenceLabel.textContent = getConfidenceLabel(metrics.confidence);
-          console.log('Set confidenceLabel to:', getConfidenceLabel(metrics.confidence));
+        if (confidenceLabel && (metrics.confidence || metrics.confidenceScore)) {
+          const confValue = metrics.confidence || metrics.confidenceScore;
+          confidenceLabel.textContent = getConfidenceLabel(confValue);
+          console.log('Set confidenceLabel to:', getConfidenceLabel(confValue));
         }
         
-        if (confidenceFill && metrics.confidence) {
-          const percentage = getConfidencePercentage(metrics.confidence);
+        if (confidenceFill && (metrics.confidence || metrics.confidenceScore)) {
+          const confValue = metrics.confidence || metrics.confidenceScore;
+          const percentage = getConfidencePercentage(confValue);
           confidenceFill.style.width = `${percentage}%`;
           console.log('Set confidenceFill to:', percentage + '%');
         }
@@ -571,12 +576,20 @@ document.addEventListener('DOMContentLoaded', () => {
       // Show the detailed analysis section
       if (resultsSection) {
         resultsSection.style.display = 'block';
+        console.log('✅ Detailed analysis section shown');
+      }
+      
+      // Show additional sections
+      if (additionalSections) {
+        additionalSections.style.display = 'block';
+        console.log('✅ Additional sections shown');
       }
       
       // Show debug section
       const debugSection = document.getElementById('debugSection');
       if (debugSection) {
         debugSection.style.display = 'block';
+        console.log('✅ Debug section shown');
       }
       
       // Populate debug information
@@ -1956,3 +1969,48 @@ ${analysisInfo.fullResponse ? analysisInfo.fullResponse.substring(0, 500) + (ana
 
     return log;
   }
+
+  // Get confidence label from confidence value
+  function getConfidenceLabel(confidence) {
+    if (typeof confidence === 'number') {
+      if (confidence >= 80) return 'High';
+      if (confidence >= 60) return 'Medium';
+      return 'Low';
+    }
+    
+    if (typeof confidence === 'string') {
+      const upper = confidence.toUpperCase();
+      if (upper === 'HIGH') return 'High';
+      if (upper === 'MEDIUM') return 'Medium';
+      if (upper === 'LOW') return 'Low';
+      return confidence;
+    }
+    
+    return 'Unknown';
+  }
+
+  // Get confidence percentage from confidence value
+  function getConfidencePercentage(confidence) {
+    if (typeof confidence === 'number') {
+      return Math.min(100, Math.max(0, confidence));
+    }
+    
+    if (typeof confidence === 'string') {
+      const upper = confidence.toUpperCase();
+      if (upper === 'HIGH') return 85;
+      if (upper === 'MEDIUM') return 65;
+      if (upper === 'LOW') return 35;
+      
+      // Try to parse as number
+      const parsed = parseFloat(confidence);
+      if (!isNaN(parsed)) {
+        return Math.min(100, Math.max(0, parsed));
+      }
+    }
+    
+    return 0;
+  }
+
+  // Initialize the application
+  initializeApp();
+});

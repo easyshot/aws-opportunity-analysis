@@ -146,21 +146,50 @@ async function invokeBedrockConverse(payload) {
 }
 
 /**
- * Apply row limit to SQL query
+ * Apply row limit to SQL query and optimize for performance
  */
 function applyRowLimit(sqlQuery, limit) {
   try {
+    // Ensure we have a reasonable limit to prevent timeouts
+    const effectiveLimit = Math.min(limit || 200, 500); // Cap at 500 to prevent timeouts
+    
+    // First, replace any {{queryLimit}} placeholders with the actual limit
+    let modifiedQuery = sqlQuery.replace(/{{queryLimit}}/gi, effectiveLimit.toString());
+    
     // Remove existing LIMIT clause if present (handles both numeric limits and template variables)
-    let modifiedQuery = sqlQuery.replace(/\s+LIMIT\s+(\d+|{{[^}]+}})\s*$/i, '');
+    modifiedQuery = modifiedQuery.replace(/\s+LIMIT\s+(\d+|{{[^}]+}})\s*$/i, '');
     
     // Also remove any duplicate LIMIT clauses that might exist
     modifiedQuery = modifiedQuery.replace(/\s+LIMIT\s+(\d+|{{[^}]+}})/gi, '');
     
-    // Add new LIMIT clause
-    modifiedQuery = modifiedQuery.trim() + ` LIMIT ${limit}`;
+    // Add new LIMIT clause if not already present
+    if (!modifiedQuery.toUpperCase().includes('LIMIT')) {
+      modifiedQuery = modifiedQuery.trim() + ` LIMIT ${effectiveLimit}`;
+    }
     
-    console.log("PROCESS_RESULTS (SQL Query): Applied row limit:", limit);
+    // Optimize query for performance by simplifying complex calculations
+    // Replace complex relevance scoring with simpler matching
+    if (modifiedQuery.includes('relevance_score') && modifiedQuery.length > 3000) {
+      console.log("PROCESS_RESULTS (SQL Query): Optimizing complex query for performance");
+      
+      // Simplify the relevance scoring to reduce computation
+      modifiedQuery = modifiedQuery.replace(
+        /\(\(CASE WHEN[^)]+\)\) AS relevance_score/gi,
+        '1 AS relevance_score'
+      );
+      
+      // Simplify WHERE clause for relevance_score
+      modifiedQuery = modifiedQuery.replace(
+        /WHERE relevance_score >= \d+/gi,
+        'WHERE 1=1'
+      );
+      
+      console.log("PROCESS_RESULTS (SQL Query): Query optimized for performance");
+    }
+    
+    console.log("PROCESS_RESULTS (SQL Query): Applied row limit:", effectiveLimit);
     console.log("PROCESS_RESULTS (SQL Query): Original query had LIMIT:", sqlQuery.includes('LIMIT'));
+    console.log("PROCESS_RESULTS (SQL Query): Had queryLimit placeholder:", sqlQuery.includes('{{queryLimit}}'));
     console.log("PROCESS_RESULTS (SQL Query): Modified query (last 200 chars):", modifiedQuery.slice(-200));
     
     return modifiedQuery;

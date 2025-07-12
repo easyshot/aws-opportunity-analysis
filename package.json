@@ -10,6 +10,7 @@
     "frontend": "node frontend-server.js",
     "dev-frontend": "nodemon frontend-server.js",
     "dev-all": "concurrently \"npm run dev\" \"npm run dev-frontend\"",
+
     "start:debug": "node app-debug.js",
     "dev:debug": "nodemon app-debug.js",
     "dev-all:debug": "concurrently \"npm run dev:debug\" \"npm run dev-frontend\"",
