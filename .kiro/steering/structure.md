@@ -184,13 +184,24 @@ Each UI option follows a consistent class-based pattern:
 - Ensure debug information doesn't impact performance
 
 ### Debugging and Troubleshooting
-- **Enhanced Frontend Debug Panels**: Comprehensive debugging interface featuring:
-  - **Query Results Analysis**: Row counts, character counts, and data size monitoring
-  - **Table View Display**: Spreadsheet-like visualization of query results with sortable columns
-  - **Real-time Statistics**: Live tracking of data metrics and payload sizes
-  - **Truncation Management**: Intelligent data truncation with visibility into size limits
-  - **Interactive Debug Controls**: Toggle between raw JSON and formatted table views
-- **Backend Enhanced Logging**: Comprehensive debug output in automation scripts
-- **Data Flow Tracing**: End-to-end visibility from frontend input to Bedrock response
-- **Error Identification**: Clear identification of where data flow breaks down
+- **Professional Debug Suite**: Comprehensive debugging infrastructure featuring:
+  - **SQL Query Generation Process**: Real-time monitoring of Bedrock SQL generation with model configuration and process status indicators
+  - **Analysis Generation Process**: Advanced payload analysis with size monitoring, token estimation, and risk assessment
+  - **User-Configurable Settings**: Settings management interface for SQL query limits, truncation limits, and debug preferences
+  - **Real-time Logging Capture**: Backend console log capture and frontend display with comprehensive data flow tracing
+  - **Interactive Debug Controls**: Professional UX with status indicators, risk assessment displays, and multi-format data viewing
+  - **Row Count Management**: User-controlled SQL query limits with real-time application and verification
+- **Backend Enhanced Logging**: Comprehensive debug output in automation scripts with professional logging capture
+- **Data Flow Tracing**: End-to-end visibility from frontend input to Bedrock response with professional visualization
+- **Error Identification**: Clear identification of where data flow breaks down with professional troubleshooting guidance
 - **Operational Documentation**: Comprehensive guides for troubleshooting and maintenance
+
+## Current Development Focus
+
+### Production Ready & Professional Debug Suite
+- **Production Status**: Successfully migrated to stable production backend (`app.js`) with full AWS integration
+- **Bedrock Integration**: Fixed Bedrock analysis issues by resolving invalid prompt version parameters
+- **Simplified Architecture**: Removed Nova Premier complexity and standardized on Claude 3.5 Sonnet model
+- **Professional Debug Suite**: Comprehensive debugging infrastructure with professional UX design
+- **Data Flow Optimization**: Resolved Bedrock input size errors with intelligent multi-level truncation system
+- **Modern API Implementation**: All Bedrock interactions use modern Converse API for consistent communication

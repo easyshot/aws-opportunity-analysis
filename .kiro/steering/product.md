@@ -3,7 +3,7 @@
 ## Product Overview
 This comprehensive serverless application analyzes business opportunities using AWS Bedrock AI models, Lambda functions, and other AWS services. The system provides intelligent opportunity analysis, funding recommendations, and follow-on opportunity identification through a modern web interface with real-time analytics, interactive visualizations, and comprehensive analysis capabilities.
 
-**Current Status: Production Ready with Enhanced Debugging** - Fully implemented with complete AWS integration, enterprise security, comprehensive monitoring, disaster recovery capabilities, and advanced debugging features for troubleshooting data flow issues.
+**Current Status: Production Ready with Professional Debug Suite** - Fully implemented with complete AWS integration, simplified architecture using Claude 3.5 Sonnet model, enterprise security, comprehensive monitoring, disaster recovery capabilities, and professional-grade debugging infrastructure featuring real-time data flow tracing, user-configurable settings, SQL query generation monitoring, and advanced troubleshooting capabilities with professional UX design.
 
 ## Core Functionality
 - **AI-Powered Analysis**: AWS Bedrock with Claude 3.5 Sonnet model using Converse API for intelligent analysis
@@ -14,7 +14,7 @@ This comprehensive serverless application analyzes business opportunities using 
 - **Advanced Analytics**: Six comprehensive analysis areas plus dedicated funding and follow-on sections
 - **Enterprise Security**: IAM roles, encryption, secrets management, and compliance controls
 - **Comprehensive Monitoring**: CloudWatch, X-Ray tracing, health checks, and performance analytics
-- **Enhanced Debugging**: Comprehensive data flow tracing and payload inspection for troubleshooting
+- **Professional Debug Suite**: Real-time data flow tracing, user-configurable settings, advanced troubleshooting capabilities, and comprehensive payload inspection with professional UX design
 
 ## Modern Interface Features
 - **Interactive Dashboard**: Modern, responsive design with real-time completion tracking
@@ -24,12 +24,15 @@ This comprehensive serverless application analyzes business opportunities using 
 - **Auto-save Functionality**: Automatic form data persistence across sessions
 - **Sample Data Loading**: Quick-load functionality for testing and demonstrations
 - **Export Capabilities**: Professional export and print functionality
-- **Enhanced Debug Information Display**: Comprehensive debugging panels with:
-  - **Row Count Display**: Exact count of data rows returned from queries
-  - **Character Count Tracking**: Real-time character count for query results and Bedrock responses
-  - **Data Size Monitoring**: Human-readable size formatting (B, KB, MB, GB)
-  - **Table View Toggle**: Switch between raw JSON and spreadsheet-like table display
-  - **Real-time Statistics**: Live updates of data metrics during analysis
+- **Professional Debug Suite**: Comprehensive debugging infrastructure with:
+  - **SQL Query Generation Process**: Real-time monitoring of Bedrock SQL generation with model configuration, process status indicators, and template processing tracking
+  - **Analysis Generation Process**: Advanced payload analysis with size monitoring, token estimation, risk assessment, and duration tracking
+  - **User-Configurable Settings**: Settings management interface for SQL query limits (50-500 records), truncation limits, and debug preferences
+  - **Real-time Logging Capture**: Backend console log capture and frontend display with comprehensive data flow tracing
+  - **Interactive Debug Controls**: Professional UX with status indicators, risk assessment displays, and multi-format data viewing
+  - **Row Count Management**: User-controlled SQL query limits with real-time application and verification
+  - **Data Flow Visualization**: End-to-end tracing from user input through SQL generation to Bedrock analysis
+  - **Payload Inspection**: Complete visibility into Bedrock communication with size tracking and risk assessment
 
 ## Enhanced Analysis Capabilities
 - **Six Comprehensive Analysis Areas**:

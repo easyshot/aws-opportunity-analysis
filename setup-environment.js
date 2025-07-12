@@ -72,7 +72,7 @@ console.log('   AWS_REGION=us-east-1');
 console.log('');
 console.log('   # Bedrock Prompts');
 console.log('   CATAPULT_QUERY_PROMPT_ID=Y6T66EI3GZ');
-console.log('   CATAPULT_ANALYSIS_PROMPT_ID=FDUHITJIME');
+console.log('   CATAPULT_ANALYSIS_PROMPT_ID=arn:aws:bedrock:us-east-1:701976266286:prompt/FDUHITJIME:4');
 
 console.log('');
 console.log('   # Lambda Functions');

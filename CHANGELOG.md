@@ -1,6 +1,54 @@
 # Partner Opportunity Intelligence Application - Changelog
 
-## [2.3.0] - 2025-07-08 (Current Release)
+## [3.0.0] - 2025-07-11 (Current Release)
+### Professional Debug Suite & Production Ready Architecture
+
+#### Added - Professional Debug Suite
+- **SQL Query Generation Process**: Real-time monitoring of Bedrock SQL generation with:
+  - Model configuration display (Claude 3.5 Sonnet, temperature, max tokens)
+  - Process status indicators with visual feedback
+  - Template processing tracking and validation
+- **Analysis Generation Process**: Advanced payload analysis featuring:
+  - Size monitoring with human-readable formatting (B, KB, MB, GB)
+  - Token estimation and risk assessment displays
+  - Duration tracking and performance metrics
+- **User-Configurable Settings**: Professional settings management interface including:
+  - SQL query limits (50-500 records) with real-time application
+  - Truncation limits and data processing parameters
+  - Debug preferences and logging levels
+- **Real-time Logging Capture**: Backend console log capture and frontend display with:
+  - Comprehensive data flow tracing from input to analysis
+  - Interactive log viewing with filtering capabilities
+  - Error identification and troubleshooting guidance
+- **Interactive Debug Controls**: Professional UX design featuring:
+  - Status indicators with color-coded risk assessment
+  - Multi-format data viewing (JSON, table, formatted)
+  - User-friendly debug panel controls and navigation
+
+#### Enhanced - Data Management & Performance
+- **Row Count Management**: User-controlled SQL query limits with real-time verification
+- **Intelligent Truncation**: Multi-level data truncation system handling datasets up to 846K+ characters
+- **Performance Optimization**: Debug features optimized to not impact user experience
+- **Data Flow Visualization**: End-to-end tracing from user input through SQL generation to Bedrock analysis
+
+#### Fixed - Production Stability
+- **Backend Architecture**: Successfully migrated to stable production backend (`app.js`) with full AWS integration
+- **Bedrock Integration**: Fixed invalid `$LATEST` version parameter causing permission denied errors
+- **Converse API**: Implemented proper Converse API usage throughout the application
+- **UI Layout**: Fixed progress indicator positioning and resolved layout jumping issues
+
+#### Removed - Architecture Simplification
+- **Nova Premier Removal**: Completely removed Nova Premier model and related complexity for simplified architecture
+- **Code Cleanup**: Streamlined codebase by removing unused dual-model logic
+- **Configuration Simplification**: Removed Nova Premier references from all configuration files
+
+#### Technical Improvements
+- **Modern API Implementation**: All Bedrock interactions use consistent Converse API format
+- **Professional UX**: Enhanced debug panels with professional design and user-friendly controls
+- **Code Maintainability**: Reduced complexity with standardized Claude 3.5 Sonnet model
+- **Documentation**: Updated all documentation to reflect latest architecture and debug capabilities
+
+## [2.3.0] - 2025-07-08
 ### Production Ready - Bedrock Integration Fixed & Architecture Simplified
 
 #### Fixed - Critical Bedrock Issues
@@ -11,10 +59,6 @@
 
 #### Removed - Architecture Simplification
 - **Nova Premier Removal**: Completely removed Nova Premier model and related complexity
-  - Deleted `finalBedAnalysisPromptNovaPremier-v3.js` automation file
-  - Removed all Nova Premier references from backend, configuration, and environment files
-  - Simplified analysis flow to use only Claude 3.5 Sonnet model
-  - Cleaned up UI options and removed Nova Premier test functions
 - **Code Simplification**: Streamlined codebase by removing unused Nova Premier logic
 
 #### Enhanced - API Integration
@@ -22,18 +66,6 @@
 - **Model Standardization**: Standardized on Claude 3.5 Sonnet model for consistent analysis
 - **Prompt Management**: Simplified prompt configuration with only required prompts
 - **Error Handling**: Improved error handling for Bedrock API interactions
-
-#### Changed - Configuration
-- **Environment Variables**: Removed Nova Premier prompt ID from configuration
-- **AWS Configuration**: Simplified AWS configuration to remove Nova Premier references
-- **Backend Logic**: Streamlined backend to always use standard analysis flow
-- **Debug Information**: Enhanced debug panels now show correct Converse API payloads
-
-#### Technical Improvements
-- **Production Backend**: `app.js` now stable and production-ready with full AWS integration
-- **API Consistency**: All Bedrock calls use consistent Converse API format
-- **Code Maintainability**: Reduced complexity by removing dual-model architecture
-- **Documentation**: Updated all documentation to reflect simplified architecture
 
 ## [2.2.0] - 2025-07-07
 ### Enhanced Debug Interface and Data Management

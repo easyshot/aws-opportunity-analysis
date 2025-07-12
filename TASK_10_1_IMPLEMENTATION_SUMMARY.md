@@ -27,7 +27,7 @@ Successfully updated and enhanced all user documentation to comprehensively cove
 - Third-party tools integration
 
 #### Advanced Analysis Features
-- Multi-model analysis (Standard vs Nova Premier comparison)
+- Comprehensive analysis using Claude 3.5 Sonnet model (simplified architecture)
 - Historical trend analysis
 - Sensitivity analysis and scenario planning
 - Continuous improvement processes
@@ -114,7 +114,7 @@ Successfully updated and enhanced all user documentation to comprehensively cove
 
 ### 3. Workflow Documentation
 - **6 Project Templates**: Complete workflow templates for different project types
-- **3 Analysis Types**: Detailed guidance for Standard, Nova Premier, and Funding Analysis
+- **2 Analysis Types**: Detailed guidance for Standard Analysis and Funding Analysis (simplified architecture)
 - **Multiple Scenarios**: Advanced workflow scenarios for complex projects
 - **Quality Assurance**: Comprehensive QA procedures
 

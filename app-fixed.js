@@ -1,9 +1,11 @@
 // AWS Opportunity Analysis - Fixed Backend with Row Count and Debug Logging
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 8123;
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 
 // Mock analysis endpoint with row count support and debug logging

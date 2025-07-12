@@ -130,7 +130,7 @@ AWS_SECRET_ACCESS_KEY=your-secret-key
 
 # Bedrock Prompt IDs
 CATAPULT_QUERY_PROMPT_ID=Y6T66EI3GZ
-CATAPULT_ANALYSIS_PROMPT_ID=FDUHITJIME
+CATAPULT_ANALYSIS_PROMPT_ID=arn:aws:bedrock:us-east-1:701976266286:prompt/FDUHITJIME:4
 
 # Lambda Function
 CATAPULT_GET_DATASET_LAMBDA=catapult_get_dataset
@@ -229,11 +229,14 @@ DEBUG_LOG_LEVEL=info
 ## Current Development Focus
 - **Production Ready**: Successfully migrated to stable production backend with full AWS integration
 - **Bedrock Integration**: Fixed Bedrock analysis issues and implemented proper Converse API usage
-- **Simplified Architecture**: Removed Nova Premier complexity and standardized on Claude 3.5 Sonnet
-- **Enhanced Debug Infrastructure**: Comprehensive debugging capabilities including:
-  - **Query Results Analysis**: Row counting, character tracking, and data size monitoring
-  - **Table View Functionality**: Spreadsheet-like display with interactive controls
-  - **Truncation Management**: Intelligent data truncation system with multi-level size management
-  - **Real-time Statistics**: Live tracking of data flow metrics and payload sizes
-- **Data Flow Optimization**: Resolved input size limitations with intelligent truncation system
+- **Simplified Architecture**: Removed Nova Premier complexity and standardized on Claude 3.5 Sonnet model
+- **Professional Debug Suite**: Comprehensive debugging infrastructure including:
+  - **SQL Query Generation Process**: Real-time monitoring of Bedrock SQL generation with model configuration and process status indicators
+  - **Analysis Generation Process**: Advanced payload analysis with size monitoring, token estimation, and risk assessment
+  - **User-Configurable Settings**: Settings management interface for SQL query limits, truncation limits, and debug preferences
+  - **Real-time Logging Capture**: Backend console log capture and frontend display with comprehensive data flow tracing
+  - **Interactive Debug Controls**: Professional UX with status indicators, risk assessment displays, and multi-format data viewing
+  - **Row Count Management**: User-controlled SQL query limits with real-time application and verification
+- **Data Flow Optimization**: Resolved input size limitations with intelligent multi-level truncation system
+- **Professional UX**: Enhanced debug panels with professional design and user-friendly controls
 - **Operational Excellence**: Comprehensive monitoring, alerting, and troubleshooting capabilities

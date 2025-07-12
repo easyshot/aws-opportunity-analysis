@@ -1847,6 +1847,180 @@ ror Styles */
     border-color: #4a5568;
 }
 
+/* Bedrock Debug Information Styles */
+.debug-bedrock-info {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.bedrock-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.bedrock-stats .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 120px;
+}
+
+.bedrock-stats .stat-item strong {
+    font-size: 12px;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bedrock-stats .stat-item span:last-child {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.bedrock-process-status {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.process-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.process-step:hover {
+    border-color: #cbd5e0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.step-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.step-text {
+    flex: 1;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.step-status {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.step-status.pending {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.step-status.processing {
+    background: #fef5e7;
+    color: #d69e2e;
+}
+
+.step-status.completed {
+    background: #c6f6d5;
+    color: #38a169;
+}
+
+.bedrock-risk-assessment {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fffaf0;
+    border: 1px solid #fed7d7;
+    border-radius: 6px;
+}
+
+.risk-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.risk-label {
+    font-size: 13px;
+    color: #4a5568;
+}
+
+.risk-value {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.risk-value.low {
+    background: #c6f6d5;
+    color: #38a169;
+}
+
+.risk-value.medium {
+    background: #fef5e7;
+    color: #d69e2e;
+}
+
+.risk-value.high {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+/* Dark mode for Bedrock debug sections */
+[data-theme="dark"] .debug-bedrock-info {
+    background: #1a202c;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .bedrock-stats .stat-item strong {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .bedrock-stats .stat-item span:last-child {
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .process-step {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .process-step:hover {
+    border-color: #718096;
+}
+
+[data-theme="dark"] .step-text {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .bedrock-risk-assessment {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .risk-label {
+    color: #a0aec0;
+}
+
 [data-theme="dark"] .query-table tr:hover {
     background: #2d3748;
 }

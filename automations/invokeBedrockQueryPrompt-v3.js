@@ -27,7 +27,7 @@ exports.execute = async (params) => {
     const converseResponse = await invokeBedrockConverse(payload);
 
     // Step 4: Process results
-    const processedResults = processConverseApiResponse(converseResponse);
+    const processedResults = processConverseApiResponse(converseResponse, params);
 
     return {
       status: 'success',
@@ -74,7 +74,14 @@ function preparePayload(params, promptData) {
       .replace('{{region}}', params.region || 'Not specified')
       .replace('{{closeDate}}', params.closeDate || 'Not specified')
       .replace('{{oppName}}', params.oppName || 'Not specified')
-      .replace('{{oppDescription}}', params.oppDescription || 'Not specified');
+      .replace('{{oppDescription}}', params.oppDescription || 'Not specified')
+      .replace('{{queryLimit}}', params.settings?.sqlQueryLimit || '200')
+      .replace('{{industry}}', params.industry || 'Not specified')
+      .replace('{{customerSegment}}', params.customerSegment || 'Not specified')
+      .replace('{{partnerName}}', params.partnerName || 'Not specified')
+      .replace('{{activityFocus}}', params.activityFocus || 'Not specified')
+      .replace('{{businessDescription}}', params.businessDescription || 'Not specified')
+      .replace('{{migrationPhase}}', params.migrationPhase || 'Not specified');
 
     // Debug: Show what's being sent to Bedrock for SQL generation
     console.log("\n" + "=".repeat(60));
@@ -139,9 +146,34 @@ async function invokeBedrockConverse(payload) {
 }
 
 /**
+ * Apply row limit to SQL query
+ */
+function applyRowLimit(sqlQuery, limit) {
+  try {
+    // Remove existing LIMIT clause if present (handles both numeric limits and template variables)
+    let modifiedQuery = sqlQuery.replace(/\s+LIMIT\s+(\d+|{{[^}]+}})\s*$/i, '');
+    
+    // Also remove any duplicate LIMIT clauses that might exist
+    modifiedQuery = modifiedQuery.replace(/\s+LIMIT\s+(\d+|{{[^}]+}})/gi, '');
+    
+    // Add new LIMIT clause
+    modifiedQuery = modifiedQuery.trim() + ` LIMIT ${limit}`;
+    
+    console.log("PROCESS_RESULTS (SQL Query): Applied row limit:", limit);
+    console.log("PROCESS_RESULTS (SQL Query): Original query had LIMIT:", sqlQuery.includes('LIMIT'));
+    console.log("PROCESS_RESULTS (SQL Query): Modified query (last 200 chars):", modifiedQuery.slice(-200));
+    
+    return modifiedQuery;
+  } catch (error) {
+    console.error("PROCESS_RESULTS (SQL Query): Error applying row limit:", error.message);
+    return sqlQuery; // Return original query if modification fails
+  }
+}
+
+/**
  * Process Converse API response
  */
-function processConverseApiResponse(response) {
+function processConverseApiResponse(response, params = {}) {
   console.log("PROCESS_RESULTS (SQL Query): Starting. Input response object (first 1000 chars):", JSON.stringify(response, null, 2).substring(0, 1000));
 
   if (!response || !response.output || !response.output.message || !response.output.message.content || !response.output.message.content[0] || !response.output.message.content[0].text) {
@@ -158,11 +190,21 @@ function processConverseApiResponse(response) {
       console.log("PROCESS_RESULTS (SQL Query): Successfully extracted SQL query from JSON within message content:", parsedJson.sql_query);
       console.log("PROCESS_RESULTS (SQL Query): SQL Query Details - Length:", parsedJson.sql_query.length, "Contains WHERE clauses:", parsedJson.sql_query.includes('WHERE'));
 
+      // Apply row limit if specified in settings
+      let finalQuery = parsedJson.sql_query;
+      const rowLimit = params.settings?.sqlQueryLimit;
+      if (rowLimit && typeof rowLimit === 'number' && rowLimit > 0) {
+        console.log("PROCESS_RESULTS (SQL Query): Applying row limit from settings:", rowLimit);
+        finalQuery = applyRowLimit(parsedJson.sql_query, rowLimit);
+      } else {
+        console.log("PROCESS_RESULTS (SQL Query): No row limit specified or invalid limit:", rowLimit);
+      }
+
       // Store the SQL query for debug purposes
       if (!global.debugInfo) global.debugInfo = {};
-      global.debugInfo.sqlQuery = parsedJson.sql_query;
+      global.debugInfo.sqlQuery = finalQuery;
 
-      return JSON.stringify(parsedJson);
+      return JSON.stringify({ sql_query: finalQuery });
     } else {
       console.error("PROCESS_RESULTS (SQL Query): Parsed JSON does not contain a 'sql_query' string property. Parsed JSON:", JSON.stringify(parsedJson, null, 2));
       throw new Error("Parsed JSON from LLM response does not contain a 'sql_query' string property.");
@@ -176,7 +218,16 @@ function processConverseApiResponse(response) {
         const embeddedParsedJson = JSON.parse(jsonMatch[0]);
         if (embeddedParsedJson && typeof embeddedParsedJson.sql_query === 'string') {
           console.warn("PROCESS_RESULTS (SQL Query): Fallback - Successfully extracted SQL query from JSON embedded in text:", embeddedParsedJson.sql_query);
-          return JSON.stringify(embeddedParsedJson);
+          
+          // Apply row limit to fallback query as well
+          let finalQuery = embeddedParsedJson.sql_query;
+          const rowLimit = params.settings?.sqlQueryLimit;
+          if (rowLimit && typeof rowLimit === 'number' && rowLimit > 0) {
+            console.log("PROCESS_RESULTS (SQL Query): Applying row limit to fallback query:", rowLimit);
+            finalQuery = applyRowLimit(embeddedParsedJson.sql_query, rowLimit);
+          }
+          
+          return JSON.stringify({ sql_query: finalQuery });
         }
       } catch (fallbackError) {
         console.error("PROCESS_RESULTS (SQL Query): Fallback parsing also failed. Error:", fallbackError.message);

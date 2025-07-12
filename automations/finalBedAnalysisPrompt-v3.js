@@ -74,13 +74,14 @@ async function fetchPrompt(promptId) {
 /**
  * Truncate query results to fit within model limits while preserving most relevant data
  */
-function truncateQueryResults(queryResults, maxLength = 200000) {
+function truncateQueryResults(queryResults, maxLength = 400000, settings = {}) {
   try {
     // Convert to string if needed
     const queryString = typeof queryResults === 'string' ? queryResults : JSON.stringify(queryResults);
     
     // Return as-is if already small enough
     if (queryString.length <= maxLength) {
+      console.log(`PROCESS_RESULTS (Analysis): Query results size ${queryString.length} is within limit ${maxLength}, no truncation needed`);
       return queryString;
     }
     
@@ -88,7 +89,7 @@ function truncateQueryResults(queryResults, maxLength = 200000) {
     
     // Simple truncation - more reliable and faster
     const truncated = queryString.substring(0, maxLength);
-    console.log(`PROCESS_RESULTS (Analysis): Truncation applied: ${truncated.length} characters`);
+    console.log(`PROCESS_RESULTS (Analysis): Simple truncation applied: ${truncated.length} characters`);
     return truncated;
     
   } catch (error) {
@@ -118,8 +119,18 @@ function preparePayload(params, promptData) {
       ? params.queryResults 
       : JSON.stringify(params.queryResults);
     
-    // Truncate query results to prevent model input limits
-    const queryResults = truncateQueryResults(rawQueryResults);
+    // Truncate query results to prevent model input limits (if enabled)
+    const enableTruncation = params.settings?.enableTruncation !== false; // Default to true
+    const truncationLimit = params.settings?.truncationLimit || 400000;
+    
+    let queryResults;
+    if (enableTruncation) {
+      queryResults = truncateQueryResults(rawQueryResults, truncationLimit, params.settings);
+      console.log("PROCESS_RESULTS (Analysis): Truncation enabled, limit:", truncationLimit);
+    } else {
+      queryResults = rawQueryResults;
+      console.log("PROCESS_RESULTS (Analysis): Truncation disabled, using full dataset");
+    }
 
     // Debug: Show the actual query results content
     console.log("PROCESS_RESULTS (Analysis): Query results type:", typeof params.queryResults);
@@ -184,11 +195,11 @@ ${queryResults}
 
 ${filledUserMessage}`;
 
-    // Check final message size and truncate further if needed
-    const maxTotalSize = 300000; // Conservative limit for Claude
+    // Check final message size and truncate further if needed (only if truncation is enabled)
+    const maxTotalSize = params.settings?.enableTruncation !== false ? 600000 : 2000000; // Much higher limit when truncation disabled
     let finalUserMessage = enhancedUserMessage;
     
-    if (finalUserMessage.length > maxTotalSize) {
+    if (enableTruncation && finalUserMessage.length > maxTotalSize) {
       console.log(`PROCESS_RESULTS (Analysis): Final message too large (${finalUserMessage.length}), applying additional truncation`);
       
       // Further truncate query results if needed
@@ -220,6 +231,8 @@ ${furtherTruncatedResults}
 </project_data>
 
 ${filledUserMessage}`;
+    } else if (!enableTruncation) {
+      console.log(`PROCESS_RESULTS (Analysis): Truncation disabled, sending full message (${finalUserMessage.length} characters)`);
     }
 
     // Debug: Show the analysis payload configuration
@@ -281,16 +294,316 @@ ${filledUserMessage}`;
 }
 
 /**
- * Invoke Bedrock Converse API
+ * Invoke Bedrock Converse API with comprehensive error diagnostics
  */
 async function invokeBedrockConverse(payload) {
+  let startTime = Date.now();
+  
+  // Pre-flight logging for diagnostics
+  const payloadSize = JSON.stringify(payload).length;
+  const messageContent = payload.messages[0]?.content[0]?.text || '';
+  const messageSize = messageContent.length;
+  const systemSize = payload.system?.[0]?.text?.length || 0;
+  const estimatedTokens = Math.ceil((messageSize + systemSize) / 3.5); // More accurate: ~3.5 chars per token for Claude
+  
+  console.log("\n" + "=".repeat(80));
+  console.log("🚀 BEDROCK API CALL COMPREHENSIVE DIAGNOSTICS");
+  console.log("=".repeat(80));
+  console.log("📊 PAYLOAD ANALYSIS:");
+  console.log("   Total Payload Size:", payloadSize.toLocaleString(), "characters");
+  console.log("   Message Content Size:", messageSize.toLocaleString(), "characters");
+  console.log("   System Instructions Size:", systemSize.toLocaleString(), "characters");
+  console.log("   Combined Content Size:", (messageSize + systemSize).toLocaleString(), "characters");
+  console.log("   Estimated Tokens:", estimatedTokens.toLocaleString(), "(~3.5 chars/token)");
+  console.log("   Model ID:", payload.modelId);
+  console.log("   Max Tokens Requested:", payload.inferenceConfig?.maxTokens || 'default');
+  console.log("   Temperature:", payload.inferenceConfig?.temperature || 'default');
+  
+  // Check against known limits with more precision
+  const CLAUDE_35_SONNET_MAX_INPUT_TOKENS = 200000; // Official Claude 3.5 Sonnet limit
+  const BEDROCK_MAX_PAYLOAD_SIZE = 1048576; // 1MB = 1,048,576 bytes
+  const BEDROCK_PRACTICAL_LIMIT = 900000; // Conservative practical limit
+  const CLAUDE_CONTEXT_WINDOW = 200000; // Claude 3.5 Sonnet context window
+  
+  console.log("\n📏 COMPREHENSIVE LIMIT ANALYSIS:");
+  console.log("   Payload vs 1MB Hard Limit:", payloadSize.toLocaleString(), "/", BEDROCK_MAX_PAYLOAD_SIZE.toLocaleString(), 
+              `(${Math.round((payloadSize/BEDROCK_MAX_PAYLOAD_SIZE)*100)}%)`);
+  console.log("   Payload vs Practical Limit:", payloadSize.toLocaleString(), "/", BEDROCK_PRACTICAL_LIMIT.toLocaleString(), 
+              `(${Math.round((payloadSize/BEDROCK_PRACTICAL_LIMIT)*100)}%)`);
+  console.log("   Tokens vs Claude Input Limit:", estimatedTokens.toLocaleString(), "/", CLAUDE_35_SONNET_MAX_INPUT_TOKENS.toLocaleString(), 
+              `(${Math.round((estimatedTokens/CLAUDE_35_SONNET_MAX_INPUT_TOKENS)*100)}%)`);
+  console.log("   Context Window Usage:", estimatedTokens.toLocaleString(), "/", CLAUDE_CONTEXT_WINDOW.toLocaleString(), 
+              `(${Math.round((estimatedTokens/CLAUDE_CONTEXT_WINDOW)*100)}%)`);
+  
+  // Detailed warnings with specific thresholds
+  console.log("\n⚠️  RISK ASSESSMENT:");
+  if (payloadSize > BEDROCK_MAX_PAYLOAD_SIZE) {
+    console.log("   🔴 CRITICAL: Payload exceeds 1MB hard limit! Request will fail.");
+  } else if (payloadSize > BEDROCK_PRACTICAL_LIMIT) {
+    console.log("   🟡 HIGH RISK: Payload near practical limit. May cause issues.");
+  } else if (payloadSize > 500000) {
+    console.log("   🟡 MODERATE RISK: Large payload. Monitor for issues.");
+  } else {
+    console.log("   🟢 LOW RISK: Payload size within safe limits.");
+  }
+  
+  if (estimatedTokens > CLAUDE_35_SONNET_MAX_INPUT_TOKENS) {
+    console.log("   🔴 CRITICAL: Token count exceeds Claude 3.5 Sonnet input limit!");
+  } else if (estimatedTokens > 150000) {
+    console.log("   🟡 HIGH RISK: Token count approaching limit.");
+  } else if (estimatedTokens > 100000) {
+    console.log("   🟡 MODERATE RISK: Large token count. Monitor performance.");
+  } else {
+    console.log("   🟢 LOW RISK: Token count within safe limits.");
+  }
+  
+  // Model-specific information
+  console.log("\n🤖 MODEL INFORMATION:");
+  console.log("   Model Family:", payload.modelId.includes('claude') ? 'Claude' : 'Unknown');
+  console.log("   Model Version:", payload.modelId.includes('3-5-sonnet') ? '3.5 Sonnet' : 'Unknown');
+  console.log("   Input Token Limit:", CLAUDE_35_SONNET_MAX_INPUT_TOKENS.toLocaleString());
+  console.log("   Output Token Limit:", "8,192 (typical)");
+  console.log("   Context Window:", CLAUDE_CONTEXT_WINDOW.toLocaleString());
+  
+  console.log("=".repeat(80) + "\n");
+
   try {
+    console.log("🔄 Sending request to Bedrock Converse API...");
+    console.log("   Request initiated at:", new Date().toISOString());
+    
     const command = new ConverseCommand(payload);
     const response = await bedrockRuntime.send(command);
+    
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    const responseSize = JSON.stringify(response).length;
+    
+    console.log("\n✅ BEDROCK API CALL SUCCESSFUL!");
+    console.log("   Response time:", duration.toLocaleString(), "ms");
+    console.log("   Response size:", responseSize.toLocaleString(), "characters");
+    console.log("   Request completed at:", new Date().toISOString());
+    
+    // Success metrics
+    console.log("\n📈 SUCCESS METRICS:");
+    console.log("   Throughput:", Math.round(payloadSize / (duration / 1000)).toLocaleString(), "chars/second");
+    console.log("   Token processing rate:", Math.round(estimatedTokens / (duration / 1000)).toLocaleString(), "tokens/second");
+    
     return response;
+    
   } catch (error) {
-    console.error('Error invoking Bedrock Converse API:', error);
-    throw new Error(`Failed to invoke Bedrock Converse API: ${error.message}`);
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    
+    console.log("\n" + "=".repeat(80));
+    console.log("❌ BEDROCK API ERROR - COMPREHENSIVE ANALYSIS");
+    console.log("=".repeat(80));
+    
+    // Basic error information
+    console.log("⏱️  TIMING INFORMATION:");
+    console.log("   Request Duration:", duration.toLocaleString(), "ms");
+    console.log("   Request Started:", new Date(startTime).toISOString());
+    console.log("   Request Failed:", new Date(endTime).toISOString());
+    
+    console.log("\n🔍 ERROR DETAILS:");
+    console.log("   Error Name:", error.name || 'Unknown');
+    console.log("   Error Message:", error.message || 'No message');
+    console.log("   Error Code:", error.code || 'N/A');
+    console.log("   HTTP Status Code:", error.$metadata?.httpStatusCode || 'N/A');
+    console.log("   Request ID:", error.$metadata?.requestId || 'N/A');
+    console.log("   Extended Request ID:", error.$metadata?.extendedRequestId || 'N/A');
+    console.log("   CloudFront ID:", error.$metadata?.cfId || 'N/A');
+    console.log("   Attempts:", error.$metadata?.attempts || 'N/A');
+    console.log("   Total Retry Delay:", error.$metadata?.totalRetryDelay || 'N/A');
+    
+    // AWS SDK specific error details
+    console.log("\n🔧 AWS SDK ERROR DETAILS:");
+    console.log("   Fault Type:", error.$fault || 'N/A');
+    console.log("   Service:", error.$service || 'N/A');
+    console.log("   Operation:", error.$operation || 'N/A');
+    console.log("   Error Stack Available:", !!error.stack);
+    
+    // Comprehensive error type analysis
+    console.log("\n🔬 DETAILED ERROR TYPE ANALYSIS:");
+    
+    // 1. Payload Size Issues
+    if (error.name === 'ValidationException' && error.message?.includes('too long')) {
+      console.log("   🎯 CONFIRMED CAUSE: Input Size Exceeded");
+      console.log("   📝 SPECIFIC ISSUE: Request payload exceeds model's maximum input size");
+      console.log("   📊 PAYLOAD METRICS:");
+      console.log("      - Your payload:", payloadSize.toLocaleString(), "characters");
+      console.log("      - Estimated tokens:", estimatedTokens.toLocaleString());
+      console.log("      - Model limit:", CLAUDE_35_SONNET_MAX_INPUT_TOKENS.toLocaleString(), "tokens");
+      console.log("      - Overage:", (estimatedTokens - CLAUDE_35_SONNET_MAX_INPUT_TOKENS).toLocaleString(), "tokens");
+      console.log("   💡 IMMEDIATE SOLUTION: Reduce payload by", Math.ceil((payloadSize - BEDROCK_PRACTICAL_LIMIT) / 1000), "KB");
+      console.log("   🔧 IMPLEMENTATION: Enable truncation or reduce query result size");
+    }
+    
+    // 2. Rate Limiting
+    else if (error.name === 'ThrottlingException' || error.message?.includes('throttl') || error.message?.includes('rate')) {
+      console.log("   🎯 CONFIRMED CAUSE: Rate Limiting");
+      console.log("   📝 SPECIFIC ISSUE: Request rate exceeded service limits");
+      console.log("   📊 RATE LIMIT ANALYSIS:");
+      console.log("      - Request size:", payloadSize.toLocaleString(), "characters");
+      console.log("      - Large requests consume more quota");
+      console.log("      - Current request is", payloadSize > 500000 ? 'LARGE' : 'NORMAL', "size");
+      console.log("   💡 IMMEDIATE SOLUTION: Implement exponential backoff retry");
+      console.log("   🔧 IMPLEMENTATION: Add retry logic with 2^n second delays");
+    }
+    
+    // 3. Service Quota Exceeded
+    else if (error.name === 'ServiceQuotaExceededException' || error.message?.includes('quota') || error.message?.includes('limit')) {
+      console.log("   🎯 CONFIRMED CAUSE: Service Quota Exceeded");
+      console.log("   📝 SPECIFIC ISSUE: Account-level service quotas exceeded");
+      console.log("   📊 QUOTA ANALYSIS:");
+      console.log("      - This may be daily/monthly token limits");
+      console.log("      - Or concurrent request limits");
+      console.log("      - Large payloads consume more quota faster");
+      console.log("   💡 IMMEDIATE SOLUTION: Request quota increase or reduce usage");
+      console.log("   🔧 IMPLEMENTATION: Contact AWS support for quota increase");
+    }
+    
+    // 4. Access/Permission Issues
+    else if (error.name === 'AccessDeniedException' || error.message?.includes('access') || error.message?.includes('permission')) {
+      console.log("   🎯 CONFIRMED CAUSE: AWS Permissions Issue");
+      console.log("   📝 SPECIFIC ISSUE: Insufficient IAM permissions or model access");
+      console.log("   📊 PERMISSION ANALYSIS:");
+      console.log("      - Model ID:", payload.modelId);
+      console.log("      - Region:", process.env.AWS_REGION || 'Not specified');
+      console.log("      - Required permissions: bedrock:InvokeModel");
+      console.log("      - Model access may need to be granted separately");
+      console.log("   💡 IMMEDIATE SOLUTION: Check IAM permissions and model access");
+      console.log("   🔧 IMPLEMENTATION: Grant bedrock:InvokeModel and enable model access");
+    }
+    
+    // 5. Resource Not Found
+    else if (error.name === 'ResourceNotFoundException' || error.message?.includes('not found')) {
+      console.log("   🎯 CONFIRMED CAUSE: Model or Resource Not Found");
+      console.log("   📝 SPECIFIC ISSUE: Model ID incorrect or not available in region");
+      console.log("   📊 RESOURCE ANALYSIS:");
+      console.log("      - Model ID:", payload.modelId);
+      console.log("      - Region:", process.env.AWS_REGION || 'Not specified');
+      console.log("      - Model may not be available in this region");
+      console.log("   💡 IMMEDIATE SOLUTION: Verify model ID and region availability");
+      console.log("   🔧 IMPLEMENTATION: Check AWS Bedrock console for available models");
+    }
+    
+    // 6. Timeout Issues
+    else if (duration > 30000) {
+      console.log("   🎯 CONFIRMED CAUSE: Request Timeout");
+      console.log("   📝 SPECIFIC ISSUE: Request processing time exceeded limits");
+      console.log("   📊 TIMEOUT ANALYSIS:");
+      console.log("      - Request duration:", duration.toLocaleString(), "ms");
+      console.log("      - Payload size:", payloadSize.toLocaleString(), "characters");
+      console.log("      - Large payloads take longer to process");
+      console.log("   💡 IMMEDIATE SOLUTION: Reduce payload size or increase timeout");
+      console.log("   🔧 IMPLEMENTATION: Implement payload truncation");
+    }
+    
+    // 7. Model-specific errors
+    else if (error.message?.includes('model')) {
+      console.log("   🎯 CONFIRMED CAUSE: Model-Specific Error");
+      console.log("   📝 SPECIFIC ISSUE: Error related to model configuration or capabilities");
+      console.log("   📊 MODEL ERROR ANALYSIS:");
+      console.log("      - Model ID:", payload.modelId);
+      console.log("      - Max tokens requested:", payload.inferenceConfig?.maxTokens || 'default');
+      console.log("      - Temperature:", payload.inferenceConfig?.temperature || 'default');
+      console.log("   💡 IMMEDIATE SOLUTION: Check model configuration parameters");
+      console.log("   🔧 IMPLEMENTATION: Verify model supports requested configuration");
+    }
+    
+    // 8. Network/Infrastructure Issues
+    else if (error.code === 'NetworkingError' || error.message?.includes('network') || error.message?.includes('connection')) {
+      console.log("   🎯 CONFIRMED CAUSE: Network/Infrastructure Issue");
+      console.log("   📝 SPECIFIC ISSUE: Network connectivity or AWS infrastructure problem");
+      console.log("   📊 NETWORK ANALYSIS:");
+      console.log("      - Duration before failure:", duration.toLocaleString(), "ms");
+      console.log("      - This may be temporary infrastructure issue");
+      console.log("   💡 IMMEDIATE SOLUTION: Retry request after brief delay");
+      console.log("   🔧 IMPLEMENTATION: Implement retry with exponential backoff");
+    }
+    
+    // 9. Unknown/Other Errors
+    else {
+      console.log("   🎯 UNIDENTIFIED ERROR TYPE");
+      console.log("   📝 ANALYSIS NEEDED: This error pattern is not recognized");
+      console.log("   📊 ERROR PATTERN ANALYSIS:");
+      console.log("      - Error name pattern:", error.name || 'None');
+      console.log("      - Message keywords:", error.message?.split(' ').slice(0, 5).join(' ') || 'None');
+      console.log("      - HTTP status pattern:", error.$metadata?.httpStatusCode || 'None');
+      console.log("   💡 INVESTIGATION NEEDED: Check AWS service status and documentation");
+      console.log("   🔧 FALLBACK: Implement generic retry logic");
+    }
+    
+    // Comprehensive diagnostic summary
+    console.log("\n📋 COMPREHENSIVE DIAGNOSTIC SUMMARY:");
+    console.log("   Request Characteristics:");
+    console.log("      - Payload Size:", payloadSize.toLocaleString(), "characters");
+    console.log("      - Estimated Tokens:", estimatedTokens.toLocaleString());
+    console.log("      - Duration:", duration.toLocaleString(), "ms");
+    console.log("      - Model:", payload.modelId);
+    console.log("   Error Characteristics:");
+    console.log("      - Error Type:", error.name || 'Unknown');
+    console.log("      - HTTP Status:", error.$metadata?.httpStatusCode || 'N/A');
+    console.log("      - Request ID:", error.$metadata?.requestId || 'N/A');
+    console.log("      - Fault Type:", error.$fault || 'N/A');
+    console.log("   Risk Factors:");
+    console.log("      - Payload Size Risk:", payloadSize > BEDROCK_PRACTICAL_LIMIT ? 'HIGH' : payloadSize > 500000 ? 'MEDIUM' : 'LOW');
+    console.log("      - Token Count Risk:", estimatedTokens > 150000 ? 'HIGH' : estimatedTokens > 100000 ? 'MEDIUM' : 'LOW');
+    console.log("      - Duration Risk:", duration > 20000 ? 'HIGH' : duration > 10000 ? 'MEDIUM' : 'LOW');
+    
+    console.log("=".repeat(80) + "\n");
+    
+    // Store comprehensive diagnostic info globally for debugging
+    if (!global.debugInfo) global.debugInfo = {};
+    global.debugInfo.bedrockError = {
+      // Request characteristics
+      payloadSize,
+      messageSize,
+      systemSize,
+      estimatedTokens,
+      duration,
+      
+      // Error details
+      errorName: error.name,
+      errorMessage: error.message,
+      errorCode: error.code,
+      httpStatus: error.$metadata?.httpStatusCode,
+      requestId: error.$metadata?.requestId,
+      extendedRequestId: error.$metadata?.extendedRequestId,
+      cfId: error.$metadata?.cfId,
+      attempts: error.$metadata?.attempts,
+      totalRetryDelay: error.$metadata?.totalRetryDelay,
+      fault: error.$fault,
+      service: error.$service,
+      operation: error.$operation,
+      
+      // Risk assessment
+      payloadSizeRisk: payloadSize > BEDROCK_PRACTICAL_LIMIT ? 'HIGH' : payloadSize > 500000 ? 'MEDIUM' : 'LOW',
+      tokenCountRisk: estimatedTokens > 150000 ? 'HIGH' : estimatedTokens > 100000 ? 'MEDIUM' : 'LOW',
+      durationRisk: duration > 20000 ? 'HIGH' : duration > 10000 ? 'MEDIUM' : 'LOW',
+      
+      // Limits comparison
+      payloadVsLimit: Math.round((payloadSize/BEDROCK_PRACTICAL_LIMIT)*100),
+      tokensVsLimit: Math.round((estimatedTokens/CLAUDE_35_SONNET_MAX_INPUT_TOKENS)*100),
+      
+      // Timestamp
+      timestamp: new Date().toISOString(),
+      startTime: new Date(startTime).toISOString(),
+      endTime: new Date(endTime).toISOString()
+    };
+    
+    // Enhanced error message with specific cause
+    let enhancedErrorMessage = `Failed to invoke Bedrock Converse API: ${error.message}`;
+    
+    if (error.name === 'ValidationException' && error.message?.includes('too long')) {
+      enhancedErrorMessage = `Bedrock Input Size Exceeded: Payload (${payloadSize.toLocaleString()} chars, ~${estimatedTokens.toLocaleString()} tokens) exceeds Claude 3.5 Sonnet's ${CLAUDE_35_SONNET_MAX_INPUT_TOKENS.toLocaleString()} token limit. Reduce input size by ${Math.ceil((estimatedTokens - CLAUDE_35_SONNET_MAX_INPUT_TOKENS) / 1000)}K tokens.`;
+    } else if (error.name === 'ThrottlingException') {
+      enhancedErrorMessage = `Bedrock Rate Limit Exceeded: Request rate too high. Large payload (${payloadSize.toLocaleString()} chars) may consume more quota. Implement retry with exponential backoff.`;
+    } else if (error.name === 'AccessDeniedException') {
+      enhancedErrorMessage = `Bedrock Access Denied: Insufficient permissions for model ${payload.modelId}. Check IAM permissions and model access grants.`;
+    }
+    
+    throw new Error(enhancedErrorMessage);
   }
 }
 

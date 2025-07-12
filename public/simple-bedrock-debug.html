@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedrock Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-box { 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+            background: #f9f9f9; 
+        }
+        .debug-title { 
+            font-weight: bold; 
+            color: #333; 
+            margin-bottom: 10px; 
+        }
+        .debug-content { 
+            font-family: monospace; 
+            background: white; 
+            padding: 10px; 
+            border-radius: 3px; 
+            white-space: pre-wrap; 
+        }
+        .test-btn { 
+            background: #007cba; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Bedrock Debug Information Test</h1>
+    
+    <button class="test-btn" onclick="testDebugInfo()">Test Debug Info Capture</button>
+    
+    <div class="debug-box">
+        <div class="debug-title">🤖 SQL Query Generation Logs</div>
+        <div class="debug-content" id="sqlLogs">Click "Test Debug Info Capture" to see logs...</div>
+    </div>
+    
+    <div class="debug-box">
+        <div class="debug-title">🧠 Analysis Generation Logs</div>
+        <div class="debug-content" id="analysisLogs">Click "Test Debug Info Capture" to see logs...</div>
+    </div>
+    
+    <div class="debug-box">
+        <div class="debug-title">⚙️ Row Count Setting Status</div>
+        <div class="debug-content" id="rowCountStatus">Click "Test Debug Info Capture" to check row count...</div>
+    </div>
+
+    <script>
+        async function testDebugInfo() {
+            try {
+                // Test with sample data
+                const testData = {
+                    CustomerName: "Test Company",
+                    region: "United States", 
+                    closeDate: "2024-12-31",
+                    oppName: "Test Migration",
+                    oppDescription: "Test migration project for debugging purposes. This is a sample description to test the row count functionality and debug information capture."
+                };
+                
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-SQL-Query-Limit': '100', // Test with 100 rows
+                        'X-Truncation-Limit': '400000',
+                        'X-Enable-Truncation': 'true'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                // Display SQL generation logs
+                const sqlLogs = result.debug?.sqlGenerationLogs || ['No SQL generation logs captured'];
+                document.getElementById('sqlLogs').textContent = sqlLogs.join('\n');
+                
+                // Display analysis generation logs  
+                const analysisLogs = result.debug?.analysisGenerationLogs || ['No analysis generation logs captured'];
+                document.getElementById('analysisLogs').textContent = analysisLogs.join('\n');
+                
+                // Display row count status
+                const sqlQuery = result.debug?.sqlQuery || '';
+                const hasLimit = sqlQuery.includes('LIMIT 100');
+                const rowCountStatus = `
+Row Count Setting: 100 (from header)
+SQL Query Contains LIMIT 100: ${hasLimit ? 'YES ✅' : 'NO ❌'}
+SQL Query Length: ${sqlQuery.length} characters
+Query Results Length: ${(result.debug?.queryResults || '').length} characters
+
+SQL Query (last 200 chars):
+${sqlQuery.slice(-200)}
+                `;
+                document.getElementById('rowCountStatus').textContent = rowCountStatus;
+                
+            } catch (error) {
+                document.getElementById('sqlLogs').textContent = 'Error: ' + error.message;
+                document.getElementById('analysisLogs').textContent = 'Error: ' + error.message;
+                document.getElementById('rowCountStatus').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
