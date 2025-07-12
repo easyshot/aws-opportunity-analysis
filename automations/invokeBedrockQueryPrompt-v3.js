@@ -204,6 +204,12 @@ function applyRowLimit(sqlQuery, limit) {
  */
 function processConverseApiResponse(response, params = {}) {
   console.log("PROCESS_RESULTS (SQL Query): Starting. Input response object (first 1000 chars):", JSON.stringify(response, null, 2).substring(0, 1000));
+  // Log the full Bedrock Converse API response for debugging
+  try {
+    console.log("PROCESS_RESULTS (SQL Query): FULL Bedrock Converse API response:", JSON.stringify(response, null, 2));
+  } catch (e) {
+    console.log("PROCESS_RESULTS (SQL Query): Could not stringify full response for logging.");
+  }
 
   if (!response || !response.output || !response.output.message || !response.output.message.content || !response.output.message.content[0] || !response.output.message.content[0].text) {
     console.error("PROCESS_RESULTS (SQL Query): Invalid or incomplete Bedrock Converse API response structure. Full response:", JSON.stringify(response, null, 2));

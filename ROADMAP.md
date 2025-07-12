@@ -22,6 +22,10 @@
   - **Row Count Management**: User-controlled SQL query limits with real-time application and verification
 ✅ **Data Flow Optimization**: Resolved Bedrock input size limitations with intelligent multi-level truncation system
 ✅ **Professional Debug UX**: Enhanced debug panels with professional design and user-friendly controls
+✅ **User-Driven Truncation & Analysis Settings**: All truncation, SQL query limits, and analysis parameters are now fully user-configurable from the frontend settings UI and honored end-to-end by the backend.
+✅ **Centralized Model Settings**: All model inference parameters (max tokens, temperature, etc.) are now managed exclusively in Bedrock prompt management. The backend no longer sets or overrides these values.
+✅ **Backend Logic & Logging**: All backend logic and logs now reflect the actual user settings received with each request, not hardcoded or default values.
+✅ **Robust Settings UI & Backend Wiring**: The settings UI is fully integrated with backend logic, providing a seamless, robust, and user-friendly experience for configuring all analysis parameters.
 
 ## Recently Completed (Q2 2025)
 ✅ **Lambda Timeout Resolution**: Fixed Lambda execution timeouts by extending timeout from 10s to 30s with proper error handling

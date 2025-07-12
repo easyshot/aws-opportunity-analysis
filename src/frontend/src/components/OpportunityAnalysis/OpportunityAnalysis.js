@@ -10,12 +10,35 @@ import AnalysisResults from './AnalysisResults';
 import ProgressIndicator from '../UI/ProgressIndicator';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ErrorMessage from '../UI/ErrorMessage';
+import Settings from '../Settings/Settings';
 
 // Services
 import { opportunityAnalysisService } from '../../services/opportunityAnalysisService';
 
 // Styles
 import './OpportunityAnalysis.css';
+
+// Add a hook to get user settings from localStorage or context
+function getUserAnalysisSettings() {
+  try {
+    const prefs = JSON.parse(localStorage.getItem('userPreferences'));
+    if (prefs && prefs.analysis) {
+      return {
+        enableTruncation: prefs.analysis.enableTruncation,
+        truncationLimit: prefs.analysis.truncationLimit,
+        sqlQueryLimit: prefs.analysis.sqlQueryLimit,
+        analysisTimeout: prefs.analysis.analysisTimeout
+      };
+    }
+  } catch (e) {}
+  // Fallback defaults
+  return {
+    enableTruncation: true,
+    truncationLimit: 400000,
+    sqlQueryLimit: 200,
+    analysisTimeout: 120
+  };
+}
 
 const OpportunityAnalysis = () => {
   const [analysisResults, setAnalysisResults] = useState(null);
@@ -68,8 +91,10 @@ const OpportunityAnalysis = () => {
         return cachedResult.data;
       }
 
+      // Get user settings for analysis
+      const userSettings = getUserAnalysisSettings();
       // Perform new analysis
-      const result = await opportunityAnalysisService.analyzeOpportunity(formData, analysisType);
+      const result = await opportunityAnalysisService.analyzeOpportunity(formData, analysisType, userSettings);
       
       // Cache the result
       await setCachedData(cacheKey, result, 30 * 60 * 1000); // 30 minutes

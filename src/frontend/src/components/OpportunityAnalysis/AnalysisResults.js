@@ -12,7 +12,7 @@ const AnalysisResults = ({ results, onExport }) => {
     );
   }
 
-  const { metrics, sections, fundingAnalysis, followOnAnalysis } = results;
+  const { metrics, sections, fundingAnalysis, followOnAnalysis, debug } = results;
 
   return (
     <div className="analysis-results">
@@ -143,6 +143,14 @@ const AnalysisResults = ({ results, onExport }) => {
           <div className="section-content">
             {followOnAnalysis}
           </div>
+        </div>
+      )}
+
+      {/* Debug Section - Always show if debug object is present */}
+      {debug && (
+        <div className="debug-section">
+          <h3>🔧 Debug Information</h3>
+          <pre>{JSON.stringify(debug, null, 2)}</pre>
         </div>
       )}
     </div>

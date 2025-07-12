@@ -119,27 +119,35 @@ function preparePayload(params, promptData) {
       ? params.queryResults 
       : JSON.stringify(params.queryResults);
     
-    // Truncate query results to prevent model input limits (if enabled)
-    const enableTruncation = params.settings?.enableTruncation !== false; // Default to true
-    const truncationLimit = params.settings?.truncationLimit || 400000;
-    
-    let queryResults;
-    if (enableTruncation) {
-      queryResults = truncateQueryResults(rawQueryResults, truncationLimit, params.settings);
-      console.log("PROCESS_RESULTS (Analysis): Truncation enabled, limit:", truncationLimit);
+    // Truncation logic for query results
+    let processedQueryResults = rawQueryResults;
+    let truncationApplied = false;
+    let truncationLimitUsed = params.settings?.truncationLimit;
+    if (params.settings?.enableTruncation) {
+      if (typeof truncationLimitUsed !== 'number' || truncationLimitUsed <= 0) {
+        truncationLimitUsed = 400000; // fallback default if user input is invalid
+      }
+      if (typeof processedQueryResults === 'string' && processedQueryResults.length > truncationLimitUsed) {
+        console.log(`PROCESS_RESULTS (Analysis): Truncating query results from ${processedQueryResults.length} to ~${truncationLimitUsed} characters`);
+        processedQueryResults = processedQueryResults.substring(0, truncationLimitUsed);
+        truncationApplied = true;
+        console.log(`PROCESS_RESULTS (Analysis): Simple truncation applied: ${processedQueryResults.length} characters`);
+      } else {
+        console.log(`PROCESS_RESULTS (Analysis): Truncation enabled, but not needed. Query results length: ${processedQueryResults.length}`);
+      }
     } else {
-      queryResults = rawQueryResults;
-      console.log("PROCESS_RESULTS (Analysis): Truncation disabled, using full dataset");
+      // No truncation
+      console.log(`PROCESS_RESULTS (Analysis): Truncation disabled by user settings. Using full query results. Length: ${processedQueryResults.length}`);
     }
 
     // Debug: Show the actual query results content
     console.log("PROCESS_RESULTS (Analysis): Query results type:", typeof params.queryResults);
     console.log("PROCESS_RESULTS (Analysis): Raw query results length:", rawQueryResults.length);
-    console.log("PROCESS_RESULTS (Analysis): Truncated query results length:", queryResults.length);
+    console.log("PROCESS_RESULTS (Analysis): Truncated query results length:", processedQueryResults.length);
     console.log("PROCESS_RESULTS (Analysis): Raw query results (first 1000 chars):", rawQueryResults.substring(0, 1000));
-    console.log("PROCESS_RESULTS (Analysis): Formatted query results (first 1000 chars):", queryResults.substring(0, 1000));
-    console.log("PROCESS_RESULTS (Analysis): Query results contains real data:", queryResults.includes('"VarCharValue"') || queryResults.includes('"Row"'));
-    console.log("PROCESS_RESULTS (Analysis): Query results contains mock data:", queryResults.includes('Project Alpha') || queryResults.includes('Customer A'));
+    console.log("PROCESS_RESULTS (Analysis): Formatted query results (first 1000 chars):", processedQueryResults.substring(0, 1000));
+    console.log("PROCESS_RESULTS (Analysis): Query results contains real data:", processedQueryResults.includes('"VarCharValue"') || processedQueryResults.includes('"Row"'));
+    console.log("PROCESS_RESULTS (Analysis): Query results contains mock data:", processedQueryResults.includes('Project Alpha') || processedQueryResults.includes('Customer A'));
 
     // Debug: Show the opportunity data being used
     console.log("PROCESS_RESULTS (Analysis): Opportunity data being used:");
@@ -155,18 +163,21 @@ function preparePayload(params, promptData) {
     console.log("- businessDescription:", params.businessDescription);
     console.log("- migrationPhase:", params.migrationPhase);
 
+    // When logging settings, always log the actual values received from the user
+    console.log(`PROCESS_RESULTS (Analysis): Truncation enabled: ${!!params.settings.enableTruncation}, truncation limit: ${truncationLimitUsed}`);
+
     const filledUserMessage = userMessageTemplate
       .replace('{{CustomerName}}', params.CustomerName || 'Not specified')
       .replace('{{region}}', params.region || 'Not specified')
       .replace('{{closeDate}}', params.closeDate || 'Not specified')
       .replace('{{oppName}}', params.oppName || 'Not specified')
       .replace('{{oppDescription}}', params.oppDescription || 'Not specified')
-      .replace('{{queryResults}}', queryResults);
+      .replace('{{queryResults}}', processedQueryResults);
     
     // Debug: Show the filled user message
     console.log("PROCESS_RESULTS (Analysis): Filled user message (first 1000 chars):", filledUserMessage.substring(0, 1000));
-    console.log("PROCESS_RESULTS (Analysis): Query results being passed (first 500 chars):", queryResults.substring(0, 500));
-    console.log("PROCESS_RESULTS (Analysis): Query results length:", queryResults.length);
+    console.log("PROCESS_RESULTS (Analysis): Query results being passed (first 500 chars):", processedQueryResults.substring(0, 500));
+    console.log("PROCESS_RESULTS (Analysis): Query results length:", processedQueryResults.length);
     console.log("PROCESS_RESULTS (Analysis): Does filled message contain '{{queryResults}}':", filledUserMessage.includes('{{queryResults}}'));
     console.log("PROCESS_RESULTS (Analysis): Does filled message contain actual query data:", filledUserMessage.includes('Project Alpha') || filledUserMessage.includes('Acme Corp'));
     console.log("PROCESS_RESULTS (Analysis): Full filled user message:", filledUserMessage);
@@ -190,7 +201,7 @@ New Opportunity Information:
 
 <project_data>
 Historical Project Dataset:
-${queryResults}
+${processedQueryResults}
 </project_data>
 
 ${filledUserMessage}`;
@@ -199,7 +210,7 @@ ${filledUserMessage}`;
     const maxTotalSize = params.settings?.enableTruncation !== false ? 600000 : 2000000; // Much higher limit when truncation disabled
     let finalUserMessage = enhancedUserMessage;
     
-    if (enableTruncation && finalUserMessage.length > maxTotalSize) {
+    if (params.settings?.enableTruncation && finalUserMessage.length > maxTotalSize) {
       console.log(`PROCESS_RESULTS (Analysis): Final message too large (${finalUserMessage.length}), applying additional truncation`);
       
       // Further truncate query results if needed
@@ -207,7 +218,7 @@ ${filledUserMessage}`;
       const templateSize = filledUserMessage.length;
       const availableForData = maxTotalSize - oppDetailsSize - templateSize - 1000; // Buffer
       
-      const furtherTruncatedResults = truncateQueryResults(queryResults, Math.max(50000, availableForData));
+      const furtherTruncatedResults = truncateQueryResults(processedQueryResults, Math.max(50000, availableForData));
       
       finalUserMessage = `
 <opp_details>
@@ -231,7 +242,7 @@ ${furtherTruncatedResults}
 </project_data>
 
 ${filledUserMessage}`;
-    } else if (!enableTruncation) {
+    } else if (!params.settings?.enableTruncation) {
       console.log(`PROCESS_RESULTS (Analysis): Truncation disabled, sending full message (${finalUserMessage.length} characters)`);
     }
 
@@ -246,7 +257,7 @@ ${filledUserMessage}`;
     console.log("   Purpose: Opportunity Analysis");
     console.log("\n📊 DATA BEING ANALYZED:");
     console.log("   Final Message Length:", finalUserMessage.length, "characters");
-    console.log("   Query Results Length:", queryResults.length, "characters");
+    console.log("   Query Results Length:", processedQueryResults.length, "characters");
     console.log("   System Instructions Length:", systemInstructions.length, "characters");
     console.log("   User Template Length:", userMessageTemplate.length, "characters");
     console.log("=".repeat(60) + "\n");
@@ -268,11 +279,11 @@ ${filledUserMessage}`;
         }
       ],
       inferenceConfig: {
-        maxTokens: 8192,
-        temperature: 0.1
+        // All model settings managed by Bedrock prompt resource
       }
     }, null, 2);
 
+    // Remove explicit maxTokens and temperature from inferenceConfig
     return {
       modelId: modelId,
       system: [{ text: systemInstructions }],
@@ -283,8 +294,7 @@ ${filledUserMessage}`;
         }
       ],
       inferenceConfig: {
-        maxTokens: 8192,
-        temperature: 0.1
+        // All model settings managed by Bedrock prompt resource
       }
     };
   } catch (error) {
@@ -612,6 +622,12 @@ async function invokeBedrockConverse(payload) {
  */
 function processConverseApiResponse(response) {
   console.log("PROCESS_RESULTS (Analysis): Starting. Input response object (first 1000 chars):", JSON.stringify(response, null, 2).substring(0,1000));
+  // Log the full Bedrock Converse API response for debugging
+  try {
+    console.log("PROCESS_RESULTS (Analysis): FULL Bedrock Converse API response:", JSON.stringify(response, null, 2));
+  } catch (e) {
+    console.log("PROCESS_RESULTS (Analysis): Could not stringify full response for logging.");
+  }
   
   if (!response || !response.output || !response.output.message || !response.output.message.content || !response.output.message.content[0] || !response.output.message.content[0].text) {
     console.error("PROCESS_RESULTS (Analysis): Invalid or incomplete Bedrock Converse API response structure. Full response:", JSON.stringify(response, null, 2));
@@ -627,72 +643,41 @@ function processConverseApiResponse(response) {
   global.debugInfo.fullResponse = messageContentText;
   
   try {
-    // Extract all sections from the analysis text - look for SUMMARY METRICS
-    const metricsMatch = messageContentText.match(/===\s*SUMMARY\s*METRICS\s*===\s*([\s\S]*?)(?===\s*|$)/i);
-    const metricsText = metricsMatch ? metricsMatch[1].trim() : '';
+    // Improved section extraction regex
+    function extractSection(sectionName) {
+      const regex = new RegExp(`===\\s*${sectionName}\\s*===([\\s\\S]*?)(?=^===|\\Z)`, 'im');
+      const match = messageContentText.match(regex);
+      return match ? match[1].trim() : '';
+    }
     
-    // If no metrics section found, try to extract from the full text
-    const fullTextForMetrics = metricsText || messageContentText;
-    
-    console.log("PROCESS_RESULTS (Analysis): Metrics section found:", !!metricsText);
-    console.log("PROCESS_RESULTS (Analysis): Metrics text (first 500 chars):", metricsText.substring(0, 500));
-    
-    const methodologyMatch = messageContentText.match(/===\s*ANALYSIS\s*METHODOLOGY\s*===\s*([\s\S]*?)(?===\s*|$)/i);
-    const methodologyText = methodologyMatch ? methodologyMatch[1].trim() : '';
-    
-    // Match the exact Bedrock section headers
-    const findingsMatch = messageContentText.match(/===\s*DETAILED\s*FINDINGS\s*===\s*([\s\S]*?)(?===\s*|$)/i);
-    const findingsText = findingsMatch ? findingsMatch[1].trim() : '';
-    
-    const riskFactorsMatch = messageContentText.match(/===\s*RISK\s*FACTORS\s*===\s*([\s\S]*?)(?===\s*|$)/i);
-    const riskFactorsText = riskFactorsMatch ? riskFactorsMatch[1].trim() : '';
-    
-    const similarProjectsMatch = messageContentText.match(/===\s*SIMILAR\s*PROJECTS\s*===\s*([\s\S]*?)(?===\s*|$)/i);
-    const similarProjectsText = similarProjectsMatch ? similarProjectsMatch[1].trim() : '';
-    
-    // Match the exact Bedrock rationale header
-    const rationaleMatch = messageContentText.match(/===\s*PREDICTION\s*RATIONALE\s*===\s*([\s\S]*?)(?===\s*|$)/i);
-    const rationaleText = rationaleMatch ? rationaleMatch[1].trim() : '';
-    
-    // Use architecture description as full analysis since that's what Bedrock provides
-    const fullAnalysisMatch = messageContentText.match(/===\s*ARCHITECTURE\s*DESCRIPTION\s*===\s*([\s\S]*?)(?===\s*|$)/i);
-    const fullAnalysisText = fullAnalysisMatch ? fullAnalysisMatch[1].trim() : '';
-    
-    // For funding options, we'll use summary metrics if available
-    const fundingOptionsMatch = messageContentText.match(/===\s*SUMMARY\s*METRICS\s*===\s*([\s\S]*?)(?===\s*|$)/i);
-    const fundingOptionsText = fundingOptionsMatch ? fundingOptionsMatch[1].trim() : '';
-    
-    // For follow-on opportunities, we'll use a fallback since it's not in the current response
+    const methodologyText = extractSection('ANALYSIS_METHODOLOGY');
+    const similarProjectsText = extractSection('SIMILAR_PROJECTS');
+    const findingsText = extractSection('DETAILED_FINDINGS');
+    const rationaleText = extractSection('PREDICTION_RATIONALE');
+    const riskFactorsText = extractSection('RISK_FACTORS');
+    const fullAnalysisText = extractSection('ARCHITECTURE_DESCRIPTION');
+    const fundingOptionsText = extractSection('SUMMARY_METRICS'); // Not always present, fallback
+    const validationErrorsText = extractSection('VALIDATION_ERRORS');
+    // For follow-on opportunities, fallback as before
     const followOnOpportunitiesText = 'Follow-on opportunities analysis not available in current response';
-    
-    // Add debugging for section extraction
-    console.log("PROCESS_RESULTS (Analysis): Section extraction results:");
-    console.log("- Methodology found:", !!methodologyText, "Length:", methodologyText.length);
-    console.log("- Findings found:", !!findingsText, "Length:", findingsText.length);
-    console.log("- Risk Factors found:", !!riskFactorsText, "Length:", riskFactorsText.length);
-    console.log("- Similar Projects found:", !!similarProjectsText, "Length:", similarProjectsText.length);
-    console.log("- Rationale found:", !!rationaleText, "Length:", rationaleText.length);
-    console.log("- Full Analysis found:", !!fullAnalysisText, "Length:", fullAnalysisText.length);
-    console.log("- Funding Options found:", !!fundingOptionsText, "Length:", fundingOptionsText.length);
-    console.log("- Follow-on Opportunities found:", !!followOnOpportunitiesText, "Length:", followOnOpportunitiesText.length);
     
     // Debug: Show all section headers found in the response
     const sectionHeaders = messageContentText.match(/===.*?===/g);
     console.log("PROCESS_RESULTS (Analysis): All section headers found:", sectionHeaders);
     
     // Parse metrics with exact patterns from Bedrock response
-    const arrMatch = fullTextForMetrics.match(/PREDICTED_ARR:\s*\$?([\d,]+)/i);
-    const mrrMatch = fullTextForMetrics.match(/MRR:\s*\$?([\d,]+)/i);
-    const launchDateMatch = fullTextForMetrics.match(/LAUNCH_DATE:\s*([^\n]+)/i);
-    const durationMatch = fullTextForMetrics.match(/PREDICTED_PROJECT_DURATION:\s*([^\n]+)/i);
-    const confidenceMatch = fullTextForMetrics.match(/CONFIDENCE:\s*(HIGH|MEDIUM|LOW)/i);
+    const arrMatch = messageContentText.match(/PREDICTED_ARR:\s*\$?([\d,]+)/i);
+    const mrrMatch = messageContentText.match(/MRR:\s*\$?([\d,]+)/i);
+    const launchDateMatch = messageContentText.match(/LAUNCH_DATE:\s*([^\n]+)/i);
+    const durationMatch = messageContentText.match(/PREDICTED_PROJECT_DURATION:\s*([^\n]+)/i);
+    const confidenceMatch = messageContentText.match(/CONFIDENCE:\s*(HIGH|MEDIUM|LOW)/i);
     
     // Extract top services section - look for the exact pattern from Bedrock
-    const servicesMatch = fullTextForMetrics.match(/TOP_SERVICES:\s*([\s\S]*?)(?=OTHER_SERVICES|CONFIDENCE|===|$)/i);
+    const servicesMatch = messageContentText.match(/TOP_SERVICES:\s*([\s\S]*?)(?=OTHER_SERVICES|CONFIDENCE|===|$)/i);
     const servicesText = servicesMatch ? servicesMatch[1].trim() : '';
     
     // Also extract OTHER_SERVICES if present
-    const otherServicesMatch = fullTextForMetrics.match(/OTHER_SERVICES:\s*([^\n]+)/i);
+    const otherServicesMatch = messageContentText.match(/OTHER_SERVICES:\s*([^\n]+)/i);
     const otherServicesText = otherServicesMatch ? otherServicesMatch[1].trim() : '';
     
     // Combine services if both are present
@@ -716,14 +701,14 @@ function processConverseApiResponse(response) {
     console.log("- Confidence:", confidenceMatch ? confidenceMatch[1].toUpperCase() : 'MEDIUM (fallback)');
     
     // Debug: Show the actual text being searched for metrics
-    console.log("PROCESS_RESULTS (Analysis): Text being searched for metrics (first 500 chars):", fullTextForMetrics.substring(0, 500));
-    console.log("PROCESS_RESULTS (Analysis): Full text length:", fullTextForMetrics.length);
+    console.log("PROCESS_RESULTS (Analysis): Text being searched for metrics (first 500 chars):", messageContentText.substring(0, 500));
+    console.log("PROCESS_RESULTS (Analysis): Full text length:", messageContentText.length);
     
     // Extract confidence factors
-    const confidenceFactorsMatch = fullTextForMetrics.match(/Confidence\s*Factors?:\s*([\s\S]*?)(?=\n\s*\n|===|$)/i);
+    const confidenceFactorsMatch = messageContentText.match(/Confidence\s*Factors?:\s*([\s\S]*?)(?=\n\s*\n|===|$)/i);
     const confidenceFactorsText = confidenceFactorsMatch ? confidenceFactorsMatch[1].trim() : '';
     const confidenceFactors = confidenceFactorsText ? 
-      confidenceFactorsText.split(/[,\n]/).map(f => f.trim()).filter(f => f.length > 0) : 
+      confidenceFactorsText.split(/[\,\n]/).map(f => f.trim()).filter(f => f.length > 0) : 
       ['Analysis based on historical data patterns', 'Statistical modeling applied', 'Industry benchmarks considered'];
     
     // Generate fallback metrics if none found
@@ -759,7 +744,8 @@ function processConverseApiResponse(response) {
       fullAnalysis: fullAnalysisText || 'Full analysis not available',
       fundingOptions: fundingOptionsText || 'Funding options not available',
       followOnOpportunities: followOnOpportunitiesText || 'Follow-on opportunities not available',
-      formattedSummaryText: messageContentText
+      formattedSummaryText: messageContentText,
+      validationErrors: validationErrorsText || ''
     };
   } catch (error) {
     console.error("PROCESS_RESULTS (Analysis): Error processing analysis response:", error.message);

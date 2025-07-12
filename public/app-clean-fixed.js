@@ -1,5 +1,11 @@
 // Clean AWS Opportunity Analysis Frontend - Fixed Version
 document.addEventListener('DOMContentLoaded', () => {
+  // Restore theme from localStorage or default to light
+  const storedTheme = localStorage.getItem('theme-preference');
+  const initialTheme = storedTheme === 'dark' ? 'dark' : 'light';
+  document.body.setAttribute('data-theme', initialTheme);
+  document.documentElement.setAttribute('data-theme', initialTheme);
+
   console.log('🚀 App initialization started');
 
   // DOM elements
@@ -35,6 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const debugQueryResults = document.getElementById('debugQueryResults');
   const debugBedrockPayload = document.getElementById('debugBedrockPayload');
   const debugFullResponse = document.getElementById('debugFullResponse');
+
+  // Utility to format bytes as human-readable string
+  function formatBytes(bytes) {
+    if (bytes === 0 || bytes === '-' || bytes == null || isNaN(bytes)) return '-';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
 
   // Initialize the application
   function initializeApp() {
@@ -317,10 +332,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🎨 Toggling theme...');
     const isDark = document.body.getAttribute('data-theme') === 'dark';
     const newTheme = isDark ? 'light' : 'dark';
-    
     document.body.setAttribute('data-theme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
-    
+    localStorage.setItem('theme-preference', newTheme);
     const themeToggle = document.querySelector('.theme-toggle');
     if (themeToggle) {
       const icon = themeToggle.querySelector('.icon');
@@ -330,7 +344,6 @@ document.addEventListener('DOMContentLoaded', () => {
         text.textContent = newTheme === 'dark' ? 'Light' : 'Dark';
       }
     }
-    
     console.log('Theme switched to:', newTheme);
   }
 
@@ -541,6 +554,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (debugFullResponse && results.debug.fullResponse) {
           debugFullResponse.value = results.debug.fullResponse;
         }
+        // Enhanced debug info
+        populateDebugInfo(results);
       }
       
       console.log('✅ UI population complete');
@@ -569,6 +584,119 @@ document.addEventListener('DOMContentLoaded', () => {
       const isVisible = debugSection.style.display !== 'none';
       debugSection.style.display = isVisible ? 'none' : 'block';
       console.log('Debug section toggled:', !isVisible ? 'shown' : 'hidden');
+    }
+  }
+
+  // Table/Raw Query View Toggle
+  function showQueryView(viewType) {
+    // Update button states
+    const rawBtn = document.getElementById('rawViewBtn');
+    const tableBtn = document.getElementById('tableViewBtn');
+    if (rawBtn && tableBtn) {
+      rawBtn.classList.toggle('active', viewType === 'raw');
+      tableBtn.classList.toggle('active', viewType === 'table');
+    }
+    // Update view visibility
+    const rawView = document.getElementById('debugQueryRaw');
+    const tableView = document.getElementById('debugQueryTable');
+    if (rawView && tableView) {
+      rawView.style.display = viewType === 'raw' ? 'block' : 'none';
+      tableView.style.display = viewType === 'table' ? 'block' : 'none';
+    }
+  }
+  window.showQueryView = showQueryView;
+
+  // Enhanced Debug Info Population
+  function populateDebugInfo(results) {
+    const debugSqlQuery = document.getElementById('debugSqlQuery');
+    const debugQueryResults = document.getElementById('debugQueryResults');
+    const debugBedrockPayload = document.getElementById('debugBedrockPayload');
+    const debugFullResponse = document.getElementById('debugFullResponse');
+    let queryResults = '';
+    let bedrockPayload = '';
+    if (debugSqlQuery) {
+      const sqlQuery = results.debug?.sqlQuery || 'No SQL query found in response';
+      debugSqlQuery.value = sqlQuery;
+    }
+    if (debugQueryResults) {
+      queryResults = results.debug?.queryResults || 'No query results found in response';
+      debugQueryResults.value = queryResults;
+      if (typeof updateQueryDebugInfo === 'function') updateQueryDebugInfo(results.debug, queryResults);
+    }
+    if (debugBedrockPayload) {
+      bedrockPayload = results.debug?.bedrockPayload || 'No Bedrock payload found in response';
+      debugBedrockPayload.value = bedrockPayload;
+      if (typeof updatePayloadDebugInfo === 'function') updatePayloadDebugInfo(bedrockPayload, queryResults);
+    }
+    if (debugFullResponse) {
+      const fullResponse = results.debug?.fullResponse || 'No full response found in response';
+      debugFullResponse.value = fullResponse;
+      if (typeof updateResponseDebugInfo === 'function') updateResponseDebugInfo(fullResponse);
+    }
+    if (typeof updateBedrockDebugInfo === 'function') updateBedrockDebugInfo(results.debug || {});
+  }
+
+  // Robust Query Debug Info (Option 3)
+  function updateQueryDebugInfo(debug, queryResults) {
+    try {
+      // Prefer backend-provided debug fields if present
+      let rowCount = debug?.queryRowCount ?? '-';
+      let dataSize = debug?.queryDataSize ?? '-';
+      let charCount = debug?.queryCharCount ?? '-';
+      // Fallback: parse queryResults if needed
+      if ((rowCount === '-' || dataSize === '-' || charCount === '-') && queryResults && queryResults !== 'No query results found in response') {
+        try {
+          charCount = queryResults.length;
+          dataSize = new Blob([queryResults]).size;
+          let parsed = JSON.parse(queryResults);
+          if (parsed && parsed.Rows && Array.isArray(parsed.Rows)) {
+            rowCount = parsed.Rows.length > 1 ? parsed.Rows.length - 1 : 0;
+          } else if (Array.isArray(parsed)) {
+            rowCount = parsed.length;
+          } else if (parsed && parsed.data && Array.isArray(parsed.data)) {
+            rowCount = parsed.data.length;
+          } else {
+            rowCount = 1;
+          }
+        } catch (e) {
+          rowCount = queryResults.split('\n').filter(line => line.trim()).length;
+        }
+      }
+      // Update UI elements
+      const queryRowCount = document.getElementById('queryRowCount');
+      const queryDataSize = document.getElementById('queryDataSize');
+      const queryCharCount = document.getElementById('queryCharCount');
+      if (queryRowCount) queryRowCount.textContent = rowCount !== undefined ? rowCount : '-';
+      if (queryDataSize) queryDataSize.textContent = dataSize !== undefined && dataSize !== '-' ? formatBytes(dataSize) : '-';
+      if (queryCharCount) queryCharCount.textContent = charCount !== undefined ? charCount : '-';
+      // Table View: try to parse and show table, else show error
+      const tableContainer = document.getElementById('debugQueryTable');
+      if (tableContainer) {
+        let tableHtml = '';
+        try {
+          let parsed = JSON.parse(queryResults);
+          if (parsed && parsed.Rows && Array.isArray(parsed.Rows)) {
+            // Athena ResultSet: first row is header
+            const headers = parsed.Rows[0].Data.map(col => col.VarCharValue);
+            const dataRows = parsed.Rows.slice(1);
+            tableHtml = '<table class="debug-table"><thead><tr>' + headers.map(h => `<th>${escapeHtml(h)}</th>`).join('') + '</tr></thead><tbody>';
+            dataRows.slice(0, 100).forEach(row => {
+              tableHtml += '<tr>' + row.Data.map(col => `<td>${escapeHtml(col.VarCharValue)}</td>`).join('') + '</tr>';
+            });
+            if (dataRows.length > 100) {
+              tableHtml += `<tr><td colspan="${headers.length}" style="text-align: center; font-style: italic; color: #666; padding: 16px;">... and ${(dataRows.length - 100).toLocaleString()} more rows</td></tr>`;
+            }
+            tableHtml += '</tbody></table>';
+          } else {
+            tableHtml = '<div class="table-placeholder">No tabular data available for this result.</div>';
+          }
+        } catch (e) {
+          tableHtml = '<div class="table-placeholder">Table view unavailable: invalid or non-tabular data.</div>';
+        }
+        tableContainer.innerHTML = tableHtml;
+      }
+    } catch (error) {
+      console.error('Error updating query debug info:', error);
     }
   }
 

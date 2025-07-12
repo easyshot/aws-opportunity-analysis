@@ -67,7 +67,7 @@ class OpportunityAnalysisService {
   }
 
   // Analyze opportunity
-  async analyzeOpportunity(formData, analysisType = 'standard') {
+  async analyzeOpportunity(formData, analysisType = 'standard', userSettings = {}) {
     try {
       const payload = {
         ...formData,
@@ -76,8 +76,17 @@ class OpportunityAnalysisService {
         timestamp: new Date().toISOString()
       };
 
+      // Prepare headers for user-configurable settings
+      const headers = {
+        ...(userSettings.enableTruncation !== undefined && { 'x-enable-truncation': String(userSettings.enableTruncation) }),
+        ...(userSettings.truncationLimit && { 'x-truncation-limit': String(userSettings.truncationLimit) }),
+        ...(userSettings.sqlQueryLimit && { 'x-sql-query-limit': String(userSettings.sqlQueryLimit) }),
+        ...(userSettings.analysisTimeout && { 'x-analysis-timeout': String(userSettings.analysisTimeout) })
+      };
+
       const response = await this.apiCall('/api/analyze', {
-        body: payload
+        body: payload,
+        headers
       });
 
       return this.processAnalysisResponse(response);

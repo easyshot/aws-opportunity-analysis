@@ -1,5 +1,22 @@
 # Partner Opportunity Intelligence Application - Changelog
 
+## [3.2.0] - 2025-07-13
+### User-Driven Truncation, Centralized Model Settings, and Robust Settings Wiring
+
+#### Added - User-Driven Analysis Settings
+- **User-Configurable Truncation & Analysis Settings**: All truncation, SQL query limits, and analysis parameters are now fully user-configurable from the frontend settings UI. The backend always honors these settings, ensuring end-to-end control and transparency for users.
+
+#### Changed - Model Settings Management
+- **Centralized Model Settings**: All model inference parameters (max tokens, temperature, etc.) are now managed exclusively in Bedrock prompt management. The backend no longer sets or overrides these values, ensuring a single source of truth and easier model governance.
+
+#### Changed - Backend Logic & Logging
+- **Settings-Driven Logic**: All backend logic and logs now reflect the actual user settings received with each request, not hardcoded or default values. This ensures accurate debugging, traceability, and user trust.
+- **Robust Settings UI & Backend Wiring**: The settings UI is fully integrated with backend logic, providing a seamless, robust, and user-friendly experience for configuring all analysis parameters.
+
+#### Fixed - Truncation and Settings Bugs
+- **Truncation Logic**: Fixed issues where truncation was applied even when disabled in user settings. Now, truncation is only applied if explicitly enabled by the user.
+- **Settings Propagation**: Fixed issues with settings not being passed correctly from frontend to backend in some flows.
+
 ## [3.1.0] - 2025-07-12 (Current Release)
 ### Lambda Timeout Fix & Enhanced Performance
 

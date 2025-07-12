@@ -251,6 +251,29 @@ app.post('/api/analyze', async (req, res) => {
       similarProjects = 'Historical matches: Found multiple comparable projects with similar characteristics and outcomes.';
     }
     
+    // Compute query result debug stats
+    let queryRowCount = '-';
+    let queryDataSize = '-';
+    let queryCharCount = '-';
+    if (queryResults) {
+      try {
+        queryCharCount = queryResults.length;
+        queryDataSize = Buffer.byteLength(queryResults, 'utf8');
+        // Try to parse as Athena ResultSet or array
+        let parsed = JSON.parse(queryResults);
+        if (parsed && parsed.Rows && Array.isArray(parsed.Rows)) {
+          // Athena ResultSet: first row is header
+          queryRowCount = parsed.Rows.length > 1 ? parsed.Rows.length - 1 : 0;
+        } else if (Array.isArray(parsed)) {
+          queryRowCount = parsed.length;
+        } else if (parsed && parsed.data && Array.isArray(parsed.data)) {
+          queryRowCount = parsed.data.length;
+        }
+      } catch (e) {
+        // fallback: count lines
+        queryRowCount = queryResults.split('\n').filter(l => l.trim()).length;
+      }
+    }
     // Create comprehensive response matching frontend expectations
     const response = {
       metrics: metrics,
@@ -259,10 +282,14 @@ app.post('/api/analyze', async (req, res) => {
       rationale: rationale,
       riskFactors: riskFactors,
       similarProjects: similarProjects,
-      fullAnalysis: fullAnalysis || `Complete analysis generated using ${settings.sqlQueryLimit} record limit with AWS Bedrock AI.`,
+      // Set fullAnalysis to the full, sectioned Bedrock output
+      fullAnalysis: analysisResult.formattedSummaryText || fullAnalysis || `Complete analysis generated using ${settings.sqlQueryLimit} record limit with AWS Bedrock AI.`,
       debug: {
         sqlQuery: sqlQuery,
         queryResults: queryResults,
+        queryRowCount: queryRowCount,
+        queryDataSize: queryDataSize,
+        queryCharCount: queryCharCount,
         bedrockPayload: JSON.stringify({
           modelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
           system: [{ text: "AWS Bedrock analysis system instructions..." }],
@@ -313,20 +340,19 @@ app.post('/api/analyze', async (req, res) => {
     res.json(response);
     
   } catch (error) {
-    console.error('❌ AWS analysis workflow failed:', error);
-    
-    // Return clean error response without fallback data
+    console.error('❌ Analysis failed:', error);
+    // Always include debug info if available
+    let debugInfo = null;
+    try {
+      debugInfo = global.debugInfo ? JSON.parse(JSON.stringify(global.debugInfo)) : null;
+    } catch (e) {
+      debugInfo = null;
+    }
     res.status(500).json({
       error: 'Analysis failed',
-      message: error.message,
-      timestamp: new Date().toISOString(),
-      troubleshooting: [
-        "Check AWS credentials in .env file",
-        "Verify AWS service permissions", 
-        "Ensure network connectivity to AWS",
-        "Check Lambda function configuration",
-        "Verify Bedrock prompt IDs are correct"
-      ]
+      message: error.message || 'Internal Server Error',
+      stack: error.stack || null,
+      debug: debugInfo
     });
   }
 });

@@ -18,7 +18,11 @@ const Settings = () => {
     analysis: {
       autoSave: true,
       cacheResults: true,
-      showAdvancedOptions: false
+      showAdvancedOptions: false,
+      enableTruncation: true, // Default for new settings
+      truncationLimit: 400000, // Default for new settings
+      sqlQueryLimit: 200, // Default for new settings
+      analysisTimeout: 120 // Default for new settings
     }
   });
 
@@ -110,6 +114,69 @@ const Settings = () => {
             </label>
           </div>
         </div>
+
+        {/* Advanced Analysis Settings */}
+        {preferences.analysis.showAdvancedOptions && (
+          <div className="settings-section advanced-settings">
+            <h3>Advanced Analysis Settings</h3>
+            <div className="setting-group">
+              <label className="setting-checkbox" title="If enabled, large datasets will be truncated to avoid model input limits. If disabled, the full dataset will be used.">
+                <input
+                  type="checkbox"
+                  checked={preferences.analysis.enableTruncation ?? true}
+                  onChange={e => handlePreferenceChange('analysis', 'enableTruncation', e.target.checked)}
+                />
+                <span>Enable Truncation</span>
+              </label>
+            </div>
+            <div className="setting-group">
+              <label className="setting-label" htmlFor="truncationLimit" title="Maximum number of characters to send to the model (default: 400,000)">
+                Truncation Limit (characters)
+              </label>
+              <input
+                type="number"
+                id="truncationLimit"
+                min={10000}
+                max={2000000}
+                step={10000}
+                value={preferences.analysis.truncationLimit ?? 400000}
+                onChange={e => handlePreferenceChange('analysis', 'truncationLimit', parseInt(e.target.value) || 400000)}
+                className="setting-input"
+                disabled={!preferences.analysis.enableTruncation}
+              />
+            </div>
+            <div className="setting-group">
+              <label className="setting-label" htmlFor="sqlQueryLimit" title="Maximum number of records to retrieve in the SQL query (default: 200)">
+                SQL Query Limit (rows)
+              </label>
+              <input
+                type="number"
+                id="sqlQueryLimit"
+                min={10}
+                max={10000}
+                step={10}
+                value={preferences.analysis.sqlQueryLimit ?? 200}
+                onChange={e => handlePreferenceChange('analysis', 'sqlQueryLimit', parseInt(e.target.value) || 200)}
+                className="setting-input"
+              />
+            </div>
+            <div className="setting-group">
+              <label className="setting-label" htmlFor="analysisTimeout" title="Maximum time (in seconds) to allow for analysis (default: 120)">
+                Analysis Timeout (seconds)
+              </label>
+              <input
+                type="number"
+                id="analysisTimeout"
+                min={30}
+                max={600}
+                step={10}
+                value={preferences.analysis.analysisTimeout ?? 120}
+                onChange={e => handlePreferenceChange('analysis', 'analysisTimeout', parseInt(e.target.value) || 120)}
+                className="setting-input"
+              />
+            </div>
+          </div>
+        )}
 
         <div className="settings-section">
           <h2>Notifications</h2>
