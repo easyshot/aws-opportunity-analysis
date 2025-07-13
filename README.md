@@ -442,3 +442,9 @@ The infrastructure includes comprehensive monitoring:
 - **Centralized Model Settings**: All model inference parameters (max tokens, temperature, etc.) are now managed exclusively in Bedrock prompt management. The backend no longer sets or overrides these values, ensuring a single source of truth and easier model governance.
 - **Backend Logic & Logging**: All backend logic and logs now reflect the actual user settings received with each request, not hardcoded or default values. This ensures accurate debugging, traceability, and user trust.
 - **Robust Settings UI & Backend Wiring**: The settings UI is fully integrated with backend logic, providing a seamless, robust, and user-friendly experience for configuring all analysis parameters.
+
+## 📚 Steering & Technical Documentation
+
+- For detailed product specifications and user flows, see `product.md`.
+- For project structure, code standards, and development guidelines, see `structure.md`.
+- For technical stack, AWS services, and troubleshooting, see `.kiro/steering/tech.md`.

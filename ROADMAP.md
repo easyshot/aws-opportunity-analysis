@@ -26,8 +26,6 @@
 ✅ **Centralized Model Settings**: All model inference parameters (max tokens, temperature, etc.) are now managed exclusively in Bedrock prompt management. The backend no longer sets or overrides these values.
 ✅ **Backend Logic & Logging**: All backend logic and logs now reflect the actual user settings received with each request, not hardcoded or default values.
 ✅ **Robust Settings UI & Backend Wiring**: The settings UI is fully integrated with backend logic, providing a seamless, robust, and user-friendly experience for configuring all analysis parameters.
-
-## Recently Completed (Q2 2025)
 ✅ **Lambda Timeout Resolution**: Fixed Lambda execution timeouts by extending timeout from 10s to 30s with proper error handling
 ✅ **Production Backend Stability**: Successfully migrated to stable production backend (`app.js`) with full AWS integration
 ✅ **Settings System Integration**: Properly integrated with comprehensive settings management system for all data manipulation
@@ -36,6 +34,7 @@
 ✅ **Architecture Simplification**: Removed Nova Premier complexity and standardized on Claude 3.5 Sonnet model for consistency
 ✅ **Modern API Implementation**: All Bedrock interactions now use modern Converse API for reliable communication
 ✅ **UI Layout Optimization**: Fixed progress indicator positioning and resolved layout jumping issues
+✅ **Documentation Updates**: Added/updated product.md and structure.md for clarity and onboarding
 
 ## Near-Term (Q2 2025) - Current Focus
 🔄 **Enhanced Testing**: Expand test scenarios for comprehensive validation

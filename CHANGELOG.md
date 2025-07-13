@@ -1,5 +1,16 @@
 # Partner Opportunity Intelligence Application - Changelog
 
+## [3.2.1] - 2025-07-14
+### Documentation and Architecture Updates
+- Added/updated product.md and structure.md for comprehensive onboarding and clarity
+- Ensured all documentation reflects:
+  - User-driven truncation/settings
+  - Centralized model settings in Bedrock prompt management
+  - Robust error handling and logging
+  - Lambda timeout fix and production backend stability
+  - Removal of Nova Premier, standardization on Claude 3.5 Sonnet
+  - Enhanced debug suite and real-time data flow tracing
+
 ## [3.2.0] - 2025-07-13
 ### User-Driven Truncation, Centralized Model Settings, and Robust Settings Wiring
 
