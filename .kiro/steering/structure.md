@@ -41,7 +41,13 @@ AWS CDK infrastructure stacks and services:
 - `monitoring-stack.js`: Comprehensive monitoring and observability
 - `security-stack.js`: Enterprise security controls and compliance
 - `disaster-recovery-stack.js`: Multi-region deployment and backup automation
-- **30+ specialized stacks** for different infrastructure components
+- `organizations-stack.js`: AWS Organizations with multi-account setup and organizational units
+- `control-tower-stack.js`: AWS Control Tower for governance and compliance monitoring
+- `multi-environment-stack.js`: Environment-specific configurations and cross-account roles
+- `enhanced-cicd-pipeline-stack.js`: Multi-stage CI/CD pipeline with cross-account deployment
+- `backup-automation-stack.js`: Automated backup schedules with cross-region replication
+- `dr-monitoring-stack.js`: Disaster recovery monitoring and alerting
+- **35+ specialized stacks** for different infrastructure components including enterprise governance
 
 ### `/public` - Modern Frontend Architecture
 Multiple UI implementations with progressive enhancement and debugging capabilities:
@@ -209,8 +215,59 @@ Each UI option follows a consistent class-based pattern:
 - **Modern API Implementation**: All Bedrock interactions use modern Converse API for consistent communication
 - **Performance Monitoring**: Added `/api/debug/performance` endpoint for real-time system health monitoring
 
-### Recent Enhancements (2025-07)
+### `/scripts`
+Automation and deployment scripts for enterprise operations:
+- `deploy-multi-environment.js`: Automated deployment orchestration across all environments
+- `provision-environment.js`: Automated new environment creation and configuration
+- `validate-infrastructure.js`: Comprehensive infrastructure validation and health checks
+- `deploy-infrastructure.js`: Infrastructure deployment automation
+- `validate-aws-connectivity.js`: AWS service connectivity testing
+- `validate-bedrock-connectivity.js`: Bedrock service validation
+- `run-comprehensive-testing-framework.js`: Complete testing suite with multiple scenarios
+- `test-production-startup.js`: Production readiness validation
+- `validate-production-readiness.js`: Pre-deployment validation checks
+
+### `/docs`
+Comprehensive documentation for enterprise deployment:
+- `USER_GUIDE.md`: Complete user guide with field validation and troubleshooting
+- `ENHANCED_WORKFLOW_GUIDE.md`: Workflow templates and best practices
+- `FIELD_REFERENCE_CARD.md`: Detailed field documentation and usage patterns
+- `BEDROCK_AGENT_GUIDE.md`: Bedrock Agent setup and configuration
+- `KNOWLEDGE_BASE_SETUP.md`: RAG-enhanced analysis configuration
+- `MONITORING_GUIDE.md`: System monitoring and observability
+- `SECURITY_GUIDE.md`: Security implementation and best practices
+- `TROUBLESHOOTING_RUNBOOKS.md`: Comprehensive troubleshooting procedures
+- `OPERATIONAL_PROCEDURES.md`: Complete operational procedures and runbooks
+
+## Enterprise Infrastructure Components
+
+### Multi-Environment Support
+- **AWS Organizations**: Multi-account setup with organizational units for security and workload separation
+- **Control Tower**: Governance and compliance monitoring with automated guardrails enforcement
+- **CI/CD Pipeline**: Multi-stage pipeline with cross-account deployment, security scanning, and automated testing
+- **Environment Provisioning**: Automated environment creation with account setup and configuration
+- **Cross-Account Roles**: Secure deployment automation across multiple AWS accounts
+
+### Business Continuity & Disaster Recovery
+- **Multi-Region Deployment**: Active-passive deployment with automated failover capabilities
+- **Backup Automation**: AWS Backup service integration with encrypted vaults and lifecycle management
+- **Cross-Region Replication**: S3 and DynamoDB replication for data protection
+- **Health Monitoring**: Comprehensive health checks with Route 53 and CloudWatch integration
+- **Incident Response**: Automated incident response workflows and notification systems
+
+### Security & Compliance
+- **Enterprise Security Controls**: IAM roles, encryption, secrets management, and audit logging
+- **Compliance Monitoring**: Automated compliance checks with AWS Config and Control Tower
+- **Security Scanning**: Automated vulnerability assessment and security monitoring
+- **Governance**: Policy enforcement, resource tagging, and cost allocation
+- **Access Management**: Multi-account access control with federated authentication
+
+## Recent Enhancements (2025-07)
 - **User-Configurable Analysis Settings**: Truncation, SQL query limits, and analysis parameters are now fully user-configurable from the frontend settings UI. The backend always honors these settings, ensuring end-to-end control and transparency.
 - **Centralized Model Settings**: All model inference parameters (max tokens, temperature, etc.) are managed exclusively in Bedrock prompt management. The backend no longer sets or overrides these values.
 - **Backend Logic & Logging**: All backend logic and logs now reflect the actual user settings received with each request, not hardcoded or default values.
 - **Robust Settings UI & Backend Wiring**: The settings UI is fully integrated with backend logic, providing a seamless, robust, and user-friendly experience for configuring all analysis parameters.
+- **Enterprise Infrastructure**: Complete multi-environment support with AWS Organizations, Control Tower, and automated CI/CD pipeline implementation.
+- **Business Continuity**: Multi-region disaster recovery with automated backup and failover capabilities.
+- **Enhanced Documentation**: Comprehensive user guides, workflow templates, and operational procedures for enterprise deployment.
+- **Security & Compliance**: Enterprise-grade security controls, compliance monitoring, and governance implementation.

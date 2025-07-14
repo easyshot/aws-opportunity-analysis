@@ -162,7 +162,7 @@ class OpportunityAnalysisService {
     };
 
     // Ensure sections have default values
-    const sections = {
+    let sections = {
       analysisMethodology: 'No methodology available',
       similarProjects: [],
       detailedFindings: 'No findings available',
@@ -170,6 +170,13 @@ class OpportunityAnalysisService {
       riskFactors: 'No risk factors identified',
       ...response.sections
     };
+
+    // If sections are missing or incomplete but fullAnalysis is present, parse it
+    const hasMinimalSections = !response.sections || Object.keys(response.sections).length < 3;
+    if (response.fullAnalysis && hasMinimalSections) {
+      const parsedSections = this.parseFullAnalysisSections(response.fullAnalysis);
+      sections = { ...sections, ...parsedSections };
+    }
 
     // Process similar projects if they're in string format
     if (typeof sections.similarProjects === 'string') {
@@ -230,6 +237,50 @@ class OpportunityAnalysisService {
       console.warn('Failed to parse similar projects text:', error);
       return [];
     }
+  }
+
+  // Parse sections from fullAnalysis string
+  parseFullAnalysisSections(fullAnalysis) {
+    if (!fullAnalysis || typeof fullAnalysis !== 'string') return {};
+
+    const sectionMap = {
+      'ANALYSIS_METHODOLOGY': 'analysisMethodology',
+      'SIMILAR_PROJECTS': 'similarProjects',
+      'DETAILED_FINDINGS': 'detailedFindings',
+      'PREDICTION_RATIONALE': 'predictionRationale',
+      'RISK_FACTORS': 'riskFactors',
+      'ARCHITECTURE_DESCRIPTION': 'architecture',
+      'SUMMARY_METRICS': 'summaryMetrics',
+      'VALIDATION_ERRORS': 'validationErrors'
+    };
+
+    const regex = /===([A-Z_]+)===/g;
+    let match, result = {};
+    const indices = [];
+
+    // Find all section headers
+    while ((match = regex.exec(fullAnalysis)) !== null) {
+      indices.push({ name: match[1], index: match.index });
+    }
+    indices.push({ name: null, index: fullAnalysis.length });
+
+    // Extract content for each section
+    for (let i = 0; i < indices.length - 1; i++) {
+      const { name, index } = indices[i];
+      const nextIndex = indices[i + 1].index;
+      const key = sectionMap[name] || name;
+      if (key) {
+        result[key] = fullAnalysis.slice(index + (`===${name}===`).length, nextIndex).trim();
+      }
+    }
+
+    // Parse similarProjects if present
+    if (result.similarProjects) {
+      result.similarProjectsRaw = result.similarProjects;
+      result.similarProjects = this.parseSimilarProjects(result.similarProjects);
+    }
+
+    return result;
   }
 
   // Get analysis history

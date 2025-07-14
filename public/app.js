@@ -3431,3 +3431,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+function formatServicesList(services) {
+  if (!services) return '<div class="empty-state">No services available</div>';
+  
+  if (typeof services === 'string') {
+    // If it's a multi-line string with pipe-separated values (e.g., "EC2|$12,500/month|$0 upfront")
+    if (services.includes('|')) {
+      const lines = services.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      return `
+        <div class="services-list">
+          ${lines.map(line => {
+            const parts = line.split('|').map(p => p.trim());
+            if (parts.length === 3) {
+              return `<div class="service-item"><span class="service-name">${parts[0]}</span> <span class="service-cost">${parts[1]}</span> <span class="service-upfront">${parts[2]}</span></div>`;
+            } else if (parts.length === 2) {
+              return `<div class="service-item"><span class="service-name">${parts[0]}</span> <span class="service-cost">${parts[1]}</span></div>`;
+            } else {
+              return `<div class="service-item">${line}</div>`;
+            }
+          }).join('')}
+        </div>
+      `;
+    }
+    // If it's a comma-separated string
+    const serviceArray = services.split(',').map(s => s.trim());
+    return `
+      <div class="services-list">
+        ${serviceArray.map(service => `<div class="service-item">${service}</div>`).join('')}
+      </div>
+    `;
+  } else if (Array.isArray(services)) {
+    return `
+      <div class="services-list">
+        ${services.map(service => `<div class="service-item">${service}</div>`).join('')}
+      </div>
+    `;
+  }
+  return `<div class="service-item">${services}</div>`;
+}

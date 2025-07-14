@@ -111,7 +111,7 @@ app.post('/api/analyze', async (req, res) => {
           }
         }),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Bedrock query generation timeout')), 15000)
+          setTimeout(() => reject(new Error('Bedrock query generation timeout')), 30000)
         )
       ]);
     } catch (error) {
@@ -177,8 +177,8 @@ app.post('/api/analyze', async (req, res) => {
     let analysisResult;
     
     try {
-      // Use settings-based timeout (convert from seconds to milliseconds)
-      const analysisTimeout = (parseInt(req.headers['x-analysis-timeout']) || 120) * 1000;
+      // Use settings-based timeout (convert from seconds to milliseconds) - increased for large datasets
+      const analysisTimeout = (parseInt(req.headers['x-analysis-timeout']) || 180) * 1000;
       console.log(`🤖 Starting Bedrock analysis with ${analysisTimeout/1000}s timeout for ${queryResults.length} chars of data`);
       
       // Use existing settings for truncation - no automatic truncation
@@ -222,16 +222,44 @@ app.post('/api/analyze', async (req, res) => {
       // Parse from formatted text if metrics not directly available
       const analysisText = analysisResult.formattedSummaryText || '';
       
-      // Extract basic metrics with fallback values
+      // Extract ARR and MRR with better parsing
+      const arrMatch = analysisText.match(/PREDICTED_ARR:\s*\$?([\d,]+)/i);
+      const mrrMatch = analysisText.match(/MRR:\s*\$?([\d,]+)/i);
+      const launchMatch = analysisText.match(/LAUNCH_DATE:\s*(\d{4}-\d{2})/i);
+      const durationMatch = analysisText.match(/PREDICTED_PROJECT_DURATION:\s*(\d+\s*months?)/i);
+      const confidenceMatch = analysisText.match(/CONFIDENCE:\s*(HIGH|MEDIUM|LOW)/i);
+      
+      // Parse top services from the analysis text
+      const servicesSection = analysisText.match(/TOP_SERVICES:(.*?)(?:OTHER_SERVICES|CONFIDENCE|$)/s);
+      let topServices = [];
+      
+      if (servicesSection && servicesSection[1]) {
+        const serviceLines = servicesSection[1].trim().split('\n');
+        serviceLines.forEach(line => {
+          const serviceMatch = line.match(/^([^|]+)\|([^|]+)\|(.+)$/);
+          if (serviceMatch) {
+            const [, name, monthly, upfront] = serviceMatch;
+            topServices.push({
+              name: name.trim(),
+              monthlyCost: monthly.replace('/month', '').trim(),
+              upfrontCost: upfront.replace(' upfront', '').trim(),
+              description: `AWS ${name.trim()} service for cloud infrastructure`
+            });
+          }
+        });
+      }
+      
+      // Extract basic metrics with better parsing
       metrics = {
-        predictedArr: extractValue(analysisText, /ARR.*?\$?([\d,]+)/) || "$150,000",
-        predictedMrr: extractValue(analysisText, /MRR.*?\$?([\d,]+)/) || "$12,500",
-        launchDate: extractValue(analysisText, /launch.*?(\w+ \d{4})/) || "March 2025",
+        predictedArr: arrMatch ? arrMatch[1] : "$150,000",
+        predictedMrr: mrrMatch ? mrrMatch[1] : "$12,500", 
+        launchDate: launchMatch ? launchMatch[1] : "2025-07",
         timeToLaunch: "6",
-        predictedProjectDuration: "6 months",
-        confidence: "HIGH",
-        confidenceScore: 85,
-        topServices: "Amazon EC2, Amazon RDS, Amazon S3"
+        predictedProjectDuration: durationMatch ? durationMatch[1] : "6 months",
+        confidence: confidenceMatch ? confidenceMatch[1] : "HIGH",
+        confidenceScore: confidenceMatch && confidenceMatch[1] === 'HIGH' ? 85 : 
+                        confidenceMatch && confidenceMatch[1] === 'MEDIUM' ? 65 : 35,
+        topServices: topServices.length > 0 ? topServices : []
       };
     }
     
@@ -243,13 +271,29 @@ app.post('/api/analyze', async (req, res) => {
       riskFactors = analysisResult.sections.riskFactors || 'Low to medium risk profile based on similar project outcomes.';
       similarProjects = analysisResult.sections.similarProjects || 'Multiple comparable projects found in historical dataset.';
     } else {
-      // Use the full analysis text and create sections
-      fullAnalysis = analysisResult.formattedSummaryText || 'Complete analysis generated using AWS Bedrock AI and historical project data.';
-      methodology = `Analysis methodology: AI-powered analysis using AWS Bedrock with ${settings.sqlQueryLimit} historical project records.`;
-      findings = 'Key findings: Strong market opportunity with high confidence based on historical data patterns.';
-      rationale = `Analysis rationale: Row limit of ${settings.sqlQueryLimit} records provided sufficient data for accurate predictions.`;
-      riskFactors = 'Risk assessment: Low risk profile based on similar successful projects in the dataset.';
-      similarProjects = 'Historical matches: Found multiple comparable projects with similar characteristics and outcomes.';
+      // Parse sections from the full analysis text
+      const analysisText = analysisResult.formattedSummaryText || '';
+      fullAnalysis = analysisText;
+      
+      // Extract individual sections using regex
+      const methodologyMatch = analysisText.match(/===ANALYSIS_METHODOLOGY===\s*(.*?)(?=\s*===|$)/s);
+      const findingsMatch = analysisText.match(/===DETAILED_FINDINGS===\s*(.*?)(?=\s*===|$)/s);
+      const rationaleMatch = analysisText.match(/===PREDICTION_RATIONALE===\s*(.*?)(?=\s*===|$)/s);
+      const riskMatch = analysisText.match(/===RISK_FACTORS===\s*(.*?)(?=\s*===|$)/s);
+      const similarMatch = analysisText.match(/===SIMILAR_PROJECTS===\s*(.*?)(?=\s*===|$)/s);
+      const architectureMatch = analysisText.match(/===ARCHITECTURE_DESCRIPTION===\s*(.*?)(?=\s*===|$)/s);
+      
+      methodology = methodologyMatch ? methodologyMatch[1].trim() : `Analysis methodology: AI-powered analysis using AWS Bedrock with ${settings.sqlQueryLimit} historical project records.`;
+      findings = findingsMatch ? findingsMatch[1].trim() : 'Key findings: Strong market opportunity with high confidence based on historical data patterns.';
+      rationale = rationaleMatch ? rationaleMatch[1].trim() : `Analysis rationale: Row limit of ${settings.sqlQueryLimit} records provided sufficient data for accurate predictions.`;
+      riskFactors = riskMatch ? riskMatch[1].trim() : 'Risk assessment: Low risk profile based on similar successful projects in the dataset.';
+      similarProjects = similarMatch ? similarMatch[1].trim() : 'Historical matches: Found multiple comparable projects with similar characteristics and outcomes.';
+      
+      // Extract architecture description if available
+      if (architectureMatch) {
+        const architectureText = architectureMatch[1].trim();
+        // You can add architecture to the response if needed
+      }
     }
     
     // Compute query result debug stats
