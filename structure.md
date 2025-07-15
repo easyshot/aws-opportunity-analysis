@@ -6,10 +6,11 @@
 - **/src/frontend**: Modern React-based frontend (if present)
 - **/lambda**: AWS Lambda functions (opportunity analysis, funding, follow-on, shared utilities)
 - **/automations**: Backend automation scripts (Bedrock query, Lambda execution, analysis orchestration)
+- **/scripts**: Deployment, validation, and multi-environment orchestration scripts (e.g., deploy-multi-environment.js, provision-environment.js)
 - **/config**: AWS, infrastructure, and environment configuration files
-- **/lib**: CDK stacks and AWS infrastructure as code (TypeScript, aws-cdk-lib v2)
+- **/lib**: CDK stacks and AWS infrastructure as code (TypeScript, aws-cdk-lib v2), including enterprise, disaster recovery, and backup automation stacks
 - **/tests**: Unit, integration, and UI tests
-- **/docs**: Guides, runbooks, and user documentation
+- **/docs**: Expanded documentation, user guides, workflow templates, and operational runbooks
 - **/logs**: Application and debug logs
 
 ## Key Files
@@ -35,10 +36,16 @@
 ## Navigating the Workspace
 - **Frontend**: `/public` (main UI), `/src/frontend` (React UI, if present)
 - **Backend**: `app.js`, `/automations`, `/lambda`
-- **Infrastructure**: `/lib` (CDK), `/config`
-- **Docs & Guides**: `/docs`, README.md, product.md, structure.md, .kiro/steering/tech.md
+- **Infrastructure**: `/lib` (CDK, including multi-environment, DR, and backup stacks), `/config`, `/scripts` (multi-environment deployment)
+- **Docs & Guides**: `/docs` (expanded), README.md, product.md, structure.md, .kiro/steering/tech.md
 - **Tests**: `/tests`
 
 ## References
 - For product details, see `product.md`
 - For technical stack, see `.kiro/steering/tech.md` 
+
+## Debug Architecture (2025 Update)
+- Debug extraction logic for analysis steps (sections 4 and 5) now uses only analysis-specific fields (analysisBedrockPayload, analysisPromptMeta, etc.).
+- Query and analysis debug fields are strictly separated in both backend and frontend code.
+- Only Claude 3.5 Sonnet is used for all Bedrock inference; Nova Premier references have been removed.
+- Bedrock prompt management is the single source of truth for all model parameters and prompt metadata, which is now surfaced in the UI debug panels. 

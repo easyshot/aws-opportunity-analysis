@@ -125,7 +125,21 @@ app.post('/api/analyze', async (req, res) => {
     }
     
     console.log('✅ SQL query generated successfully');
-    const sqlQuery = queryPromptResult.processResults;
+    // Parse the SQL string from the Bedrock response (processResults is a JSON string)
+    let sqlQuery = queryPromptResult.processResults;
+    if (typeof sqlQuery === 'string') {
+      try {
+        const parsed = JSON.parse(sqlQuery);
+        if (parsed && parsed.sql_query) {
+          sqlQuery = parsed.sql_query;
+        }
+      } catch (e) {
+        // fallback: leave as is
+      }
+    }
+    
+    // In the response object, set the model name for SQL query generation from the actual prompt/model used
+    const queryModel = process.env.CATAPULT_QUERY_MODEL_NAME || (queryPromptResult && queryPromptResult.modelName) || "Claude 3.5 Sonnet";
     
     // Step 2: Execute SQL query via Lambda (with fallback)
     console.log('🔍 Step 2: Executing SQL query via Lambda...');
@@ -215,53 +229,74 @@ app.post('/api/analyze', async (req, res) => {
     let similarProjects = '';
     let fullAnalysis = '';
     
-    // Extract metrics from analysis result
-    if (analysisResult.metrics) {
-      metrics = analysisResult.metrics;
+    // Use both formattedSummaryText and fullAnalysis as fallback
+    const analysisText = analysisResult.formattedSummaryText || analysisResult.fullAnalysis || '';
+    // Try to extract the summary metrics section robustly
+    let summarySection = '';
+    let summarySectionMatch = analysisText.match(/===SUMMARY METRICS===([\s\S]*?)(?=^===|\n===|$)/m);
+    if (summarySectionMatch && summarySectionMatch[1].trim().length > 0) {
+      summarySection = summarySectionMatch[1];
     } else {
-      // Parse from formatted text if metrics not directly available
-      const analysisText = analysisResult.formattedSummaryText || '';
-      
-      // Extract ARR and MRR with better parsing
-      const arrMatch = analysisText.match(/PREDICTED_ARR:\s*\$?([\d,]+)/i);
-      const mrrMatch = analysisText.match(/MRR:\s*\$?([\d,]+)/i);
-      const launchMatch = analysisText.match(/LAUNCH_DATE:\s*(\d{4}-\d{2})/i);
-      const durationMatch = analysisText.match(/PREDICTED_PROJECT_DURATION:\s*(\d+\s*months?)/i);
-      const confidenceMatch = analysisText.match(/CONFIDENCE:\s*(HIGH|MEDIUM|LOW)/i);
-      
-      // Parse top services from the analysis text
-      const servicesSection = analysisText.match(/TOP_SERVICES:(.*?)(?:OTHER_SERVICES|CONFIDENCE|$)/s);
-      let topServices = [];
-      
-      if (servicesSection && servicesSection[1]) {
-        const serviceLines = servicesSection[1].trim().split('\n');
-        serviceLines.forEach(line => {
-          const serviceMatch = line.match(/^([^|]+)\|([^|]+)\|(.+)$/);
-          if (serviceMatch) {
-            const [, name, monthly, upfront] = serviceMatch;
-            topServices.push({
-              name: name.trim(),
-              monthlyCost: monthly.replace('/month', '').trim(),
-              upfrontCost: upfront.replace(' upfront', '').trim(),
-              description: `AWS ${name.trim()} service for cloud infrastructure`
-            });
-          }
-        });
+      // Fallback: try to find the block manually
+      const startIdx = analysisText.indexOf('===SUMMARY METRICS===');
+      if (startIdx !== -1) {
+        let endIdx = analysisText.indexOf('===', startIdx + 1);
+        if (endIdx === -1) endIdx = analysisText.length;
+        summarySection = analysisText.substring(startIdx + 20, endIdx);
       }
-      
-      // Extract basic metrics with better parsing
-      metrics = {
-        predictedArr: arrMatch ? arrMatch[1] : "$150,000",
-        predictedMrr: mrrMatch ? mrrMatch[1] : "$12,500", 
-        launchDate: launchMatch ? launchMatch[1] : "2025-07",
-        timeToLaunch: "6",
-        predictedProjectDuration: durationMatch ? durationMatch[1] : "6 months",
-        confidence: confidenceMatch ? confidenceMatch[1] : "HIGH",
-        confidenceScore: confidenceMatch && confidenceMatch[1] === 'HIGH' ? 85 : 
-                        confidenceMatch && confidenceMatch[1] === 'MEDIUM' ? 65 : 35,
-        topServices: topServices.length > 0 ? topServices : []
-      };
     }
+    console.log('DEBUG: Extracted summarySection:', summarySection.substring(0, 500));
+
+    // Now parse as before
+    const arrMatch = summarySection.match(/PREDICTED_ARR:\s*\$?([\d,]+)/i);
+    const mrrMatch = summarySection.match(/MRR:\s*\$?([\d,]+)/i);
+    const launchDateMatch = summarySection.match(/LAUNCH_DATE:\s*([^\n]+)/i);
+    const durationMatch = summarySection.match(/PREDICTED_PROJECT_DURATION:\s*([^\n]+)/i);
+    const confidenceMatch = summarySection.match(/CONFIDENCE:\s*([^\n]+)/i);
+
+    // Parse TOP_SERVICES block
+    const servicesMatch = summarySection.match(/TOP_SERVICES:\s*([\s\S]*?)(?:OTHER_SERVICES:|CONFIDENCE:|$)/i);
+    let topServices = [];
+    if (servicesMatch && servicesMatch[1]) {
+      const serviceLines = servicesMatch[1].trim().split('\n').filter(l => l.trim());
+      let parsed = [];
+      serviceLines.forEach(line => {
+        const match = line.match(/^([^|]+)\|\$?([\d,\.]+)\/month\|\$?([\d,\.]+) upfront$/);
+        if (match) {
+          parsed.push({
+            name: match[1].trim(),
+            monthlyCost: `$${match[2]}/month`,
+            upfrontCost: `$${match[3]} upfront`
+          });
+        }
+      });
+      if (parsed.length > 4) {
+        const top4 = parsed.slice(0, 4);
+        const others = parsed.slice(4);
+        let totalMonthly = 0, totalUpfront = 0;
+        others.forEach(s => {
+          totalMonthly += parseFloat(s.monthlyCost.replace(/[^0-9.]/g, '')) || 0;
+          totalUpfront += parseFloat(s.upfrontCost.replace(/[^0-9.]/g, '')) || 0;
+        });
+        top4.push({
+          name: "Other Services",
+          monthlyCost: `$${totalMonthly.toLocaleString()}/month`,
+          upfrontCost: `$${totalUpfront.toLocaleString()} upfront`
+        });
+        topServices = top4;
+      } else {
+        topServices = parsed;
+      }
+    }
+
+    metrics = {
+      predictedArr: arrMatch ? `$${arrMatch[1]}` : "",
+      predictedMrr: mrrMatch ? `$${mrrMatch[1]}` : "",
+      launchDate: launchDateMatch ? launchDateMatch[1].trim() : "",
+      predictedProjectDuration: durationMatch ? durationMatch[1].trim() : "",
+      confidence: confidenceMatch ? confidenceMatch[1].trim() : "",
+      topServices
+    };
     
     // Extract sections from analysis result
     if (analysisResult.sections) {
@@ -331,7 +366,7 @@ app.post('/api/analyze', async (req, res) => {
       fullAnalysis: analysisResult.formattedSummaryText || fullAnalysis || `Complete analysis generated using ${settings.sqlQueryLimit} record limit with AWS Bedrock AI.`,
       query: {
         sql: sqlQuery,
-        model: "Claude 3.5 Sonnet",
+        model: queryModel,
         promptId: process.env.CATAPULT_QUERY_PROMPT_ID || 'Not configured',
         temperature: 0.0,
         maxTokens: 4096,
@@ -348,20 +383,31 @@ app.post('/api/analyze', async (req, res) => {
         queryRowCount: queryRowCount,
         queryDataSize: queryDataSize,
         queryCharCount: queryCharCount,
-        bedrockPayload: JSON.stringify({
+        // Enhanced debug information from global debug store
+        bedrockPayload: global.debugInfo?.sqlBedrockPayload || global.debugInfo?.bedrockPayload || JSON.stringify({
           modelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
           system: [{ text: "AWS Bedrock analysis system instructions..." }],
           messages: [{ role: "user", content: [{ text: "Analysis request processed..." }] }],
-          inferenceConfig: { maxTokens: 4096, temperature: 0.0 }
+          inferenceConfig: { maxTokens: 5120, temperature: 0.0 }
         }),
+        // Add analysis-specific Bedrock payload and prompt info
+        analysisBedrockPayload: global.debugInfo?.analysisBedrockPayload || global.debugInfo?.bedrockPayload || JSON.stringify({
+          modelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
+          system: [{ text: "AWS Bedrock analysis system instructions..." }],
+          messages: [{ role: "user", content: [{ text: "Analysis request processed..." }] }],
+          inferenceConfig: { maxTokens: 5120, temperature: 0.0 }
+        }),
+        analysisPromptId: global.debugInfo?.analysisPromptId || process.env.CATAPULT_ANALYSIS_PROMPT_ID || 'FDUHITJIME',
+        analysisPromptVersion: 'default',
         fullResponse: analysisResult.formattedSummaryText || "Analysis completed successfully with AWS integration",
-        sqlGenerationLogs: [
+        // Enhanced SQL generation logs with real-time information
+        sqlGenerationLogs: global.debugInfo?.sqlGenerationLogs || [
           "🤖 BEDROCK SQL QUERY GENERATION PAYLOAD",
           "====================================",
           "📋 MODEL CONFIGURATION:",
           "   Model ID: Claude 3.5 Sonnet",
-          "   Temperature: 0.0",
-          "   Max Tokens: 4096",
+          "   Temperature: 0.0 (explicitly set)",
+          "   Max Tokens: 5120 (explicitly set)",
           "   Purpose: SQL Query Generation",
           "",
           "📊 INPUT PARAMETERS:",
@@ -390,7 +436,8 @@ app.post('/api/analyze', async (req, res) => {
           "   AI Analysis: Complete",
           "",
           "✅ Analysis Generated Successfully"
-        ]
+        ],
+        analysisPromptMeta: global.debugInfo?.analysisPromptMeta || {}
       }
     };
     

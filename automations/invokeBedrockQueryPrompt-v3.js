@@ -44,7 +44,7 @@ exports.execute = async (params) => {
 };
 
 /**
- * Fetch the Bedrock Prompt resource
+ * Fetch the Bedrock Prompt resource with enhanced metadata capture
  */
 async function fetchPrompt(promptId) {
   try {
@@ -53,6 +53,25 @@ async function fetchPrompt(promptId) {
     });
 
     const response = await bedrockAgent.send(command);
+    
+    // Capture prompt metadata for enhanced debugging
+    const promptMetadata = {
+      promptId: promptId,
+      version: response.version || 'Unknown',
+      promptVersion: response.promptVersion || response.version || 'Unknown',
+      selectionReason: 'Direct prompt ID selection',
+      abTestActive: false,
+      selectedVariant: null,
+      modelId: response.variants?.[0]?.modelId || 'Unknown',
+      lastModified: response.updatedAt || response.createdAt || 'Unknown'
+    };
+    
+    // Store metadata globally for debug access
+    if (!global.debugInfo) global.debugInfo = {};
+    global.debugInfo.promptMetadata = promptMetadata;
+    
+    console.log('PROCESS_RESULTS (SQL Query): Prompt metadata captured:', JSON.stringify(promptMetadata, null, 2));
+    
     return response;
   } catch (error) {
     console.error('Error fetching Bedrock prompt:', error);
@@ -111,7 +130,7 @@ function preparePayload(params, promptData) {
     }, null, 2));
     console.log("=".repeat(60) + "\n");
 
-    return {
+    const finalPayload = {
       modelId: modelId,
       system: [{ text: systemInstructions }],
       messages: [
@@ -125,6 +144,23 @@ function preparePayload(params, promptData) {
         temperature: 0.0
       }
     };
+
+    // Store the complete payload for enhanced debugging
+    if (!global.debugInfo) global.debugInfo = {};
+    global.debugInfo.sqlBedrockPayload = JSON.stringify(finalPayload, null, 2);
+    global.debugInfo.sqlGenerationLogs = [
+      `SQL Query Generation initiated at ${new Date().toISOString()}`,
+      `Model ID: ${modelId}`,
+      `Prompt ID: ${PROMPT_ID}`,
+      `Temperature: 0.0 (explicitly set)`,
+      `Max Tokens: 5120 (explicitly set)`,
+      `User message length: ${filledUserMessage.length} characters`,
+      `System instructions length: ${systemInstructions.length} characters`
+    ];
+
+    console.log('PROCESS_RESULTS (SQL Query): Enhanced payload captured for debugging');
+
+    return finalPayload;
   } catch (error) {
     console.error('Critical error in preparePayload:', error.message, error.stack);
     throw new Error('Failed to prepare Bedrock payload for SQL query: ' + error.message);

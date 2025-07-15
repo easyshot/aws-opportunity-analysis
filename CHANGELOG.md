@@ -1,5 +1,24 @@
 # Partner Opportunity Intelligence Application - Changelog
 
+## [3.4.0] - 2025-07-15
+### Enterprise, Disaster Recovery, Debug Suite, and Documentation Enhancements
+
+#### Added - Enterprise & Multi-Environment Support
+- **AWS Organizations, Control Tower, and CI/CD pipeline** for multi-account, multi-region deployments
+- **Automated environment provisioning** and validation scripts
+
+#### Added - Disaster Recovery & Business Continuity
+- **Automated backup, cross-region replication, and failover** (RTO 15 min, RPO 1 hr, 99.9% availability)
+- **Backup automation and DR monitoring stacks**
+
+#### Enhanced - Debug Suite & User-Driven Settings
+- **Real-time data flow tracing, advanced debug panels, and troubleshooting tools**
+- **All truncation, SQL query limits, and analysis parameters are now fully user-configurable and respected end-to-end**
+
+#### Enhanced - Documentation
+- **Expanded user guides, workflow templates, and operational runbooks** for enterprise, disaster recovery, and multi-environment deployments
+- **README, product.md, structure.md, and tech.md** updated to reflect latest architecture and operational procedures
+
 ## [3.3.0] - 2025-07-14
 ### Enterprise Infrastructure & Multi-Environment Support
 
@@ -328,3 +347,10 @@
 - **User Experience**: Accessibility improvements and customization options
 - **Advanced Analytics**: Real-time dashboard and usage analytics
 - **Debug Enhancement**: Continue expanding debug capabilities based on user feedback 
+
+## [2025-06-XX] Debug Transparency and Prompt Management Overhaul
+- Strict separation of query and analysis debug fields in backend and frontend.
+- Debug panels for analysis steps now use only analysis prompt/model and payload.
+- Nova Premier fully removed; only Claude 3.5 Sonnet is used for all inference.
+- Backend and frontend updated to surface full prompt metadata for analysis steps.
+- Improved transparency and troubleshooting for debug output. 

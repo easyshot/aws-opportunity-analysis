@@ -9,6 +9,7 @@ const { ConverseCommand } = require('@aws-sdk/client-bedrock-runtime');
 
 // Configuration
 const PROMPT_ID = config.promptIds.analysisPrompt;
+const PROMPT_VERSION = (config.promptVersions && config.promptVersions.analysisPrompt) || "default";
 
 /**
  * Main automation function
@@ -17,11 +18,32 @@ exports.execute = async (params) => {
   try {
     console.log('Starting finalBedAnalysisPrompt with params:', JSON.stringify(params));
     
-    // Step 1: Fetch the Bedrock Prompt resource
+    // Step 1: Fetch prompt resource for analysis
     const promptData = await fetchPrompt(PROMPT_ID);
+
+    // Store all prompt metadata for debug info
+    if (typeof global !== 'undefined') {
+      if (!global.debugInfo) global.debugInfo = {};
+      global.debugInfo.analysisPromptMeta = {
+        promptId: PROMPT_ID,
+        promptVersion: PROMPT_VERSION,
+        modelId: promptData?.variants?.[0]?.modelId || 'Unknown',
+        promptName: promptData?.name || '',
+        description: promptData?.description || '',
+        variants: promptData?.variants || [],
+        rawPromptResource: promptData
+      };
+    }
     
     // Step 2: Prepare payload for Bedrock Converse API
     const payload = preparePayload(params, promptData);
+
+    // Store analysis payload and prompt ID for debug info
+    if (typeof global !== 'undefined') {
+      if (!global.debugInfo) global.debugInfo = {};
+      global.debugInfo.analysisBedrockPayload = JSON.stringify(payload);
+      global.debugInfo.analysisPromptId = PROMPT_ID;
+    }
     
     // Step 3: Invoke Bedrock Converse API
     const converseResponse = await invokeBedrockConverse(payload);
@@ -318,14 +340,15 @@ ${filledUserMessage}`;
     console.log("   User Template Length:", userMessageTemplate.length, "characters");
     console.log("=".repeat(60) + "\n");
     
-    // Store the complete payload for debug purposes
+    // Store the complete payload for debug purposes with enhanced information
     if (!global.debugInfo) global.debugInfo = {};
 
     console.log("PROCESS_RESULTS (Analysis): Enhanced user message (first 1000 chars):", finalUserMessage.substring(0, 1000));
     console.log("PROCESS_RESULTS (Analysis): Enhanced message contains opportunity data:", finalUserMessage.includes(params.CustomerName || 'Not specified'));
     console.log("PROCESS_RESULTS (Analysis): Enhanced message contains query results:", finalUserMessage.includes('VarCharValue') || finalUserMessage.includes('Rows'));
 
-    global.debugInfo.bedrockPayload = JSON.stringify({
+    // Enhanced payload capture with actual configuration
+    const enhancedPayload = {
       modelId: modelId,
       system: [{ text: systemInstructions }],
       messages: [
@@ -335,9 +358,38 @@ ${filledUserMessage}`;
         }
       ],
       inferenceConfig: {
-        // All model settings managed by Bedrock prompt resource
+        // Model settings managed by Bedrock prompt resource
+        // Actual values will be determined by the prompt configuration
       }
-    }, null, 2);
+    };
+
+    global.debugInfo.bedrockPayload = JSON.stringify(enhancedPayload, null, 2);
+    
+    // Capture enhanced analysis metadata
+    global.debugInfo.analysisMetadata = {
+      promptId: PROMPT_ID,
+      modelId: modelId,
+      messageLength: finalUserMessage.length,
+      systemInstructionsLength: systemInstructions.length,
+      queryResultsLength: processedQueryResults.length,
+      truncationApplied: truncationApplied,
+      truncationLimit: truncationLimitUsed,
+      estimatedTokens: Math.ceil(finalUserMessage.length / 3.5),
+      timestamp: new Date().toISOString()
+    };
+
+    // Enhanced analysis generation logs
+    global.debugInfo.analysisGenerationLogs = [
+      `Analysis Generation initiated at ${new Date().toISOString()}`,
+      `Model ID: ${modelId}`,
+      `Prompt ID: ${PROMPT_ID}`,
+      `Message length: ${finalUserMessage.length} characters`,
+      `System instructions length: ${systemInstructions.length} characters`,
+      `Query results length: ${processedQueryResults.length} characters`,
+      `Truncation applied: ${truncationApplied ? 'Yes' : 'No'}`,
+      `Estimated tokens: ${Math.ceil(finalUserMessage.length / 3.5)}`,
+      `Settings: SQL limit=${params.settings?.sqlQueryLimit}, Truncation=${params.settings?.enableTruncation}`
+    ];
 
     // Remove explicit maxTokens and temperature from inferenceConfig
     return {

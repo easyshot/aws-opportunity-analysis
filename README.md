@@ -1,5 +1,12 @@
 # AWS Bedrock Partner Management System
 
+> **July 2025 Update:**
+> - **Enterprise & Multi-Environment Support:** Full AWS Organizations, Control Tower, and CI/CD pipeline for multi-account, multi-region deployments.
+> - **Disaster Recovery & Business Continuity:** Automated backup, cross-region replication, and failover (RTO 15 min, RPO 1 hr, 99.9% availability).
+> - **Enhanced Debug Suite:** Real-time data flow tracing, advanced debug panels, and professional troubleshooting tools.
+> - **User-Driven Settings:** All truncation, SQL query limits, and analysis parameters are fully user-configurable and respected end-to-end.
+> - **Comprehensive Documentation:** Expanded user guides, workflow templates, and operational runbooks for enterprise deployment and troubleshooting.
+
 This comprehensive serverless application analyzes business opportunities using AWS Bedrock AI models, Lambda functions, and other AWS services. The system provides intelligent opportunity analysis, funding recommendations, and follow-on opportunity identification through a modern web interface with real-time analytics, interactive visualizations, and comprehensive analysis capabilities.
 
 ## 🚀 Current Status: Production Ready with User-Configurable Settings & Enhanced Architecture
@@ -144,6 +151,10 @@ npm run lambda:deploy              # Lambda functions
 npm run dynamodb:deploy           # Database infrastructure  
 npm run bedrock-agent:deploy      # AI orchestration
 npm run knowledge-base:deploy     # RAG enhancement
+
+# Enterprise & Multi-Environment Deployment
+node scripts/deploy-multi-environment.js deploy-complete
+node scripts/provision-environment.js --environment production
 ```
 
 ### 5. Enterprise Multi-Environment Deployment
@@ -330,6 +341,7 @@ Identifies potential follow-on opportunities with the same customer based on his
 - **[User Guide](docs/USER_GUIDE.md)**: Complete guide to using the enhanced interface with all field descriptions and workflow instructions
 - **[Enhanced Workflow Guide](docs/ENHANCED_WORKFLOW_GUIDE.md)**: Detailed workflow templates and best practices for comprehensive analysis
 - **[Testing Guide](docs/TESTING_GUIDE.md)**: Testing procedures and validation methods
+- **[Operational Procedures](docs/OPERATIONAL_PROCEDURES.md)**: Complete operational procedures and runbooks for enterprise, disaster recovery, and multi-environment deployments
 
 ### Technical Documentation
 - **[Bedrock Agent Guide](docs/BEDROCK_AGENT_GUIDE.md)**: Bedrock Agent setup and configuration
@@ -503,3 +515,9 @@ The infrastructure includes comprehensive monitoring:
 - For detailed product specifications and user flows, see `product.md`.
 - For project structure, code standards, and development guidelines, see `structure.md`.
 - For technical stack, AWS services, and troubleshooting, see `.kiro/steering/tech.md`.
+
+## 2025 Debug and Model Management Update
+- All model inference parameters are managed in Bedrock prompt management.
+- Nova Premier is deprecated; only Claude 3.5 Sonnet is used for all analysis and query steps.
+- Debug panels now show only the analysis prompt/model for analysis steps, with full prompt metadata surfaced in the UI.
+- Improved transparency and troubleshooting for debug output, with strict separation of query and analysis debug fields.

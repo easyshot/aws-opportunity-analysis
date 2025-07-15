@@ -296,7 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Format currency
   function formatCurrency(amount) {
     if (!amount) return '-';
-    const num = parseFloat(amount);
+    // Remove commas before parsing
+    const num = parseFloat(amount.toString().replace(/,/g, ''));
     if (isNaN(num)) return amount;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -319,6 +320,32 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
       return dateString;
     }
+  }
+
+  function extractSummaryMetrics(fullAnalysis) {
+    // Support both ===SUMMARY_METRICS=== and ===SUMMARY METRICS===
+    const summarySection = fullAnalysis && fullAnalysis.match(/===SUMMARY[ _]METRICS===([\s\S]*?)(?:===|$)/i);
+    if (!summarySection) return {};
+    const section = summarySection[1];
+    const metrics = {};
+    metrics.predictedArr = (section.match(/PREDICTED_ARR:\s*\$?([\d,]+)/i) || [])[1] || "-";
+    metrics.predictedMrr = (section.match(/MRR:\s*\$?([\d,]+)/i) || [])[1] || "-";
+    metrics.launchDate = (section.match(/LAUNCH_DATE:\s*([^\n]+)/i) || [])[1] || "-";
+    metrics.predictedProjectDuration = (section.match(/PREDICTED_PROJECT_DURATION:\s*([^\n]+)/i) || [])[1] || "-";
+    metrics.confidence = (section.match(/CONFIDENCE:\s*([^\n]+)/i) || [])[1] || "-";
+    // Extract top services
+    const services = [];
+    const serviceRegex = /^([A-Za-z0-9]+)\|([^|]+)\|([^\n]+)$/gm;
+    let match;
+    while ((match = serviceRegex.exec(section)) !== null) {
+      services.push({
+        name: match[1],
+        monthlyCost: match[2].trim(),
+        upfrontCost: match[3].trim()
+      });
+    }
+    metrics.topServices = services;
+    return metrics;
   }
 
   // Populate UI with results
@@ -356,6 +383,18 @@ document.addEventListener('DOMContentLoaded', () => {
         metrics = results.projections;
       }
       
+      // If metrics is still null or empty, try to extract from fullAnalysis
+      function isMetricsEmpty(metricsObj) {
+        if (!metricsObj) return true;
+        // Check if all expected keys are missing or empty
+        const keys = ['predictedArr', 'predictedMrr', 'launchDate', 'predictedProjectDuration', 'confidence'];
+        return keys.every(k => !metricsObj[k] || metricsObj[k] === '-');
+      }
+      if ((isMetricsEmpty(metrics) || Object.keys(metrics).length === 0) && results.fullAnalysis) {
+        metrics = extractSummaryMetrics(results.fullAnalysis);
+        console.log('Extracted metrics from fullAnalysis:', metrics);
+      }
+      
       // Check for sections in different possible locations
       if (!fullResponse) {
         // Prioritize top-level section properties over nested sections
@@ -381,124 +420,50 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Populate projections from metrics
       console.log('Metrics object:', metrics);
-      console.log('Projections object:', results.projections);
-      console.log('DOM elements found:', {
-        predictedArr: !!predictedArr,
-        predictedMrr: !!predictedMrr,
-        launchDate: !!launchDate,
-        timeToLaunch: !!timeToLaunch,
-        confidenceScore: !!confidenceScore,
-        confidenceLabel: !!confidenceLabel,
-        confidenceFill: !!confidenceFill,
-        topServices: !!topServices
-      });
-      
       if (metrics) {
         console.log('Populating from metrics object');
         if (predictedArr && metrics.predictedArr) {
-          console.log('Before update - predictedArr:', predictedArr.textContent);
           predictedArr.textContent = formatCurrency(metrics.predictedArr);
           console.log('After update - predictedArr:', predictedArr.textContent, 'from value:', metrics.predictedArr);
         }
-        
         if (predictedMrr && metrics.predictedMrr) {
           predictedMrr.textContent = formatCurrency(metrics.predictedMrr);
           console.log('Set predictedMrr to:', metrics.predictedMrr);
         }
-        
         if (launchDate && metrics.launchDate) {
           launchDate.textContent = formatDate(metrics.launchDate);
           console.log('Set launchDate to:', metrics.launchDate);
         }
-        
         if (timeToLaunch && metrics.timeToLaunch) {
-          // Just set the number, the HTML already has "months" in a separate element
           timeToLaunch.textContent = metrics.timeToLaunch;
           console.log('Set timeToLaunch to:', metrics.timeToLaunch);
         } else if (timeToLaunch && metrics.predictedProjectDuration) {
-          // Remove "months" if it's already in the string to avoid duplication
           const duration = metrics.predictedProjectDuration.replace(/\s*months?\s*$/i, '');
           timeToLaunch.textContent = duration;
           console.log('Set timeToLaunch to:', duration + ' (from:', metrics.predictedProjectDuration + ')');
         }
-        
         if (confidenceScore && (metrics.confidence || metrics.confidenceScore)) {
-          // Use numeric score if available, otherwise use confidence string
           const scoreValue = metrics.confidenceScore || metrics.confidence;
           confidenceScore.textContent = typeof scoreValue === 'number' ? scoreValue : metrics.confidence;
           console.log('Set confidence to:', scoreValue);
         }
-        
         if (confidenceLabel && (metrics.confidence || metrics.confidenceScore)) {
           const confValue = metrics.confidence || metrics.confidenceScore;
           confidenceLabel.textContent = getConfidenceLabel(confValue);
           console.log('Set confidenceLabel to:', getConfidenceLabel(confValue));
         }
-        
         if (confidenceFill && (metrics.confidence || metrics.confidenceScore)) {
           const confValue = metrics.confidence || metrics.confidenceScore;
           const percentage = getConfidencePercentage(confValue);
           confidenceFill.style.width = `${percentage}%`;
           console.log('Set confidenceFill to:', percentage + '%');
         }
-        
         if (topServices && metrics.topServices) {
           topServices.innerHTML = formatServicesList(metrics.topServices);
           console.log('Set topServices to:', metrics.topServices);
         }
       } else {
-        console.log('No metrics object found, trying to populate from projections directly');
-        // Try to populate directly from projections if metrics is not available
-        if (results.projections) {
-          const projections = results.projections;
-          console.log('Direct projections object:', projections);
-          
-          if (predictedArr && projections.predictedArr) {
-            predictedArr.textContent = formatCurrency(projections.predictedArr);
-            console.log('Set predictedArr to:', projections.predictedArr);
-          }
-          
-          if (predictedMrr && projections.predictedMrr) {
-            predictedMrr.textContent = formatCurrency(projections.predictedMrr);
-            console.log('Set predictedMrr to:', projections.predictedMrr);
-          }
-          
-          if (launchDate && projections.launchDate) {
-            launchDate.textContent = formatDate(projections.launchDate);
-            console.log('Set launchDate to:', projections.launchDate);
-          }
-          
-          if (timeToLaunch && projections.timeToLaunch) {
-            timeToLaunch.textContent = `${projections.timeToLaunch} months`;
-            console.log('Set timeToLaunch to:', projections.timeToLaunch);
-          } else if (timeToLaunch && projections.predictedProjectDuration) {
-            // Remove "months" if it's already in the string to avoid duplication
-            const duration = projections.predictedProjectDuration.replace(/\s*months?\s*$/i, '');
-            timeToLaunch.textContent = `${duration} months`;
-            console.log('Set timeToLaunch to:', duration + ' months');
-          }
-          
-          if (confidenceScore && projections.confidence) {
-            confidenceScore.textContent = projections.confidence;
-            console.log('Set confidence to:', projections.confidence);
-          }
-          
-          if (confidenceLabel && projections.confidence) {
-            confidenceLabel.textContent = getConfidenceLabel(projections.confidence);
-            console.log('Set confidenceLabel to:', getConfidenceLabel(projections.confidence));
-          }
-          
-          if (confidenceFill && projections.confidence) {
-            const percentage = getConfidencePercentage(projections.confidence);
-            confidenceFill.style.width = `${percentage}%`;
-            console.log('Set confidenceFill to:', percentage + '%');
-          }
-          
-          if (topServices && projections.topServices) {
-            topServices.innerHTML = formatServicesList(projections.topServices);
-            console.log('Set topServices to:', projections.topServices);
-          }
-        }
+        console.log('No metrics object found. Projections will not be populated.');
       }
       
       // Populate analysis sections from full response
@@ -566,45 +531,68 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       
-      // Direct section population as primary method
-      console.log('Populating sections directly from response');
-      console.log('Available sections in response:', {
-        methodology: !!results.methodology,
-        findings: !!results.findings,
-        rationale: !!results.rationale,
-        riskFactors: !!results.riskFactors,
-        similarProjects: !!results.similarProjects,
-        fullAnalysis: !!results.fullAnalysis
-      });
-      
-      // Populate individual sections
+      // Enhanced: Always try to extract detailed sections from fullAnalysis if present
+      let extractedSections = {};
+      if (results.fullAnalysis) {
+        extractedSections = extractSections(results.fullAnalysis);
+      }
+
+      // Helper to check if a value is generic/placeholder
+      function isGeneric(val, field) {
+        if (!val) return true;
+        const genericMap = {
+          methodology: /analysis methodology not available|based on historical project data/i,
+          findings: /key findings not available|strong market opportunity identified/i,
+          rationale: /rationale not available|comprehensive historical data/i,
+          riskFactors: /risk factors not available|low to medium risk profile/i,
+          similarProjects: /similar projects not available|multiple comparable projects found/i
+        };
+        return genericMap[field] && genericMap[field].test(val.trim());
+      }
+
+      // Populate individual sections with fallback to extracted detailed content
       if (methodology) {
-        const methodologyContent = results.methodology || 'Analysis methodology not available';
-        methodology.innerHTML = formatSectionContent(methodologyContent);
+        let content = (results.sections && results.sections.methodology) || results.methodology;
+        if (!content || isGeneric(content, 'methodology')) {
+          content = extractedSections.methodology || 'Analysis methodology not available';
+        }
+        methodology.innerHTML = formatSectionContent(content);
         console.log('✅ Methodology section populated');
       }
       
       if (findings) {
-        const findingsContent = results.findings || 'Key findings not available';
-        findings.innerHTML = formatSectionContent(findingsContent);
+        let content = (results.sections && results.sections.findings) || results.findings;
+        if (!content || isGeneric(content, 'findings')) {
+          content = extractedSections.findings || 'Key findings not available';
+        }
+        findings.innerHTML = formatSectionContent(content);
         console.log('✅ Findings section populated');
       }
       
       if (rationale) {
-        const rationaleContent = results.rationale || 'Analysis rationale not available';
-        rationale.innerHTML = formatSectionContent(rationaleContent);
+        let content = (results.sections && results.sections.rationale) || results.rationale;
+        if (!content || isGeneric(content, 'rationale')) {
+          content = extractedSections.rationale || 'Rationale not available';
+        }
+        rationale.innerHTML = formatSectionContent(content);
         console.log('✅ Rationale section populated');
       }
       
       if (riskFactors) {
-        const riskFactorsContent = results.riskFactors || 'Risk factors not available';
-        riskFactors.innerHTML = formatSectionContent(riskFactorsContent);
+        let content = (results.sections && results.sections.riskFactors) || results.riskFactors;
+        if (!content || isGeneric(content, 'riskFactors')) {
+          content = extractedSections.riskFactors || 'Risk factors not available';
+        }
+        riskFactors.innerHTML = formatSectionContent(content);
         console.log('✅ Risk factors section populated');
       }
       
       if (similarProjects) {
-        const similarProjectsContent = results.similarProjects || 'Similar projects not available';
-        similarProjects.innerHTML = formatSectionContent(similarProjectsContent);
+        let content = (results.sections && results.sections.similarProjects) || results.similarProjects;
+        if (!content || isGeneric(content, 'similarProjects')) {
+          content = extractedSections.similarProjects || 'Similar projects not available';
+        }
+        similarProjects.innerHTML = formatSectionContent(content);
         console.log('✅ Similar projects section populated');
       }
       
@@ -743,35 +731,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Format services list
   function formatServicesList(services) {
-    if (!services) return '<div class="empty-state">No services available</div>';
-    
-    if (typeof services === 'string') {
-      // Check if it's pipe-separated (like "Combined|$55,000/month|$0 upfront")
-      if (services.includes('|')) {
-        const serviceArray = services.split('|').map(s => s.trim());
-        return `
-          <div class="services-list">
-            ${serviceArray.map(service => `<div class="service-item">${service}</div>`).join('')}
-          </div>
-        `;
-      }
-      
-      // If it's a comma-separated string
-      const serviceArray = services.split(',').map(s => s.trim());
-      return `
-        <div class="services-list">
-          ${serviceArray.map(service => `<div class="service-item">${service}</div>`).join('')}
-        </div>
-      `;
-    } else if (Array.isArray(services)) {
-      return `
-        <div class="services-list">
-          ${services.map(service => `<div class="service-item">${service}</div>`).join('')}
-        </div>
-      `;
+    if (!services || (Array.isArray(services) && services.length === 0)) {
+      return '<div class="empty-state">No AWS services available</div>';
     }
-    
-    return `<div class="service-item">${services}</div>`;
+    // If services is a string, parse it into array of objects
+    let parsedServices = [];
+    if (typeof services === 'string') {
+      // Split by newlines, filter out empty lines
+      const lines = services.split('\n').map(l => l.trim()).filter(Boolean);
+      lines.forEach(line => {
+        // Ignore OTHER_SERVICES and Combined rows
+        if (/OTHER_SERVICES|Combined/i.test(line)) return;
+        const match = line.match(/^([^|]+)\|\$?([\d,]+)\/month\|\$?([\d,]+) upfront$/);
+        if (match) {
+          parsedServices.push({
+            name: match[1].trim(),
+            monthlyCost: `$${match[2].replace(/,/g, '')}`,
+            upfrontCost: `$${match[3].replace(/,/g, '')}`
+          });
+        }
+      });
+    } else if (Array.isArray(services)) {
+      parsedServices = services.filter(s => s.name && !/OTHER_SERVICES|Combined/i.test(s.name));
+    }
+    if (parsedServices.length === 0) {
+      return '<div class="empty-state">No AWS services available</div>';
+    }
+    // Render as a clean table
+    return `
+      <table class="services-table">
+        <thead>
+          <tr><th>Service</th><th>Monthly Cost</th><th>Upfront Cost</th></tr>
+        </thead>
+        <tbody>
+          ${parsedServices.map(s => `
+            <tr>
+              <td>${escapeHtml(s.name)}</td>
+              <td>${escapeHtml(s.monthlyCost)}</td>
+              <td>${escapeHtml(s.upfrontCost)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
   }
 
   // Populate debug information with enhanced data points

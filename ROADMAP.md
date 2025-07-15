@@ -48,6 +48,7 @@
 🔄 **API Enhancement**: RESTful API improvements with better error handling and validation
 🔄 **Mobile Optimization**: Enhanced mobile experience and responsive design improvements
 🔄 **Integration Expansion**: Additional AWS service integrations and third-party connectors
+✅ **Expanded Documentation**: Further enhance operational runbooks, workflow templates, and user guides for enterprise and multi-environment deployments
 
 ## Mid-Term (Q3 2025)
 - **Enhanced Analytics**: Advanced analytics and reporting capabilities
@@ -119,3 +120,11 @@
 - **Debug Capabilities**: ✅ Real-time visibility into query results, character counts, and data truncation
 - **Data Management**: ✅ Intelligent truncation handling datasets up to 846K+ characters
 - **API Integration**: ✅ Modern Converse API implementation for all Bedrock interactions 
+
+## 2025 Completed Milestones
+- Debug transparency and prompt management overhaul complete: Only analysis prompt/model is shown for analysis steps, with full metadata.
+- Nova Premier fully removed; only Claude 3.5 Sonnet is used.
+
+## Future Work
+- Further enhance prompt metadata surfacing in the UI.
+- Add user-driven debug customization options. 

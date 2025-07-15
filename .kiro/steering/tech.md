@@ -295,3 +295,16 @@ DEBUG_LOG_LEVEL=info
 - **Business Continuity**: Multi-region disaster recovery with automated backup and failover capabilities.
 - **Enhanced Documentation**: Comprehensive user guides, workflow templates, and operational procedures for enterprise deployment.
 - **Security & Compliance**: Enterprise-grade security controls, compliance monitoring, and governance implementation.
+
+## Enterprise & Multi-Environment Deployment
+- **AWS Organizations & Control Tower**: Automated multi-account setup, governance, and compliance monitoring for enterprise workloads.
+- **CI/CD Pipeline**: Cross-account, multi-stage deployment with security scanning and automated testing.
+- **Disaster Recovery & Backup Automation**: Dedicated stacks for cross-region replication, backup, and failover (see /lib and /scripts).
+- **Environment Provisioning**: Automated scripts for new environment creation, validation, and configuration management.
+- **Expanded Documentation**: See /docs for operational runbooks, workflow templates, and troubleshooting guides.
+
+## Technical Update: Debug and Prompt Management (2025)
+- All model inference parameters are managed in Bedrock prompt management; backend code does not override these.
+- Nova Premier is deprecated; only Claude 3.5 Sonnet is used for all inference.
+- Debug panel discrepancies are resolved by ensuring frontend and backend use only analysis debug fields for analysis steps.
+- Troubleshooting: If debug panels show the wrong model or prompt, verify that only analysisBedrockPayload and analysisPromptMeta are used for analysis debug extraction in both backend and frontend.

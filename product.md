@@ -34,6 +34,20 @@ The AWS Bedrock Partner Management System is a serverless, AI-powered applicatio
 ## User-Driven Settings Impact
 - All truncation, query limits, and analysis parameters are user-configurable and respected throughout the workflow, ensuring transparency and control.
 
+## New Capabilities (2025)
+- **Enterprise & Multi-Environment Support**: Full AWS Organizations, Control Tower, and CI/CD pipeline implementation for seamless multi-account, multi-region deployments.
+- **Disaster Recovery & Business Continuity**: Automated backup, cross-region replication, and failover with RTO/RPO objectives (RTO 15 min, RPO 1 hr, 99.9% availability).
+- **Enhanced Debug Suite**: Real-time data flow tracing, advanced debug panels, and professional troubleshooting tools for both frontend and backend.
+- **User-Driven Settings**: All truncation, SQL query limits, and analysis parameters are fully user-configurable and respected end-to-end.
+- **Comprehensive Documentation**: Expanded user guides, workflow templates, and operational runbooks for enterprise deployment and troubleshooting.
+
 ## References
 - For technical stack and AWS integration, see `.kiro/steering/tech.md`.
 - For project structure and development guidelines, see `structure.md`. 
+
+## 2025 Debug and Analysis Enhancements
+- All model inference parameters (max tokens, temperature, etc.) are now managed exclusively in Bedrock prompt management, not in backend code.
+- Nova Premier has been fully removed; only Claude 3.5 Sonnet is used for all analysis and query steps.
+- Debug panels in the UI now show only the analysis prompt/model for analysis steps, ensuring transparency and accuracy.
+- The backend and frontend have been updated to ensure that analysis debug sections (4 and 5) use only the analysis prompt and payload, never falling back to query prompt data.
+- Enhanced debug extraction logic provides full prompt metadata (modelId, promptVersion, promptName, etc.) for the analysis step. 
