@@ -29,7 +29,7 @@
 - **Security**: Follow AWS best practices (IAM least privilege, encryption, secrets management)
 - **Performance**: Optimize for serverless scale, minimize cold starts, use efficient queries
 - **Testing**: Use Jest for JS/TS, comprehensive unit/integration tests for Lambda and automations
-- **Error Handling**: Structured JSON errors, CloudWatch logging, and debug panels
+- **Error Handling**: Standardized error messages ('ERROR: Data not received'), structured JSON errors, CloudWatch logging, and debug panels
 - **Configuration**: Store sensitive data in environment variables, not code
 - **Documentation**: Keep README, product.md, and structure.md up to date
 

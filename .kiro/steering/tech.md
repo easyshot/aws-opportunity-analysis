@@ -287,6 +287,7 @@ DEBUG_LOG_LEVEL=info
 - **Operational Excellence**: Comprehensive monitoring, alerting, troubleshooting, and business continuity capabilities
 
 ## Recent Enhancements (2025-07)
+- **Standardized Error Handling**: Replaced all fallback values with consistent 'ERROR: Data not received' message throughout the application, eliminating silent failures and improving debugging and user experience.
 - **User-Driven Truncation & Analysis Settings**: All truncation, SQL query limits, and analysis parameters are now fully user-configurable from the frontend settings UI. The backend always honors these settings, ensuring end-to-end control and transparency for users.
 - **Centralized Model Settings**: All model inference parameters (max tokens, temperature, etc.) are now managed exclusively in Bedrock prompt management. The backend no longer sets or overrides these values, ensuring a single source of truth and easier model governance.
 - **Backend Logic & Logging**: All backend logic and logs now reflect the actual user settings received with each request, not hardcoded or default values. This ensures accurate debugging, traceability, and user trust.

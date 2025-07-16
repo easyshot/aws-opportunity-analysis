@@ -19,7 +19,7 @@ The AWS Bedrock Partner Management System is a serverless, AI-powered applicatio
 - **Export/Print**: Professional export and print functionality for reports.
 
 ## System Behavior
-- **Error Handling**: Robust error handling with structured JSON responses and detailed logs.
+- **Error Handling**: Robust error handling with structured JSON responses, detailed logs, and standardized error messages ('ERROR: Data not received') for improved debugging and user experience.
 - **Performance**: Lambda timeout extended to 30s; backend optimized for large datasets and real-time feedback.
 - **Security**: IAM roles, encryption, secrets management, and compliance controls.
 - **Monitoring**: CloudWatch, X-Ray, and custom endpoints for health and performance.
