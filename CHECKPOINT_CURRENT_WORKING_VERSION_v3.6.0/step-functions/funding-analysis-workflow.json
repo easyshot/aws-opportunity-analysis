@@ -1,0 +1,73 @@
+{
+  "Comment": "AWS Opportunity Analysis Funding Workflow",
+  "StartAt": "ValidateInput",
+  "States": {
+    "ValidateInput": {
+      "Type": "Pass",
+      "Comment": "Validate input parameters for funding analysis",
+      "Parameters": {
+        "opportunityDetails.$": "$.opportunityDetails",
+        "analysisResults.$": "$.analysisResults",
+        "validated": true
+      },
+      "Next": "AnalyzeFunding"
+    },
+    "AnalyzeFunding": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Comment": "Analyze funding options using Bedrock",
+      "Parameters": {
+        "FunctionName": "${FundingAnalysisLambdaArn}",
+        "Payload": {
+          "CustomerName.$": "$.opportunityDetails.CustomerName",
+          "region.$": "$.opportunityDetails.region",
+          "oppName.$": "$.opportunityDetails.oppName",
+          "oppDescription.$": "$.opportunityDetails.oppDescription",
+          "analysisResults.$": "$.analysisResults"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "FundingAnalysisFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "ResultPath": "$.fundingResult",
+      "Next": "FormatFundingResults"
+    },
+    "FormatFundingResults": {
+      "Type": "Pass",
+      "Comment": "Format funding analysis results",
+      "Parameters": {
+        "status": "success",
+        "fundingAnalysis.$": "$.fundingResult.Payload.fundingAnalysis",
+        "orchestrationType": "step-functions",
+        "executionArn.$": "$$.Execution.Name",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    },
+    "FundingAnalysisFailed": {
+      "Type": "Pass",
+      "Comment": "Handle funding analysis failure",
+      "Parameters": {
+        "status": "error",
+        "error": "Funding analysis failed",
+        "message.$": "$.error.Cause",
+        "orchestrationType": "step-functions",
+        "failedAt": "FundingAnalysis",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    }
+  }
+}
