@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enhanced Debug Verification Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .test-section {
+        margin-bottom: 30px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .test-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .test-result {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 5px 0;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      .info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      .code-block {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 12px;
+        overflow-x: auto;
+        margin: 10px 0;
+      }
+      .button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      .status-success {
+        background-color: #28a745;
+      }
+      .status-error {
+        background-color: #dc3545;
+      }
+      .status-warning {
+        background-color: #ffc107;
+      }
+      .status-info {
+        background-color: #17a2b8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔧 Enhanced Debug Verification Test</h1>
+      <p>
+        This test verifies that the enhanced debug rebuild is properly
+        implemented and working.
+      </p>
+
+      <div class="test-section">
+        <div class="test-title">1. Enhanced Debug Files Loading Test</div>
+        <div id="fileLoadingTest">
+          <div class="test-result info">
+            <span class="status-indicator status-info"></span>
+            Testing enhanced debug file loading...
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">
+          2. Enhanced Debug Functions Availability Test
+        </div>
+        <div id="functionTest">
+          <div class="test-result info">
+            <span class="status-indicator status-info"></span>
+            Testing enhanced debug function availability...
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">3. Enhanced Debug HTML Elements Test</div>
+        <div id="htmlTest">
+          <div class="test-result info">
+            <span class="status-indicator status-info"></span>
+            Testing enhanced debug HTML elements...
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">4. Backend Enhanced Debug Response Test</div>
+        <div id="backendTest">
+          <div class="test-result info">
+            <span class="status-indicator status-info"></span>
+            Testing backend enhanced debug response...
+          </div>
+          <button class="button" onclick="testBackendResponse()">
+            Test Backend Response
+          </button>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">5. Enhanced Debug Integration Test</div>
+        <div id="integrationTest">
+          <div class="test-result info">
+            <span class="status-indicator status-info"></span>
+            Testing enhanced debug integration...
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">6. Overall Status</div>
+        <div id="overallStatus">
+          <div class="test-result info">
+            <span class="status-indicator status-info"></span>
+            Calculating overall implementation status...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Test 1: Enhanced Debug Files Loading Test
+      function testFileLoading() {
+        const fileLoadingTest = document.getElementById("fileLoadingTest");
+
+        // Check if enhanced debug files are loaded
+        const enhancedDebugLoaded =
+          typeof updateBedrockDebugInfoEnhanced === "function";
+        const bedrockDebugLoaded = typeof updateBedrockDebugInfo === "function";
+
+        if (enhancedDebugLoaded && bedrockDebugLoaded) {
+          fileLoadingTest.innerHTML = `
+                    <div class="test-result success">
+                        <span class="status-indicator status-success"></span>
+                        ✅ Enhanced debug files loaded successfully
+                    </div>
+                    <div class="code-block">
+                        ✓ enhanced-debug-integration.js loaded
+                        ✓ bedrock-debug-functions.js loaded
+                        ✓ updateBedrockDebugInfoEnhanced() available
+                        ✓ updateBedrockDebugInfo() available
+                    </div>
+                `;
+          return true;
+        } else {
+          fileLoadingTest.innerHTML = `
+                    <div class="test-result error">
+                        <span class="status-indicator status-error"></span>
+                        ❌ Enhanced debug files not loaded properly
+                    </div>
+                    <div class="code-block">
+                        enhancedDebugLoaded: ${enhancedDebugLoaded}
+                        bedrockDebugLoaded: ${bedrockDebugLoaded}
+                    </div>
+                `;
+          return false;
+        }
+      }
+
+      // Test 2: Enhanced Debug Functions Availability Test
+      function testFunctionAvailability() {
+        const functionTest = document.getElementById("functionTest");
+
+        const requiredFunctions = [
+          "updateBedrockDebugInfoEnhanced",
+          "updateSqlGenerationDebugEnhanced",
+          "updateAnalysisGenerationDebugEnhanced",
+          "extractSqlGenerationInfoEnhanced",
+          "extractAnalysisGenerationInfoEnhanced",
+        ];
+
+        const availableFunctions = requiredFunctions.filter(
+          (func) => typeof window[func] === "function"
+        );
+
+        if (availableFunctions.length === requiredFunctions.length) {
+          functionTest.innerHTML = `
+                    <div class="test-result success">
+                        <span class="status-indicator status-success"></span>
+                        ✅ All enhanced debug functions available
+                    </div>
+                    <div class="code-block">
+                        ${availableFunctions
+                          .map((func) => `✓ ${func}()`)
+                          .join("\n")}
+                    </div>
+                `;
+          return true;
+        } else {
+          const missingFunctions = requiredFunctions.filter(
+            (func) => typeof window[func] !== "function"
+          );
+          functionTest.innerHTML = `
+                    <div class="test-result error">
+                        <span class="status-indicator status-error"></span>
+                        ❌ Some enhanced debug functions missing
+                    </div>
+                    <div class="code-block">
+                        Missing functions:
+                        ${missingFunctions
+                          .map((func) => `✗ ${func}()`)
+                          .join("\n")}
+                    </div>
+                `;
+          return false;
+        }
+      }
+
+      // Test 3: Enhanced Debug HTML Elements Test
+      function testHTMLElements() {
+        const htmlTest = document.getElementById("htmlTest");
+
+        // Check if we're on the main application page
+        const isMainApp = window.location.href.includes("localhost:3123");
+
+        if (isMainApp) {
+          // Test for enhanced debug elements
+          const enhancedElements = [
+            "debugSection",
+            "enhancedAccuracyIndicator",
+            "sqlModelId",
+            "analysisModelId",
+            "debugSqlGeneration",
+            "debugAnalysisGeneration",
+          ];
+
+          const availableElements = enhancedElements.filter((id) =>
+            document.getElementById(id)
+          );
+
+          if (availableElements.length === enhancedElements.length) {
+            htmlTest.innerHTML = `
+                        <div class="test-result success">
+                            <span class="status-indicator status-success"></span>
+                            ✅ All enhanced debug HTML elements found
+                        </div>
+                        <div class="code-block">
+                            ${availableElements
+                              .map((id) => `✓ #${id}`)
+                              .join("\n")}
+                        </div>
+                    `;
+            return true;
+          } else {
+            const missingElements = enhancedElements.filter(
+              (id) => !document.getElementById(id)
+            );
+            htmlTest.innerHTML = `
+                        <div class="test-result warning">
+                            <span class="status-indicator status-warning"></span>
+                            ⚠️ Some enhanced debug HTML elements missing
+                        </div>
+                        <div class="code-block">
+                            Missing elements:
+                            ${missingElements
+                              .map((id) => `✗ #${id}`)
+                              .join("\n")}
+                        </div>
+                    `;
+            return false;
+          }
+        } else {
+          htmlTest.innerHTML = `
+                    <div class="test-result info">
+                        <span class="status-indicator status-info"></span>
+                        ℹ️ This test should be run on the main application page (localhost:3123)
+                    </div>
+                `;
+          return null;
+        }
+      }
+
+      // Test 4: Backend Enhanced Debug Response Test
+      async function testBackendResponse() {
+        const backendTest = document.getElementById("backendTest");
+
+        backendTest.innerHTML = `
+                <div class="test-result info">
+                    <span class="status-indicator status-info"></span>
+                    🔄 Testing backend enhanced debug response...
+                </div>
+            `;
+
+        try {
+          const response = await fetch("http://localhost:8123/health");
+          const data = await response.json();
+
+          if (data.status === "healthy") {
+            backendTest.innerHTML = `
+                        <div class="test-result success">
+                            <span class="status-indicator status-success"></span>
+                            ✅ Backend server is running and healthy
+                        </div>
+                        <div class="code-block">
+                            Status: ${data.status}
+                            Version: ${data.version}
+                            Mode: ${data.mode}
+                        </div>
+                    `;
+            return true;
+          } else {
+            backendTest.innerHTML = `
+                        <div class="test-result error">
+                            <span class="status-indicator status-error"></span>
+                            ❌ Backend server responded but status is not healthy
+                        </div>
+                    `;
+            return false;
+          }
+        } catch (error) {
+          backendTest.innerHTML = `
+                    <div class="test-result error">
+                        <span class="status-indicator status-error"></span>
+                        ❌ Backend server not accessible: ${error.message}
+                    </div>
+                `;
+          return false;
+        }
+      }
+
+      // Test 5: Enhanced Debug Integration Test
+      function testIntegration() {
+        const integrationTest = document.getElementById("integrationTest");
+
+        // Test if the main app has enhanced debug integration
+        const hasEnhancedIntegration = typeof populateDebugInfo === "function";
+
+        if (hasEnhancedIntegration) {
+          integrationTest.innerHTML = `
+                    <div class="test-result success">
+                        <span class="status-indicator status-success"></span>
+                        ✅ Enhanced debug integration found in main application
+                    </div>
+                    <div class="code-block">
+                        ✓ populateDebugInfo() function available
+                        ✓ Enhanced debug integration active
+                    </div>
+                `;
+          return true;
+        } else {
+          integrationTest.innerHTML = `
+                    <div class="test-result error">
+                        <span class="status-indicator status-error"></span>
+                        ❌ Enhanced debug integration not found in main application
+                    </div>
+                `;
+          return false;
+        }
+      }
+
+      // Test 6: Overall Status
+      function calculateOverallStatus() {
+        const overallStatus = document.getElementById("overallStatus");
+
+        const results = [
+          testFileLoading(),
+          testFunctionAvailability(),
+          testHTMLElements(),
+          testIntegration(),
+        ];
+
+        const validResults = results.filter((result) => result !== null);
+        const successCount = validResults.filter(
+          (result) => result === true
+        ).length;
+        const totalTests = validResults.length;
+
+        if (successCount === totalTests) {
+          overallStatus.innerHTML = `
+                    <div class="test-result success">
+                        <span class="status-indicator status-success"></span>
+                        🎉 ENHANCED DEBUG REBUILD FULLY IMPLEMENTED AND WORKING!
+                    </div>
+                    <div class="code-block">
+                        All ${totalTests} tests passed successfully!
+                        
+                        ✅ Enhanced debug files loaded
+                        ✅ Enhanced debug functions available
+                        ✅ Enhanced debug HTML elements present
+                        ✅ Enhanced debug integration active
+                        
+                        The enhanced debug rebuild is complete and functional!
+                    </div>
+                `;
+        } else {
+          overallStatus.innerHTML = `
+                    <div class="test-result warning">
+                        <span class="status-indicator status-warning"></span>
+                        ⚠️ Enhanced debug rebuild partially implemented
+                    </div>
+                    <div class="code-block">
+                        ${successCount}/${totalTests} tests passed
+                        
+                        Some components may need attention.
+                        Please check the individual test results above.
+                    </div>
+                `;
+        }
+      }
+
+      // Run all tests when page loads
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          calculateOverallStatus();
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

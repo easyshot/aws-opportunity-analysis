@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Opportunity Intelligence</title>
+    <link rel="stylesheet" href="styles-modern.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <h1>🤝 Partner Opportunity Intelligence</h1>
+            <div class="header-actions">
+                <button class="btn-secondary" onclick="exportData()">Export</button>
+                <button class="btn-secondary" onclick="printReport()">Print</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Opportunity Details Section -->
+        <section class="card opportunity-details">
+            <h2>Opportunity Details</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="customerName">Customer Name</label>
+                    <input type="text" id="customerName" placeholder="Enter customer name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="region">Region</label>
+                    <select id="region">
+                        <option value="">Select Region</option>
+                        <option value="us-east-1">US East (N. Virginia)</option>
+                        <option value="us-west-2">US West (Oregon)</option>
+                        <option value="eu-west-1">Europe (Ireland)</option>
+                        <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="closeDate">Close Date</label>
+                    <input type="date" id="closeDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="opportunityName">Opportunity Name</label>
+                    <input type="text" id="opportunityName" placeholder="Brief opportunity title">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="4" placeholder="Detailed description of the opportunity, including business requirements, technical needs, and expected outcomes..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-primary" onclick="analyzeOpportunity()">
+                    <span class="btn-icon">🔍</span>
+                    Analyze Opportunity
+                </button>
+                <button class="btn-secondary" onclick="clearForm()">Clear</button>
+            </div>
+        </section>
+
+        <!-- Analysis Results Section -->
+        <section class="card analysis-results" id="analysisResults" style="display: none;">
+            <h2>Opportunity Analysis</h2>
+            
+            <div class="results-grid">
+                <!-- Key Metrics -->
+                <div class="metric-card">
+                    <h3>📊 Key Projections</h3>
+                    <div class="metrics-list">
+                        <div class="metric-item">
+                            <span class="metric-label">Predicted ARR:</span>
+                            <span class="metric-value" id="predictedArr">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Predicted MRR:</span>
+                            <span class="metric-value" id="predictedMrr">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Launch Date:</span>
+                            <span class="metric-value" id="launchDate">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Project Duration:</span>
+                            <span class="metric-value" id="projectDuration">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confidence Score -->
+                <div class="metric-card">
+                    <h3>🎯 Confidence Analysis</h3>
+                    <div class="confidence-display">
+                        <div class="confidence-score" id="confidenceScore">-</div>
+                        <div class="confidence-label" id="confidenceLabel">-</div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill"></div>
+                        </div>
+                    </div>
+                    <div class="confidence-factors" id="confidenceFactors"></div>
+                </div>
+            </div>
+
+            <!-- Detailed Analysis Sections -->
+            <div class="analysis-sections">
+                <div class="analysis-section">
+                    <h3>🏗️ Recommended Architecture</h3>
+                    <div class="content-area" id="architecture">
+                        <div class="loading-placeholder">Analysis will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>☁️ Top AWS Services</h3>
+                    <div class="content-area" id="topServices">
+                        <div class="loading-placeholder">Service recommendations will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>📈 Similar Projects</h3>
+                    <div class="content-area" id="similarProjects">
+                        <div class="loading-placeholder">Historical project matches will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>💰 Funding Options</h3>
+                    <div class="content-area" id="fundingOptions">
+                        <div class="loading-placeholder">Funding recommendations will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>🚀 Follow-On Opportunities</h3>
+                    <div class="content-area" id="followOnOpportunities">
+                        <div class="loading-placeholder">Future opportunity insights will appear here...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app-modern.js"></script>
+</body>
+</html>

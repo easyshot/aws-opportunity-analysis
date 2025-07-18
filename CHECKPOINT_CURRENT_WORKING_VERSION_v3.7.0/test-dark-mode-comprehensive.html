@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode Comprehensive Test</title>
+    <link rel="stylesheet" href="public/styles-compact-option-c.css">
+    <style>
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        
+        .test-section h3 {
+            margin-bottom: 15px;
+            color: #1a202c;
+        }
+        
+        [data-theme="dark"] .test-section {
+            border-color: #4a5568;
+        }
+        
+        [data-theme="dark"] .test-section h3 {
+            color: #f7fafc;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .test-item {
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        [data-theme="dark"] .test-item {
+            background: #2d3748;
+            border-color: #4a5568;
+            color: #f7fafc;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-good {
+            background: #10b981;
+        }
+        
+        .status-bad {
+            background: #ef4444;
+        }
+        
+        .status-warning {
+            background: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Dark Mode Comprehensive Test</h1>
+                <div class="header-meta">
+                    <span class="timestamp" id="currentTime"></span>
+                    <div class="header-actions">
+                        <button class="action-btn theme-toggle" onclick="toggleTheme()" title="Switch Theme">
+                            <span class="icon">🌙</span>
+                            <span class="theme-text">Dark</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="test-section">
+                <h3>Theme Toggle Test</h3>
+                <p>Current theme: <span id="currentTheme">light</span></p>
+                <p>Click the dark mode button in the header to test theme switching.</p>
+            </div>
+
+            <div class="test-section">
+                <h3>Main Content Areas Test</h3>
+                <div class="test-grid">
+                    <div class="test-item">
+                        <h4>Input Panel</h4>
+                        <div class="input-panel">
+                            <div class="panel-header">
+                                <h2>Test Panel</h2>
+                                <div class="completion-status">
+                                    <span class="status-text">50% Complete</span>
+                                    <div class="status-bar">
+                                        <div class="status-fill" style="width: 50%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="opportunity-form">
+                                <div class="input-group">
+                                    <label class="input-label">Test Input</label>
+                                    <input type="text" class="input-field" placeholder="Test placeholder">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-item">
+                        <h4>Results Panel</h4>
+                        <div class="results-panel">
+                            <div class="panel-header">
+                                <h2>Test Results</h2>
+                                <div class="analysis-status">
+                                    <span class="status-dot"></span>
+                                    <span class="status-text">Ready</span>
+                                </div>
+                            </div>
+                            <div class="metrics-section">
+                                <div class="metrics-row">
+                                    <div class="metric-box arr-metric">
+                                        <div class="metric-label">Test Metric</div>
+                                        <div class="metric-value">$100K</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h3>Detailed Analysis Test</h3>
+                <div class="detailed-analysis">
+                    <div class="analysis-header">
+                        <h2>Test Analysis</h2>
+                        <div class="analysis-controls">
+                            <button class="control-btn active">Grid View</button>
+                            <button class="control-btn">List View</button>
+                        </div>
+                    </div>
+                    <div class="analysis-content">
+                        <div class="analysis-item">
+                            <div class="item-header">
+                                <h3>Test Item</h3>
+                                <div class="item-status">Complete</div>
+                            </div>
+                            <div class="item-content">
+                                <div class="loading-state">Test content here...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h3>Additional Sections Test</h3>
+                <div class="additional-sections">
+                    <div class="section-grid">
+                        <div class="additional-section">
+                            <div class="section-header">
+                                <h2>Test Section</h2>
+                                <div class="section-badge">Test Badge</div>
+                            </div>
+                            <div class="section-content">
+                                <div class="loading-state">Test section content...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h3>Form Elements Test</h3>
+                <div class="test-grid">
+                    <div class="test-item">
+                        <h4>Input Fields</h4>
+                        <div class="input-group">
+                            <label class="input-label">Text Input</label>
+                            <input type="text" class="input-field" placeholder="Text input">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Select Field</label>
+                            <select class="input-field select-field">
+                                <option>Option 1</option>
+                                <option>Option 2</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Textarea</label>
+                            <textarea class="input-field textarea-field" rows="3">Test textarea content</textarea>
+                            <div class="char-counter">25 characters</div>
+                        </div>
+                    </div>
+
+                    <div class="test-item">
+                        <h4>Buttons</h4>
+                        <div class="action-panel">
+                            <button class="primary-btn">
+                                <span class="btn-icon">🔍</span>
+                                Primary Button
+                            </button>
+                            <div class="secondary-actions">
+                                <button class="secondary-btn">Secondary</button>
+                                <button class="secondary-btn">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h3>Status Indicators Test</h3>
+                <div class="test-grid">
+                    <div class="test-item">
+                        <h4>Metrics</h4>
+                        <div class="metrics-section">
+                            <div class="metrics-row">
+                                <div class="metric-box arr-metric">
+                                    <div class="metric-label">ARR</div>
+                                    <div class="metric-value">$500K</div>
+                                    <div class="metric-trend">+15%</div>
+                                </div>
+                                <div class="metric-box mrr-metric">
+                                    <div class="metric-label">MRR</div>
+                                    <div class="metric-value">$42K</div>
+                                    <div class="metric-unit">/month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-item">
+                        <h4>Confidence</h4>
+                        <div class="confidence-section">
+                            <div class="confidence-display">
+                                <div class="confidence-gauge">
+                                    <div class="gauge-value">85%</div>
+                                    <div class="gauge-label">High Confidence</div>
+                                    <div class="gauge-bar">
+                                        <div class="gauge-fill" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h3>Empty States Test</h3>
+                <div class="test-grid">
+                    <div class="test-item">
+                        <div class="empty-state">
+                            <div class="empty-icon">☁️</div>
+                            <div class="empty-text">This is a test empty state</div>
+                        </div>
+                    </div>
+                    <div class="test-item">
+                        <div class="empty-state small">
+                            <div class="empty-text">Small empty state</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString();
+            document.getElementById('currentTime').textContent = timeString;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            const themeText = document.querySelector('.theme-text');
+            const icon = document.querySelector('.theme-toggle .icon');
+            const currentThemeSpan = document.getElementById('currentTheme');
+            
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            themeToggle.setAttribute('data-current-theme', newTheme);
+            
+            if (newTheme === 'dark') {
+                themeText.textContent = 'Light';
+                icon.textContent = '☀️';
+                currentThemeSpan.textContent = 'dark';
+            } else {
+                themeText.textContent = 'Dark';
+                icon.textContent = '🌙';
+                currentThemeSpan.textContent = 'light';
+            }
+            
+            console.log('Theme toggled to:', newTheme);
+        }
+
+        // Initialize theme
+        document.addEventListener('DOMContentLoaded', function() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            const currentTheme = body.getAttribute('data-theme') || 'light';
+            
+            body.setAttribute('data-theme', currentTheme);
+            themeToggle.setAttribute('data-current-theme', currentTheme);
+            
+            document.getElementById('currentTheme').textContent = currentTheme;
+        });
+    </script>
+</body>
+</html> 

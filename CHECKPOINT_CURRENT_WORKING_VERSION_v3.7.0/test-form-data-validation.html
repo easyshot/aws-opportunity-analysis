@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Form Data Collection - Task 6.2</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .test-results { margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 4px; }
+        .error { color: #d32f2f; }
+        .warning { color: #f57c00; }
+        .success { color: #388e3c; }
+    </style>
+</head>
+<body>
+    <h1>Task 6.2: Enhanced Form Data Collection Test</h1>
+    
+    <form id="opportunityForm">
+        <!-- Basic Details -->
+        <h3>Basic Details</h3>
+        <div class="form-group">
+            <label for="CustomerName">Customer Name *</label>
+            <input type="text" id="CustomerName" name="CustomerName" placeholder="Enter customer name...">
+        </div>
+        
+        <div class="form-group">
+            <label for="oppName">Opportunity Name *</label>
+            <input type="text" id="oppName" name="oppName" placeholder="Enter opportunity name...">
+        </div>
+        
+        <div class="form-group">
+            <label for="oppDescription">Opportunity Description *</label>
+            <textarea id="oppDescription" name="oppDescription" rows="4" placeholder="Enter detailed description..."></textarea>
+        </div>
+        
+        <!-- Location & Timing -->
+        <h3>Location & Timing</h3>
+        <div class="form-group">
+            <label for="region">Region *</label>
+            <select id="region" name="region">
+                <option value="">Select AWS Region</option>
+                <option value="us-east-1">US East (N. Virginia)</option>
+                <option value="us-west-2">US West (Oregon)</option>
+                <option value="eu-west-1">Europe (Ireland)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="closeDate">Close Date *</label>
+            <input type="date" id="closeDate" name="closeDate">
+        </div>
+        
+        <!-- Business Context -->
+        <h3>Business Context</h3>
+        <div class="form-group">
+            <label for="industry">Industry</label>
+            <select id="industry" name="industry">
+                <option value="">Select Industry</option>
+                <option value="Technology">Technology</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Financial Services">Financial Services</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="text" id="industryOther" name="industryOther" placeholder="Please specify..." style="display: none; margin-top: 8px;">
+        </div>
+        
+        <div class="form-group">
+            <label for="customerSegment">Customer Segment</label>
+            <select id="customerSegment" name="customerSegment">
+                <option value="">Select Customer Segment</option>
+                <option value="Enterprise">Enterprise</option>
+                <option value="Mid-Market">Mid-Market</option>
+                <option value="SMB">Small & Medium Business</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="partnerName">Partner Name</label>
+            <input type="text" id="partnerName" name="partnerName" placeholder="Optional partner name...">
+        </div>
+        
+        <!-- Technical Details -->
+        <h3>Technical Details</h3>
+        <div class="form-group">
+            <label for="activityFocus">Activity Focus</label>
+            <select id="activityFocus" name="activityFocus">
+                <option value="">Select Activity Focus</option>
+                <option value="Migration">Migration</option>
+                <option value="Modernization">Modernization</option>
+                <option value="New Development">New Development</option>
+                <option value="Analytics">Analytics</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="businessDescription">Business Description</label>
+            <textarea id="businessDescription" name="businessDescription" rows="3" placeholder="Optional business context..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="migrationPhase">Migration Phase</label>
+            <select id="migrationPhase" name="migrationPhase">
+                <option value="">Select Migration Phase</option>
+                <option value="Assessment">Assessment</option>
+                <option value="Planning">Planning</option>
+                <option value="Migration">Migration</option>
+                <option value="Optimization">Optimization</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="salesforceLink">Salesforce Link</label>
+            <input type="url" id="salesforceLink" name="salesforceLink" placeholder="https://example.salesforce.com/...">
+        </div>
+        
+        <div class="form-group">
+            <label for="awsCalculatorLink">AWS Calculator Link</label>
+            <input type="url" id="awsCalculatorLink" name="awsCalculatorLink" placeholder="https://calculator.aws/...">
+        </div>
+    </form>
+    
+    <button onclick="testFormDataCollection()">Test Form Data Collection</button>
+    <button onclick="fillSampleData()">Fill Sample Data</button>
+    <button onclick="clearForm()">Clear Form</button>
+    
+    <div id="testResults" class="test-results" style="display: none;">
+        <h3>Test Results</h3>
+        <div id="resultsContent"></div>
+    </div>
+
+    <script src="test-form-data-collection.js"></script>
+    <script>
+        // Handle industry "Other" option
+        document.getElementById('industry').addEventListener('change', function() {
+            const otherField = document.getElementById('industryOther');
+            if (this.value === 'Other') {
+                otherField.style.display = 'block';
+            } else {
+                otherField.style.display = 'none';
+                otherField.value = '';
+            }
+        });
+
+        // Test function
+        function testFormDataCollection() {
+            const formData = getFormData();
+            const validation = validateFormData(formData);
+            
+            const resultsDiv = document.getElementById('testResults');
+            const contentDiv = document.getElementById('resultsContent');
+            
+            let html = '<h4>Collected Form Data:</h4>';
+            html += '<pre>' + JSON.stringify(formData, null, 2) + '</pre>';
+            
+            html += '<h4>Validation Results:</h4>';
+            html += '<p><strong>Valid:</strong> <span class="' + (validation.isValid ? 'success' : 'error') + '">' + validation.isValid + '</span></p>';
+            
+            if (validation.errors.length > 0) {
+                html += '<h5 class="error">Errors:</h5><ul>';
+                validation.errors.forEach(error => {
+                    html += '<li class="error">' + error + '</li>';
+                });
+                html += '</ul>';
+            }
+            
+            if (validation.warnings.length > 0) {
+                html += '<h5 class="warning">Warnings:</h5><ul>';
+                validation.warnings.forEach(warning => {
+                    html += '<li class="warning">' + warning + '</li>';
+                });
+                html += '</ul>';
+            }
+            
+            contentDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
+
+        // Fill sample data for testing
+        function fillSampleData() {
+            document.getElementById('CustomerName').value = 'Acme Corporation';
+            document.getElementById('oppName').value = 'Cloud Migration Project';
+            document.getElementById('oppDescription').value = 'Complete migration of legacy systems to AWS cloud infrastructure with modernization of key applications';
+            document.getElementById('region').value = 'us-east-1';
+            
+            // Set future date
+            const futureDate = new Date();
+            futureDate.setMonth(futureDate.getMonth() + 6);
+            document.getElementById('closeDate').value = futureDate.toISOString().split('T')[0];
+            
+            document.getElementById('industry').value = 'Technology';
+            document.getElementById('customerSegment').value = 'Enterprise';
+            document.getElementById('partnerName').value = 'AWS Partner Solutions';
+            document.getElementById('activityFocus').value = 'Migration';
+            document.getElementById('businessDescription').value = 'Modernizing legacy infrastructure to improve scalability and reduce operational costs';
+            document.getElementById('migrationPhase').value = 'Planning';
+            document.getElementById('salesforceLink').value = 'https://example.salesforce.com/opportunity/123';
+            document.getElementById('awsCalculatorLink').value = 'https://calculator.aws/estimate/456';
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('opportunityForm').reset();
+            document.getElementById('industryOther').style.display = 'none';
+            document.getElementById('testResults').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

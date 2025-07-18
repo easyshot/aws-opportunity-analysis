@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Real Data Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .metric {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+        .metric-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .metric-value {
+            color: #007bff;
+            font-size: 1.1em;
+        }
+        .error {
+            color: red;
+            background: #fee;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            background: #efe;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Real Data Connection</h1>
+    <p>This page tests the connection between the frontend and backend to ensure real data is being displayed instead of mock data.</p>
+
+    <div class="test-section">
+        <h2>Test Form</h2>
+        <form id="testForm">
+            <div class="form-group">
+                <label for="CustomerName">Customer Name *</label>
+                <input type="text" id="CustomerName" name="CustomerName" value="Test Customer Inc." required>
+            </div>
+            
+            <div class="form-group">
+                <label for="oppName">Opportunity Name *</label>
+                <input type="text" id="oppName" name="oppName" value="Cloud Migration Project" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="oppDescription">Opportunity Description *</label>
+                <textarea id="oppDescription" name="oppDescription" rows="4" required>Complete migration of legacy systems to AWS cloud infrastructure including database migration, application modernization, and security implementation.</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="region">Region *</label>
+                <select id="region" name="region" required>
+                    <option value="">Select Region</option>
+                    <option value="us-east-1" selected>US East (N. Virginia) - us-east-1</option>
+                    <option value="us-west-2">US West (Oregon) - us-west-2</option>
+                    <option value="eu-west-1">Europe (Ireland) - eu-west-1</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="closeDate">Close Date *</label>
+                <input type="date" id="closeDate" name="closeDate" value="2025-12-31" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="industry">Industry</label>
+                <select id="industry" name="industry">
+                    <option value="">Select Industry</option>
+                    <option value="Technology" selected>Technology</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Financial Services">Financial Services</option>
+                </select>
+            </div>
+        </form>
+        
+        <div style="margin-top: 20px;">
+            <button id="testStandardBtn" onclick="testAnalysis(false)">Test Standard Analysis</button>
+            <button id="testNovaBtn" onclick="testAnalysis(true)">Test Nova Premier Analysis</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="testResults">
+            <p class="loading">Click a test button to see results...</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>API Response Debug</h2>
+        <div id="apiDebug">
+            <p class="loading">API response will appear here...</p>
+        </div>
+    </div>
+
+    <script>
+        async function testAnalysis(useNovaPremier) {
+            const testResults = document.getElementById('testResults');
+            const apiDebug = document.getElementById('apiDebug');
+            const testStandardBtn = document.getElementById('testStandardBtn');
+            const testNovaBtn = document.getElementById('testNovaBtn');
+            
+            // Show loading state
+            testResults.innerHTML = '<p class="loading">Analyzing opportunity...</p>';
+            apiDebug.innerHTML = '<p class="loading">Making API call...</p>';
+            testStandardBtn.disabled = true;
+            testNovaBtn.disabled = true;
+            
+            try {
+                // Get form data
+                const formData = {
+                    CustomerName: document.getElementById('CustomerName').value,
+                    oppName: document.getElementById('oppName').value,
+                    oppDescription: document.getElementById('oppDescription').value,
+                    region: document.getElementById('region').value,
+                    closeDate: document.getElementById('closeDate').value,
+                    industry: document.getElementById('industry').value,
+                    useNovaPremier: useNovaPremier
+                };
+                
+                // Validate required fields
+                const requiredFields = ['CustomerName', 'oppName', 'oppDescription', 'region', 'closeDate'];
+                const missingFields = requiredFields.filter(field => !formData[field]);
+                
+                if (missingFields.length > 0) {
+                    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+                }
+                
+                // Make API call
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const results = await response.json();
+                
+                // Display API response debug
+                apiDebug.innerHTML = `
+                    <div class="success">
+                        <strong>API Call Successful!</strong><br>
+                        Status: ${response.status}<br>
+                        Response Size: ${JSON.stringify(results).length} characters<br>
+                        Analysis Type: ${useNovaPremier ? 'Nova Premier' : 'Standard'}
+                    </div>
+                    <pre style="background: #f5f5f5; padding: 10px; overflow-x: auto; max-height: 300px;">${JSON.stringify(results, null, 2)}</pre>
+                `;
+                
+                // Display results
+                displayResults(results);
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                testResults.innerHTML = `<div class="error"><strong>Test Failed:</strong> ${error.message}</div>`;
+                apiDebug.innerHTML = `<div class="error"><strong>API Error:</strong> ${error.message}</div>`;
+            } finally {
+                testStandardBtn.disabled = false;
+                testNovaBtn.disabled = false;
+            }
+        }
+        
+        function displayResults(results) {
+            const testResults = document.getElementById('testResults');
+            
+            let html = '<div class="success"><strong>Analysis Completed Successfully!</strong></div>';
+            
+            // Display metrics
+            if (results.metrics) {
+                html += '<h3>Projections & Analysis</h3>';
+                html += '<div class="results">';
+                
+                const metrics = results.metrics;
+                
+                html += `
+                    <div class="metric">
+                        <span class="metric-label">Predicted ARR:</span>
+                        <span class="metric-value">${formatCurrency(metrics.predictedArr)}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Predicted MRR:</span>
+                        <span class="metric-value">${formatCurrency(metrics.predictedMrr)}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Launch Date:</span>
+                        <span class="metric-value">${formatDate(metrics.launchDate)}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Time to Launch:</span>
+                        <span class="metric-value">${metrics.timeToLaunch} months</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Confidence Level:</span>
+                        <span class="metric-value">${metrics.confidence}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Top Services:</span>
+                        <span class="metric-value">${metrics.topServices}</span>
+                    </div>
+                `;
+                
+                html += '</div>';
+            }
+            
+            // Display sections
+            if (results.sections) {
+                html += '<h3>Analysis Sections</h3>';
+                html += '<div class="results">';
+                
+                const sections = results.sections;
+                
+                if (sections.analysisMethodology) {
+                    html += `
+                        <div class="metric">
+                            <span class="metric-label">Methodology:</span>
+                            <div style="margin-top: 5px; white-space: pre-wrap;">${sections.analysisMethodology}</div>
+                        </div>
+                    `;
+                }
+                
+                if (sections.detailedFindings) {
+                    html += `
+                        <div class="metric">
+                            <span class="metric-label">Detailed Findings:</span>
+                            <div style="margin-top: 5px; white-space: pre-wrap;">${sections.detailedFindings}</div>
+                        </div>
+                    `;
+                }
+                
+                if (sections.predictionRationale) {
+                    html += `
+                        <div class="metric">
+                            <span class="metric-label">Prediction Rationale:</span>
+                            <div style="margin-top: 5px; white-space: pre-wrap;">${sections.predictionRationale}</div>
+                        </div>
+                    `;
+                }
+                
+                if (sections.riskFactors) {
+                    html += `
+                        <div class="metric">
+                            <span class="metric-label">Risk Factors:</span>
+                            <div style="margin-top: 5px; white-space: pre-wrap;">${sections.riskFactors}</div>
+                        </div>
+                    `;
+                }
+                
+                if (sections.similarProjects) {
+                    html += `
+                        <div class="metric">
+                            <span class="metric-label">Similar Projects:</span>
+                            <div style="margin-top: 5px; white-space: pre-wrap;">${JSON.stringify(sections.similarProjects, null, 2)}</div>
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+            }
+            
+            testResults.innerHTML = html;
+        }
+        
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '<p class="loading">Click a test button to see results...</p>';
+            document.getElementById('apiDebug').innerHTML = '<p class="loading">API response will appear here...</p>';
+        }
+        
+        function formatCurrency(amount) {
+            if (!amount) return '-';
+            const num = parseFloat(amount);
+            if (isNaN(num)) return amount;
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(num);
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return dateString;
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+    </script>
+</body>
+</html> 

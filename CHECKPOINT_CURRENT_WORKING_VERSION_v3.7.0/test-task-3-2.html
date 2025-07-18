@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 3.2 Test - Launch Date and Time to Launch Display</title>
+    <link rel="stylesheet" href="public/styles.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-buttons {
+            margin-bottom: 20px;
+        }
+        .test-button {
+            margin-right: 10px;
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Task 3.2 Test: Launch Date and Time to Launch Display</h1>
+        
+        <div class="test-section">
+            <h2>Test Controls</h2>
+            <div class="test-buttons">
+                <button class="test-button" onclick="testNearFuture()">Test Near Future (30 days)</button>
+                <button class="test-button" onclick="testFarFuture()">Test Far Future (6 months)</button>
+                <button class="test-button" onclick="testPastDate()">Test Past Date</button>
+                <button class="test-button" onclick="testToday()">Test Today</button>
+                <button class="test-button" onclick="clearDisplays()">Clear Displays</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Launch Date and Time to Launch Displays</h2>
+            <div class="projections-grid">
+                <!-- Task 3.2: Enhanced Launch Date Display -->
+                <div class="projection-card launch-date-card">
+                    <h3>Launch Date</h3>
+                    <div class="projection-value" id="projectedLaunchDate">
+                        <span class="value" id="launchDateValue">-</span>
+                        <span class="timeline" id="launchTimeline">Timeline will appear here</span>
+                        <div class="date-details">
+                            <span class="formatted-date" id="launchDateFormatted"></span>
+                            <span class="days-from-now" id="launchDaysFromNow"></span>
+                            <div class="timeline-visualization" id="launchTimelineViz">
+                                <div class="timeline-bar">
+                                    <div class="timeline-progress" id="launchProgress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 3.2: Enhanced Time to Launch Display -->
+                <div class="projection-card time-to-launch-card">
+                    <h3>Time to Launch</h3>
+                    <div class="projection-value" id="projectedTimeToLaunch">
+                        <span class="value" id="timeToLaunchValue">-</span>
+                        <span class="duration" id="launchDuration">Duration details will appear here</span>
+                        <div class="duration-details">
+                            <span class="formatted-duration" id="durationFormatted"></span>
+                            <div class="duration-visualization" id="durationViz">
+                                <div class="duration-bar">
+                                    <div class="duration-segments" id="durationSegments"></div>
+                                </div>
+                                <div class="duration-milestones" id="durationMilestones"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Include the relevant functions from app.js for testing
+        
+        // Task 3.2: Format date appropriately for display
+        function formatDate(dateValue) {
+          if (!dateValue) {
+            return null;
+          }
+          
+          try {
+            const date = new Date(dateValue);
+            if (isNaN(date.getTime())) {
+              return null;
+            }
+            
+            return date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+          } catch (error) {
+            console.error('Error formatting date:', error);
+            return null;
+          }
+        }
+
+        // Task 3.2: Clear launch date display
+        function clearLaunchDateDisplay() {
+          const launchDateValue = document.getElementById('launchDateValue');
+          const launchTimeline = document.getElementById('launchTimeline');
+          const launchDateFormatted = document.getElementById('launchDateFormatted');
+          const launchDaysFromNow = document.getElementById('launchDaysFromNow');
+          const launchProgress = document.getElementById('launchProgress');
+          
+          if (launchDateValue) launchDateValue.textContent = '-';
+          if (launchTimeline) launchTimeline.textContent = 'Timeline will appear here';
+          if (launchDateFormatted) launchDateFormatted.textContent = '';
+          if (launchDaysFromNow) launchDaysFromNow.textContent = '';
+          if (launchProgress) launchProgress.style.width = '0%';
+        }
+
+        // Task 3.2: Clear time to launch display
+        function clearTimeToLaunchDisplay() {
+          const timeToLaunchValue = document.getElementById('timeToLaunchValue');
+          const launchDuration = document.getElementById('launchDuration');
+          const durationFormatted = document.getElementById('durationFormatted');
+          const durationSegments = document.getElementById('durationSegments');
+          const durationMilestones = document.getElementById('durationMilestones');
+          
+          if (timeToLaunchValue) timeToLaunchValue.textContent = '-';
+          if (launchDuration) launchDuration.textContent = 'Duration details will appear here';
+          if (durationFormatted) durationFormatted.textContent = '';
+          if (durationSegments) durationSegments.innerHTML = '';
+          if (durationMilestones) durationMilestones.innerHTML = '';
+        }
+
+        // Task 3.2: Populate launch date display with timeline visualization
+        function populateLaunchDateDisplay(launchDate) {
+          const launchDateValue = document.getElementById('launchDateValue');
+          const launchTimeline = document.getElementById('launchTimeline');
+          const launchDateFormatted = document.getElementById('launchDateFormatted');
+          const launchDaysFromNow = document.getElementById('launchDaysFromNow');
+          const launchProgress = document.getElementById('launchProgress');
+          
+          if (!launchDate) {
+            clearLaunchDateDisplay();
+            return;
+          }
+          
+          try {
+            const targetDate = new Date(launchDate);
+            const currentDate = new Date();
+            const timeDiff = targetDate.getTime() - currentDate.getTime();
+            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            // Format the date appropriately
+            const formattedDate = targetDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            });
+            
+            // Update main value
+            if (launchDateValue) {
+              launchDateValue.textContent = formattedDate;
+            }
+            
+            // Update timeline description
+            if (launchTimeline) {
+              if (daysDiff > 0) {
+                launchTimeline.textContent = `${daysDiff} days from now`;
+              } else if (daysDiff === 0) {
+                launchTimeline.textContent = 'Today';
+              } else {
+                launchTimeline.textContent = `${Math.abs(daysDiff)} days ago`;
+              }
+            }
+            
+            // Update formatted date
+            if (launchDateFormatted) {
+              launchDateFormatted.textContent = targetDate.toLocaleDateString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+              });
+            }
+            
+            // Update days from now with styling
+            if (launchDaysFromNow) {
+              if (daysDiff > 0) {
+                launchDaysFromNow.textContent = `In ${daysDiff} days`;
+                launchDaysFromNow.style.backgroundColor = '#e3f2fd';
+                launchDaysFromNow.style.color = '#1976d2';
+              } else if (daysDiff === 0) {
+                launchDaysFromNow.textContent = 'Today';
+                launchDaysFromNow.style.backgroundColor = '#fff3e0';
+                launchDaysFromNow.style.color = '#f57c00';
+              } else {
+                launchDaysFromNow.textContent = `${Math.abs(daysDiff)} days overdue`;
+                launchDaysFromNow.style.backgroundColor = '#ffebee';
+                launchDaysFromNow.style.color = '#d32f2f';
+              }
+            }
+            
+            // Update timeline progress visualization
+            if (launchProgress) {
+              // Calculate progress based on a typical project timeline (assume 6 months = 180 days)
+              const totalProjectDays = 180;
+              const elapsedDays = totalProjectDays - Math.max(daysDiff, 0);
+              const progressPercentage = Math.min(Math.max((elapsedDays / totalProjectDays) * 100, 0), 100);
+              
+              launchProgress.style.width = `${progressPercentage}%`;
+              
+              // Add animation delay for visual effect
+              setTimeout(() => {
+                launchProgress.style.width = `${progressPercentage}%`;
+              }, 100);
+            }
+            
+          } catch (error) {
+            console.error('Error formatting launch date:', error);
+            clearLaunchDateDisplay();
+          }
+        }
+
+        // Task 3.2: Populate time to launch display with duration visualization
+        function populateTimeToLaunchDisplay(projectDuration, launchDate) {
+          const timeToLaunchValue = document.getElementById('timeToLaunchValue');
+          const launchDuration = document.getElementById('launchDuration');
+          const durationFormatted = document.getElementById('durationFormatted');
+          const durationSegments = document.getElementById('durationSegments');
+          const durationMilestones = document.getElementById('durationMilestones');
+          
+          if (!projectDuration && !launchDate) {
+            clearTimeToLaunchDisplay();
+            return;
+          }
+          
+          try {
+            let durationInMonths = 0;
+            let durationText = '';
+            
+            // Parse duration from different possible formats
+            if (projectDuration) {
+              if (typeof projectDuration === 'string') {
+                // Extract number from strings like "6 months", "12-18 months", etc.
+                const monthMatch = projectDuration.match(/(\d+)(?:-\d+)?\s*months?/i);
+                if (monthMatch) {
+                  durationInMonths = parseInt(monthMatch[1]);
+                  durationText = projectDuration;
+                } else {
+                  // Try to extract any number and assume months
+                  const numberMatch = projectDuration.match(/(\d+)/);
+                  if (numberMatch) {
+                    durationInMonths = parseInt(numberMatch[1]);
+                    durationText = `${durationInMonths} months`;
+                  }
+                }
+              } else if (typeof projectDuration === 'number') {
+                durationInMonths = projectDuration;
+                durationText = `${durationInMonths} months`;
+              }
+            }
+            
+            // If we have launch date but no duration, calculate from current date
+            if (!durationInMonths && launchDate) {
+              const targetDate = new Date(launchDate);
+              const currentDate = new Date();
+              const timeDiff = targetDate.getTime() - currentDate.getTime();
+              const monthsDiff = Math.ceil(timeDiff / (1000 * 3600 * 24 * 30));
+              
+              if (monthsDiff > 0) {
+                durationInMonths = monthsDiff;
+                durationText = `${monthsDiff} months`;
+              }
+            }
+            
+            // Update main value
+            if (timeToLaunchValue) {
+              timeToLaunchValue.textContent = durationText || 'TBD';
+            }
+            
+            // Update duration description
+            if (launchDuration) {
+              if (durationInMonths > 0) {
+                const weeks = Math.round(durationInMonths * 4.33);
+                launchDuration.textContent = `Approximately ${weeks} weeks (${durationInMonths} months)`;
+              } else {
+                launchDuration.textContent = 'Duration details will appear here';
+              }
+            }
+            
+            // Update formatted duration
+            if (durationFormatted) {
+              if (durationInMonths > 0) {
+                const years = Math.floor(durationInMonths / 12);
+                const remainingMonths = durationInMonths % 12;
+                
+                if (years > 0) {
+                  durationFormatted.textContent = `${years} year${years > 1 ? 's' : ''} ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}`;
+                } else {
+                  durationFormatted.textContent = `${durationInMonths} month${durationInMonths !== 1 ? 's' : ''}`;
+                }
+              } else {
+                durationFormatted.textContent = 'Duration TBD';
+              }
+            }
+            
+            // Create duration visualization segments
+            if (durationSegments && durationInMonths > 0) {
+              durationSegments.innerHTML = '';
+              
+              // Define project phases with typical percentages
+              const phases = [
+                { name: 'planning', label: 'Planning', percentage: 20, color: 'planning' },
+                { name: 'development', label: 'Development', percentage: 50, color: 'development' },
+                { name: 'testing', label: 'Testing', percentage: 20, color: 'testing' },
+                { name: 'deployment', label: 'Deployment', percentage: 10, color: 'deployment' }
+              ];
+              
+              phases.forEach(phase => {
+                const segment = document.createElement('div');
+                segment.className = `duration-segment ${phase.color}`;
+                segment.style.width = `${phase.percentage}%`;
+                segment.title = `${phase.label} (${phase.percentage}%)`;
+                durationSegments.appendChild(segment);
+              });
+              
+              // Add animation
+              setTimeout(() => {
+                phases.forEach((phase, index) => {
+                  const segment = durationSegments.children[index];
+                  if (segment) {
+                    segment.style.opacity = '1';
+                    segment.style.transform = 'scaleX(1)';
+                  }
+                });
+              }, 200);
+            }
+            
+            // Create milestones
+            if (durationMilestones && durationInMonths > 0) {
+              durationMilestones.innerHTML = '';
+              
+              const milestones = [
+                { name: 'Start', status: 'completed' },
+                { name: 'Planning', status: 'completed' },
+                { name: 'Development', status: 'current' },
+                { name: 'Testing', status: 'pending' },
+                { name: 'Launch', status: 'pending' }
+              ];
+              
+              milestones.forEach(milestone => {
+                const milestoneDiv = document.createElement('div');
+                milestoneDiv.className = `milestone ${milestone.status}`;
+                
+                const dot = document.createElement('div');
+                dot.className = 'milestone-dot';
+                
+                const label = document.createElement('span');
+                label.textContent = milestone.name;
+                label.style.fontSize = '0.7em';
+                
+                milestoneDiv.appendChild(dot);
+                milestoneDiv.appendChild(label);
+                durationMilestones.appendChild(milestoneDiv);
+              });
+            }
+            
+          } catch (error) {
+            console.error('Error formatting time to launch:', error);
+            clearTimeToLaunchDisplay();
+          }
+        }
+
+        // Test functions
+        function testNearFuture() {
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + 30);
+            populateLaunchDateDisplay(futureDate.toISOString());
+            populateTimeToLaunchDisplay('1 month', futureDate.toISOString());
+        }
+
+        function testFarFuture() {
+            const futureDate = new Date();
+            futureDate.setMonth(futureDate.getMonth() + 6);
+            populateLaunchDateDisplay(futureDate.toISOString());
+            populateTimeToLaunchDisplay('6 months', futureDate.toISOString());
+        }
+
+        function testPastDate() {
+            const pastDate = new Date();
+            pastDate.setDate(pastDate.getDate() - 15);
+            populateLaunchDateDisplay(pastDate.toISOString());
+            populateTimeToLaunchDisplay('Overdue', pastDate.toISOString());
+        }
+
+        function testToday() {
+            const today = new Date();
+            populateLaunchDateDisplay(today.toISOString());
+            populateTimeToLaunchDisplay('0 months', today.toISOString());
+        }
+
+        function clearDisplays() {
+            clearLaunchDateDisplay();
+            clearTimeToLaunchDisplay();
+        }
+
+        // Initialize with clear displays
+        clearDisplays();
+    </script>
+</body>
+</html>

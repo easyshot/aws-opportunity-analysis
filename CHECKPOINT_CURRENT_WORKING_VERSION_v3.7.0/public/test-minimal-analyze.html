@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Analyze Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; }
+        input, select, textarea { width: 300px; padding: 5px; }
+        button { padding: 10px 20px; margin: 10px 5px; }
+        #result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Minimal Analyze Test</h1>
+    
+    <div class="form-group">
+        <label>Customer Name:</label>
+        <input type="text" id="customerName" value="Test Customer">
+    </div>
+    
+    <div class="form-group">
+        <label>Region:</label>
+        <select id="region">
+            <option value="United States">United States</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label>Close Date:</label>
+        <input type="date" id="closeDate" value="2025-12-31">
+    </div>
+    
+    <div class="form-group">
+        <label>Opportunity Name:</label>
+        <input type="text" id="opportunityName" value="Test Opportunity">
+    </div>
+    
+    <div class="form-group">
+        <label>Description:</label>
+        <textarea id="description">This is a comprehensive test description that contains more than fifty characters to meet the validation requirements for the opportunity analysis system.</textarea>
+    </div>
+    
+    <button onclick="directAnalyze()">Direct API Call</button>
+    <button onclick="loadSampleAndAnalyze()">Load Sample & Analyze</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        function directAnalyze() {
+            console.log('Direct analyze called');
+            
+            const formData = {
+                customerName: document.getElementById('customerName').value,
+                region: document.getElementById('region').value,
+                closeDate: document.getElementById('closeDate').value,
+                opportunityName: document.getElementById('opportunityName').value,
+                description: document.getElementById('description').value
+            };
+            
+            console.log('Sending data:', formData);
+            
+            fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                console.log('Response received:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data received:', data);
+                document.getElementById('result').innerHTML = `
+                    <h3>Success!</h3>
+                    <p><strong>Predicted ARR:</strong> ${data.metrics?.predictedArr || 'N/A'}</p>
+                    <p><strong>Predicted MRR:</strong> ${data.metrics?.predictedMrr || 'N/A'}</p>
+                    <p><strong>Launch Date:</strong> ${data.metrics?.launchDate || 'N/A'}</p>
+                    <p><strong>Confidence:</strong> ${data.metrics?.confidence || 'N/A'}</p>
+                    <details>
+                        <summary>Full Response</summary>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </details>
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            });
+        }
+        
+        function loadSampleAndAnalyze() {
+            // Load sample data
+            document.getElementById('customerName').value = 'NextGen Automotive Solutions';
+            document.getElementById('region').value = 'United States';
+            document.getElementById('closeDate').value = '2025-12-20';
+            document.getElementById('opportunityName').value = 'Autonomous Vehicle Data Platform';
+            document.getElementById('description').value = 'Revolutionary autonomous vehicle data processing and analytics platform supporting real-time decision making for self-driving car fleet. System must process 10TB+ of sensor data daily from 5,000+ vehicles, provide millisecond response times for safety-critical decisions, implement advanced computer vision and machine learning algorithms, and ensure 99.999% uptime for mission-critical operations.';
+            
+            // Then analyze
+            directAnalyze();
+        }
+    </script>
+</body>
+</html>

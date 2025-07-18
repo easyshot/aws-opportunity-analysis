@@ -63,8 +63,9 @@
 ### Current Active Interface
 
 - **Primary Interface**: Partner Opportunity Intelligence page at `http://localhost:3123/` (fully functional)
-- **Main JavaScript**: `public/app-clean-fixed.js` with enhanced debug panels and SQL validation
+- **Main JavaScript**: `public/app-clean-fixed.js` with enhanced debug panels, SQL validation, sound notifications, and data consistency fixes
 - **Styling**: Modern CSS with animations, gradients, and responsive design
+- **Enhanced Debug Integration**: `public/enhanced-debug-integration.js` with separated SQL and analysis debug sections
 
 ### UI Options Available
 
@@ -82,13 +83,17 @@
 - **Responsive Design**: Mobile-first approach with flexible layouts
 - **Modern CSS**: CSS Grid, Flexbox, custom properties, and animations
 - **Accessibility**: ARIA labels, keyboard navigation, and screen reader support
+- **Sound Notification System**: Visual completion notifications with user-configurable toggle
 - **Enhanced Debug Information Panels**: Comprehensive debugging interface featuring:
+  - **Separated Debug Sections**: Clear distinction between SQL generation and analysis generation processes
   - **Query Results Statistics**: Row count, character count, and data size tracking
   - **Interactive Table View**: Spreadsheet-like display with toggle controls
   - **Real-time Data Monitoring**: Live updates of query metrics and payload sizes
   - **Truncation Visibility**: Clear indication of data truncation with size management
   - **Multi-format Display**: Toggle between raw JSON and formatted table views
   - **SQL Validation Feedback**: Real-time display of SQL corrections and syntax fixes
+  - **Model ID Accuracy**: Correct model identification for each process type
+  - **Data Consistency**: Accurate MRR extraction and payload field mapping
 
 ### JavaScript Architecture
 
@@ -99,6 +104,8 @@
 - **Error Handling**: Comprehensive error handling with user-friendly messages
 - **Loading States**: Visual feedback during processing with animated indicators
 - **Debug Integration**: Real-time data flow tracing and payload inspection
+- **Sound Notifications**: Visual completion notifications with user control
+- **Data Consistency**: Fixed MRR extraction and analysis payload field mapping
 
 ## Build & Run Commands
 
@@ -203,7 +210,7 @@ DEBUG_LOG_LEVEL=info
 
 ## Application URLs
 
-- **Main Application**: `http://localhost:3123/` (Partner Opportunity Intelligence page with enhanced debug features)
+- **Main Application**: `http://localhost:3123/` (Partner Opportunity Intelligence page with enhanced debug features and sound notifications)
 - **Alternative Options**:
   - Option A: `http://localhost:3123/index-compact-option-a.html` (Clean Professional)
   - Option B: `http://localhost:3123/index-compact-option-b.html` (Enhanced Interactive)
@@ -225,7 +232,8 @@ DEBUG_LOG_LEVEL=info
 - **Dedicated Sections**: Separate Funding Options and Follow-On Opportunities sections
 - **Top AWS Services**: Interactive service cards with icons, costs, and descriptions
 - **Confidence Assessment**: Animated gauge with color-coded confidence levels (0-100%)
-- **Debug Information**: Real-time display of data flow and processing steps
+- **Debug Information**: Real-time display of data flow and processing steps with separated sections
+- **Sound Notifications**: Visual completion notifications with user control
 
 ## Performance Optimizations
 
@@ -236,6 +244,7 @@ DEBUG_LOG_LEVEL=info
 - **Caching Strategy**: localStorage for form data and intelligent API caching
 - **Debug Performance**: Optimized debug information display without impacting user experience
 - **SQL Validation**: Automatic correction of AI-generated SQL syntax errors for improved reliability
+- **Sound System**: Visual notifications optimized for accessibility and performance
 
 ## Browser Compatibility
 
@@ -248,36 +257,6 @@ DEBUG_LOG_LEVEL=info
 
 - **Primary Interface**: Partner Opportunity Intelligence page at `http://localhost:3123/` for all development
 - **Testing**: All three UI options maintained for comparison and testing
-- **Debugging**: app-debug.js provides development backend with comprehensive mock data for testing
-- **Hot Reload**: nodemon for automatic server restart during development
-- **Data Flow Tracing**: Real-time visibility into SQL queries, query results, and Bedrock payloads
-- **SQL Validation**: Real-time detection and correction of SQL syntax errors
-
-## Debugging and Troubleshooting
-
-### Frontend Debug Features
-
-- **Enhanced Debug Panels**: Comprehensive debugging interface with advanced capabilities:
-  - **Query Results Analysis**: Row count, character count, and data size tracking
-  - **Interactive Table View**: Spreadsheet-like display with sortable columns and pagination
-  - **Real-time Statistics**: Live monitoring of data metrics and payload sizes
-  - **Truncation Management**: Intelligent data truncation with visibility into size limits
-  - **Multi-format Display**: Toggle between raw JSON and formatted table views
-  - **SQL Validation Feedback**: Real-time display of SQL corrections and syntax fixes
-- **Data Flow Visualization**: End-to-end tracing from user input to analysis results
-- **Error Identification**: Clear identification of where data flow breaks down
-- **Payload Inspection**: Detailed view of what data is sent to and received from Bedrock
-
-### Backend Debug Features
-
-- **Enhanced Logging**: Comprehensive debug output in automation scripts
-- **Payload Capture**: Complete capture of data sent to and received from AWS services
-- **Error Tracing**: Detailed error tracking with context and stack traces
-- **Performance Monitoring**: Real-time performance metrics and bottlenecks
-- **SQL Validation Logging**: Real-time logging of SQL syntax corrections and fixes
-
-### Operational Debugging
-
-- **Health Checks**: Automated service health monitoring and diagnostics
-- **Connectivity Validation**: AWS service connectivity testing and validation
-- **SQL Validation Monitoring**: Real-time monitoring of SQL syntax correction effectiveness
+- **Debug Integration**: Enhanced debug rebuild with separated SQL and analysis sections
+- **Sound Notifications**: Visual completion notifications with user control
+- **Data Consistency**: Fixed MRR extraction and analysis payload field mapping

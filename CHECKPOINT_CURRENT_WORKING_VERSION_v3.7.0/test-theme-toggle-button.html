@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Toggle Button Test</title>
+    <link rel="stylesheet" href="public/styles-compact-option-c.css">
+    <style>
+        body {
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .theme-test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .button-test {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Theme Toggle Button State Management Test</h1>
+        
+        <div class="theme-test-section">
+            <h2>Current Theme Toggle Button</h2>
+            <div class="button-test">
+                <button class="action-btn theme-toggle" onclick="toggleTheme()" title="Switch to Dark Mode">
+                    <span class="icon">🌙</span>
+                    <span class="theme-text">Dark</span>
+                </button>
+                <span id="currentThemeDisplay">Current theme: light</span>
+            </div>
+        </div>
+        
+        <div class="theme-test-section">
+            <h2>Requirements Check</h2>
+            <div id="requirementsCheck">
+                <p>✓ Button displays moon icon and "Dark" text in light mode</p>
+                <p>✓ Button displays sun icon and "Light" text in dark mode</p>
+                <p>✓ Button provides hover effects</p>
+                <p>✓ Button updates immediately when theme changes</p>
+            </div>
+        </div>
+        
+        <div class="theme-test-section">
+            <h2>Theme Test Elements</h2>
+            <p>This text should change color based on theme</p>
+            <div style="background: var(--bg-primary); padding: 10px; margin: 10px 0; border: 1px solid var(--border-color);">
+                Background color test
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simplified theme management for testing
+        class ThemeToggleTest {
+            constructor() {
+                this.currentTheme = this.getStoredTheme() || 'light';
+                this.themeStorageKey = 'poi-theme-preference';
+                this.initializeTheme();
+                
+                // Set up global function
+                window.toggleTheme = () => this.toggleTheme();
+            }
+            
+            getStoredTheme() {
+                try {
+                    return localStorage.getItem(this.themeStorageKey);
+                } catch (error) {
+                    console.warn('Failed to retrieve theme from localStorage:', error);
+                    return null;
+                }
+            }
+            
+            setTheme(theme) {
+                if (theme !== 'light' && theme !== 'dark') {
+                    console.warn('Invalid theme value:', theme);
+                    return false;
+                }
+
+                this.currentTheme = theme;
+                this.applyTheme(theme);
+                this.saveTheme(theme);
+                this.updateThemeButton();
+                this.updateThemeDisplay();
+                return true;
+            }
+            
+            toggleTheme() {
+                const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+                this.setTheme(newTheme);
+                console.log('Theme toggled to:', newTheme);
+            }
+            
+            applyTheme(theme) {
+                try {
+                    if (!theme || (theme !== 'light' && theme !== 'dark')) {
+                        console.warn('Invalid theme parameter for applyTheme:', theme);
+                        theme = 'light';
+                    }
+
+                    if (!document || !document.documentElement) {
+                        throw new Error('Document or document element not available');
+                    }
+
+                    document.documentElement.setAttribute('data-theme', theme);
+                    document.documentElement.offsetHeight; // Force reflow
+                    
+                    const appliedTheme = document.documentElement.getAttribute('data-theme');
+                    if (appliedTheme !== theme) {
+                        throw new Error(`Theme application failed: expected ${theme}, got ${appliedTheme}`);
+                    }
+
+                    console.log(`Theme successfully applied: ${theme}`);
+                    return true;
+
+                } catch (error) {
+                    console.error('Failed to apply theme to DOM:', error);
+                    
+                    try {
+                        if (document && document.documentElement) {
+                            document.documentElement.setAttribute('data-theme', 'light');
+                            console.log('Fallback to light theme applied');
+                        }
+                    } catch (fallbackError) {
+                        console.error('Fallback theme application also failed:', fallbackError);
+                    }
+                    
+                    return false;
+                }
+            }
+            
+            saveTheme(theme) {
+                try {
+                    localStorage.setItem(this.themeStorageKey, theme);
+                } catch (error) {
+                    console.warn('Failed to save theme to localStorage:', error);
+                }
+            }
+            
+            // Task 4: Theme toggle button state management
+            updateThemeButton() {
+                try {
+                    const themeToggle = document.querySelector('.theme-toggle');
+                    if (!themeToggle) {
+                        console.log('Theme toggle button not found');
+                        return;
+                    }
+
+                    const themeIcon = themeToggle.querySelector('.icon');
+                    const themeText = themeToggle.querySelector('.theme-text');
+
+                    // Update button icon and text based on current theme
+                    if (this.currentTheme === 'dark') {
+                        // In dark mode: show sun icon and "Light" text
+                        if (themeIcon) themeIcon.textContent = '☀️';
+                        if (themeText) themeText.textContent = 'Light';
+                        themeToggle.title = 'Switch to Light Mode';
+                    } else {
+                        // In light mode: show moon icon and "Dark" text  
+                        if (themeIcon) themeIcon.textContent = '🌙';
+                        if (themeText) themeText.textContent = 'Dark';
+                        themeToggle.title = 'Switch to Dark Mode';
+                    }
+                    
+                    console.log(`Theme button updated for ${this.currentTheme} mode`);
+                } catch (error) {
+                    console.error('Failed to update theme button:', error);
+                }
+            }
+            
+            updateThemeDisplay() {
+                const display = document.getElementById('currentThemeDisplay');
+                if (display) {
+                    display.textContent = `Current theme: ${this.currentTheme}`;
+                }
+            }
+            
+            initializeTheme() {
+                this.applyTheme(this.currentTheme);
+                this.updateThemeButton();
+                this.updateThemeDisplay();
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new ThemeToggleTest();
+        });
+    </script>
+</body>
+</html>

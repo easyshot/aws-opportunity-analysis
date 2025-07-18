@@ -1,0 +1,160 @@
+{
+  "Comment": "AWS Opportunity Analysis Follow-On Opportunities Workflow",
+  "StartAt": "ValidateInput",
+  "States": {
+    "ValidateInput": {
+      "Type": "Pass",
+      "Comment": "Validate input parameters for follow-on analysis",
+      "Parameters": {
+        "opportunityDetails.$": "$.opportunityDetails",
+        "analysisResults.$": "$.analysisResults",
+        "validated": true
+      },
+      "Next": "GenerateFollowOnQuery"
+    },
+    "GenerateFollowOnQuery": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Comment": "Generate SQL query for follow-on opportunities",
+      "Parameters": {
+        "FunctionName": "${FollowOnQueryLambdaArn}",
+        "Payload": {
+          "CustomerName.$": "$.opportunityDetails.CustomerName",
+          "region.$": "$.opportunityDetails.region",
+          "closeDate.$": "$.opportunityDetails.closeDate",
+          "oppName.$": "$.opportunityDetails.oppName",
+          "oppDescription.$": "$.opportunityDetails.oppDescription"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "FollowOnQueryFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "ResultPath": "$.followOnQueryResult",
+      "Next": "ExecuteFollowOnQuery"
+    },
+    "ExecuteFollowOnQuery": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Comment": "Execute follow-on query to retrieve relevant data",
+      "Parameters": {
+        "FunctionName": "${DataRetrievalLambdaArn}",
+        "Payload": {
+          "query.$": "$.followOnQueryResult.Payload.processResults"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "FollowOnDataRetrievalFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "ResultPath": "$.followOnDataResult",
+      "Next": "AnalyzeFollowOnOpportunities"
+    },
+    "AnalyzeFollowOnOpportunities": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Comment": "Analyze follow-on opportunities using Bedrock",
+      "Parameters": {
+        "FunctionName": "${FollowOnAnalysisLambdaArn}",
+        "Payload": {
+          "CustomerName.$": "$.opportunityDetails.CustomerName",
+          "region.$": "$.opportunityDetails.region",
+          "oppName.$": "$.opportunityDetails.oppName",
+          "oppDescription.$": "$.opportunityDetails.oppDescription",
+          "queryResults.$": "$.followOnDataResult.Payload.processResults",
+          "analysisResults.$": "$.analysisResults"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "FollowOnAnalysisFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "ResultPath": "$.followOnAnalysisResult",
+      "Next": "FormatFollowOnResults"
+    },
+    "FormatFollowOnResults": {
+      "Type": "Pass",
+      "Comment": "Format follow-on analysis results",
+      "Parameters": {
+        "status": "success",
+        "followOnAnalysis.$": "$.followOnAnalysisResult.Payload.followOnAnalysis",
+        "orchestrationType": "step-functions",
+        "executionArn.$": "$$.Execution.Name",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    },
+    "FollowOnQueryFailed": {
+      "Type": "Pass",
+      "Comment": "Handle follow-on query generation failure",
+      "Parameters": {
+        "status": "error",
+        "error": "Follow-on query generation failed",
+        "message.$": "$.error.Cause",
+        "orchestrationType": "step-functions",
+        "failedAt": "FollowOnQueryGeneration",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    },
+    "FollowOnDataRetrievalFailed": {
+      "Type": "Pass",
+      "Comment": "Handle follow-on data retrieval failure",
+      "Parameters": {
+        "status": "error",
+        "error": "Follow-on data retrieval failed",
+        "message.$": "$.error.Cause",
+        "orchestrationType": "step-functions",
+        "failedAt": "FollowOnDataRetrieval",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    },
+    "FollowOnAnalysisFailed": {
+      "Type": "Pass",
+      "Comment": "Handle follow-on analysis failure",
+      "Parameters": {
+        "status": "error",
+        "error": "Follow-on analysis failed",
+        "message.$": "$.error.Cause",
+        "orchestrationType": "step-functions",
+        "failedAt": "FollowOnAnalysis",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    }
+  }
+}

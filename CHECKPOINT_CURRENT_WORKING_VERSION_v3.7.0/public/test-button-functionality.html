@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Functionality Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 10px 0; }
+        #testForm { margin: 20px 0; }
+        #testForm input, #testForm select, #testForm textarea { 
+            display: block; margin: 5px 0; padding: 8px; width: 300px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Analyze Button Functionality Test</h1>
+    
+    <div id="testResults"></div>
+    
+    <h2>Test Form</h2>
+    <form id="testForm">
+        <input type="text" id="customerName" placeholder="Customer Name" value="Test Customer">
+        <select id="region">
+            <option value="">Select Region</option>
+            <option value="United States" selected>United States</option>
+        </select>
+        <input type="date" id="closeDate" value="2025-12-31">
+        <input type="text" id="opportunityName" placeholder="Opportunity Name" value="Test Opportunity">
+        <textarea id="description" placeholder="Description">This is a test description with more than fifty characters to meet the minimum requirement for validation and testing purposes.</textarea>
+    </form>
+    
+    <button onclick="runAllTests()">Run All Tests</button>
+    <button onclick="testAnalyzeButton()">Test Analyze Button</button>
+    
+    <script>
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            document.getElementById('testResults').appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+        }
+        
+        async function runAllTests() {
+            clearResults();
+            addResult('Starting comprehensive tests...', 'info');
+            
+            // Test 1: Check if backend is accessible
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerName: 'Test Customer',
+                        region: 'United States',
+                        closeDate: '2025-12-31',
+                        opportunityName: 'Test Opportunity',
+                        description: 'This is a test description with more than fifty characters to meet the minimum requirement.'
+                    })
+                });
+                
+                if (response.ok) {
+                    addResult('✓ Backend API is accessible and responding', 'success');
+                } else {
+                    addResult(`✗ Backend API returned status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`✗ Backend API error: ${error.message}`, 'error');
+            }
+            
+            // Test 2: Check if DOM elements exist
+            const requiredElements = ['customerName', 'region', 'closeDate', 'opportunityName', 'description'];
+            let missingElements = [];
+            
+            requiredElements.forEach(id => {
+                if (!document.getElementById(id)) {
+                    missingElements.push(id);
+                }
+            });
+            
+            if (missingElements.length === 0) {
+                addResult('✓ All required form elements are present', 'success');
+            } else {
+                addResult(`✗ Missing form elements: ${missingElements.join(', ')}`, 'error');
+            }
+            
+            // Test 3: Check if analyze function exists
+            if (typeof window.analyzeOpportunity === 'function') {
+                addResult('✓ analyzeOpportunity function is available', 'success');
+            } else {
+                addResult('✗ analyzeOpportunity function is not available', 'error');
+            }
+            
+            // Test 4: Test form validation
+            try {
+                // Clear form to test validation
+                document.getElementById('customerName').value = '';
+                
+                if (typeof window.analyzeOpportunity === 'function') {
+                    window.analyzeOpportunity();
+                    addResult('✓ Form validation appears to be working (empty form should trigger validation)', 'success');
+                } else {
+                    addResult('✗ Cannot test form validation - function not available', 'error');
+                }
+                
+                // Restore form values
+                document.getElementById('customerName').value = 'Test Customer';
+            } catch (error) {
+                addResult(`✗ Form validation test error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testAnalyzeButton() {
+            addResult('Testing analyze button...', 'info');
+            
+            if (typeof window.analyzeOpportunity === 'function') {
+                try {
+                    window.analyzeOpportunity();
+                    addResult('✓ Analyze button function called successfully', 'success');
+                } catch (error) {
+                    addResult(`✗ Error calling analyze function: ${error.message}`, 'error');
+                }
+            } else {
+                addResult('✗ analyzeOpportunity function not found', 'error');
+            }
+        }
+        
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>

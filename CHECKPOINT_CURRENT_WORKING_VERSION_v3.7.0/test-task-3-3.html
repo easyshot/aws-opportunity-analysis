@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 3.3 Test - Confidence Level and Top Services Display</title>
+    <link rel="stylesheet" href="public/styles.css">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button.clear {
+            background: #6c757d;
+        }
+        .projections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Task 3.3 Test - Enhanced Confidence Level and Top Services Display</h1>
+        
+        <div class="test-section">
+            <h2>Test Controls</h2>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="testHighConfidence()" class="test-button">Test High Confidence</button>
+                <button onclick="testMediumConfidence()" class="test-button">Test Medium Confidence</button>
+                <button onclick="testLowConfidence()" class="test-button">Test Low Confidence</button>
+                <button onclick="testTopServices()" class="test-button">Test Top Services</button>
+                <button onclick="testCompleteData()" class="test-button">Test Complete Data</button>
+                <button onclick="clearDisplays()" class="test-button clear">Clear Displays</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Enhanced Displays</h2>
+            <div class="projections-grid">
+                <!-- Task 3.3: Enhanced Confidence Level Display -->
+                <div class="projection-card confidence-card">
+                    <h3>Confidence Level</h3>
+                    <div class="projection-value" id="projectedConfidence">
+                        <span class="value confidence-level" id="confidenceValue">-</span>
+                        <div class="confidence-details">
+                            <div class="confidence-indicator" id="confidenceIndicator">
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" id="confidenceFill"></div>
+                                </div>
+                                <span class="confidence-percentage" id="confidencePercentage"></span>
+                            </div>
+                            <div class="confidence-factors" id="confidenceFactorsDisplay">
+                                <span class="factors-label">Key factors will appear here</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 3.3: Enhanced Top Services Display -->
+                <div class="projection-card full-width services-card">
+                    <h3>Top Services</h3>
+                    <div class="projection-value" id="projectedTopServices">
+                        <div class="services-list" id="servicesList">
+                            <div class="services-placeholder">Top AWS services with estimated costs will appear here</div>
+                            <div class="services-structured" id="servicesStructured" style="display: none;">
+                                <!-- Services will be populated dynamically -->
+                            </div>
+                        </div>
+                        <div class="services-summary" id="servicesSummary" style="display: none;">
+                            <div class="total-estimated-cost" id="totalEstimatedCost"></div>
+                            <div class="services-count" id="servicesCount"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="testResults" style="background: #f8f9fa; padding: 15px; border-radius: 4px; font-family: monospace; white-space: pre-wrap;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Include the necessary functions from app.js
+        
+        // Helper function to format currency
+        function formatCurrency(value) {
+            if (!value || isNaN(parseFloat(value))) {
+                return '$0';
+            }
+            
+            const numValue = parseFloat(value);
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(numValue);
+        }
+
+        // Task 3.3: Clear confidence display
+        function clearConfidenceDisplay() {
+            const confidenceValue = document.getElementById('confidenceValue');
+            const confidenceFill = document.getElementById('confidenceFill');
+            const confidencePercentage = document.getElementById('confidencePercentage');
+            const confidenceFactorsDisplay = document.getElementById('confidenceFactorsDisplay');
+            
+            if (confidenceValue) {
+                confidenceValue.textContent = '-';
+                confidenceValue.className = 'value confidence-level';
+            }
+            if (confidenceFill) {
+                confidenceFill.style.width = '0%';
+                confidenceFill.className = 'confidence-fill';
+            }
+            if (confidencePercentage) confidencePercentage.textContent = '';
+            if (confidenceFactorsDisplay) {
+                confidenceFactorsDisplay.innerHTML = '<span class="factors-label">Key factors will appear here</span>';
+            }
+        }
+
+        // Task 3.3: Clear top services display
+        function clearTopServicesDisplay() {
+            const servicesStructured = document.getElementById('servicesStructured');
+            const servicesSummary = document.getElementById('servicesSummary');
+            const servicesPlaceholder = document.querySelector('.services-placeholder');
+            
+            if (servicesStructured) {
+                servicesStructured.style.display = 'none';
+                servicesStructured.innerHTML = '';
+            }
+            if (servicesSummary) {
+                servicesSummary.style.display = 'none';
+                servicesSummary.innerHTML = '';
+            }
+            if (servicesPlaceholder) {
+                servicesPlaceholder.style.display = 'block';
+            }
+        }
+
+        // Task 3.3: Populate confidence display with visual indicators
+        function populateConfidenceDisplay(confidenceLevel, confidenceScore, confidenceFactors) {
+            const confidenceValue = document.getElementById('confidenceValue');
+            const confidenceFill = document.getElementById('confidenceFill');
+            const confidencePercentage = document.getElementById('confidencePercentage');
+            const confidenceFactorsDisplay = document.getElementById('confidenceFactorsDisplay');
+            
+            if (!confidenceLevel && !confidenceScore) {
+                clearConfidenceDisplay();
+                return;
+            }
+            
+            // Normalize confidence level
+            const normalizedLevel = (confidenceLevel || 'MEDIUM').toUpperCase();
+            const score = confidenceScore || getDefaultConfidenceScore(normalizedLevel);
+            
+            // Update confidence level with color coding
+            if (confidenceValue) {
+                confidenceValue.textContent = normalizedLevel;
+                confidenceValue.className = `value confidence-level ${normalizedLevel}`;
+            }
+            
+            // Update confidence bar with visual indicator
+            if (confidenceFill) {
+                confidenceFill.style.width = `${score}%`;
+                confidenceFill.className = `confidence-fill ${normalizedLevel}`;
+                
+                // Add animation delay for visual effect
+                setTimeout(() => {
+                    confidenceFill.style.width = `${score}%`;
+                }, 100);
+            }
+            
+            // Update confidence percentage
+            if (confidencePercentage) {
+                confidencePercentage.textContent = `${score}%`;
+            }
+            
+            // Update confidence factors
+            if (confidenceFactorsDisplay) {
+                if (confidenceFactors && Array.isArray(confidenceFactors) && confidenceFactors.length > 0) {
+                    const factorsHTML = confidenceFactors.map(factor => 
+                        `<span class="confidence-factor-item">${factor}</span>`
+                    ).join('');
+                    confidenceFactorsDisplay.innerHTML = `
+                        <span class="factors-label">Key Confidence Factors:</span>
+                        ${factorsHTML}
+                    `;
+                } else {
+                    // Default factors based on confidence level
+                    const defaultFactors = getDefaultConfidenceFactors(normalizedLevel);
+                    const factorsHTML = defaultFactors.map(factor => 
+                        `<span class="confidence-factor-item">${factor}</span>`
+                    ).join('');
+                    confidenceFactorsDisplay.innerHTML = `
+                        <span class="factors-label">Key Confidence Factors:</span>
+                        ${factorsHTML}
+                    `;
+                }
+            }
+        }
+
+        // Task 3.3: Populate top services display with structured formatting
+        function populateTopServicesDisplay(topServices, servicesData) {
+            const servicesStructured = document.getElementById('servicesStructured');
+            const servicesSummary = document.getElementById('servicesSummary');
+            const servicesPlaceholder = document.querySelector('.services-placeholder');
+            
+            if (!topServices && !servicesData) {
+                clearTopServicesDisplay();
+                return;
+            }
+            
+            // Parse services data
+            let services = [];
+            
+            if (servicesData && Array.isArray(servicesData)) {
+                services = servicesData;
+            } else if (topServices) {
+                // Parse from string format if needed
+                services = parseServicesFromString(topServices);
+            }
+            
+            if (services.length === 0) {
+                clearTopServicesDisplay();
+                return;
+            }
+            
+            // Hide placeholder and show structured display
+            if (servicesPlaceholder) {
+                servicesPlaceholder.style.display = 'none';
+            }
+            
+            // Populate structured services list
+            if (servicesStructured) {
+                const servicesHTML = services.map(service => `
+                    <div class="service-item">
+                        <div class="service-info">
+                            <div class="service-name">${service.name || service.service || 'Unknown Service'}</div>
+                            <div class="service-description">${service.description || service.details || ''}</div>
+                        </div>
+                        <div class="service-cost">${formatCurrency(service.cost || service.estimatedCost || 0)}</div>
+                    </div>
+                `).join('');
+                
+                servicesStructured.innerHTML = servicesHTML;
+                servicesStructured.style.display = 'grid';
+            }
+            
+            // Calculate and display summary
+            if (servicesSummary) {
+                const totalCost = services.reduce((sum, service) => {
+                    const cost = service.cost || service.estimatedCost || 0;
+                    return sum + (typeof cost === 'number' ? cost : parseFloat(cost) || 0);
+                }, 0);
+                
+                servicesSummary.innerHTML = `
+                    <div class="total-estimated-cost">Total Estimated: ${formatCurrency(totalCost)}</div>
+                    <div class="services-count">${services.length} service${services.length !== 1 ? 's' : ''}</div>
+                `;
+                servicesSummary.style.display = 'flex';
+            }
+        }
+
+        // Helper function to get default confidence score based on level
+        function getDefaultConfidenceScore(level) {
+            switch (level) {
+                case 'HIGH': return 85;
+                case 'MEDIUM': return 65;
+                case 'LOW': return 35;
+                default: return 50;
+            }
+        }
+
+        // Helper function to get default confidence factors
+        function getDefaultConfidenceFactors(level) {
+            const factors = {
+                'HIGH': [
+                    'Strong historical data match',
+                    'Similar customer profile',
+                    'Proven service combination',
+                    'Consistent market trends'
+                ],
+                'MEDIUM': [
+                    'Moderate historical data',
+                    'Some customer similarities',
+                    'Standard service patterns',
+                    'General market alignment'
+                ],
+                'LOW': [
+                    'Limited historical data',
+                    'Unique customer profile',
+                    'Novel service combination',
+                    'Uncertain market conditions'
+                ]
+            };
+            
+            return factors[level] || factors['MEDIUM'];
+        }
+
+        // Helper function to parse services from string format
+        function parseServicesFromString(servicesString) {
+            if (!servicesString || typeof servicesString !== 'string') {
+                return [];
+            }
+            
+            try {
+                // Try to parse as JSON first
+                if (servicesString.trim().startsWith('[') || servicesString.trim().startsWith('{')) {
+                    return JSON.parse(servicesString);
+                }
+                
+                // Parse from common text formats
+                const services = [];
+                const lines = servicesString.split('\n').filter(line => line.trim());
+                
+                for (const line of lines) {
+                    // Look for patterns like "Service Name - $cost" or "Service Name: description ($cost)"
+                    const costMatch = line.match(/\$[\d,]+(?:\.\d{2})?/);
+                    const cost = costMatch ? parseFloat(costMatch[0].replace(/[$,]/g, '')) : 0;
+                    
+                    let name = line.replace(/\$[\d,]+(?:\.\d{2})?.*$/, '').trim();
+                    name = name.replace(/^[-•*]\s*/, ''); // Remove bullet points
+                    name = name.replace(/:.*$/, ''); // Remove description after colon
+                    
+                    if (name) {
+                        services.push({
+                            name: name,
+                            cost: cost,
+                            description: extractServiceDescription(line)
+                        });
+                    }
+                }
+                
+                return services;
+            } catch (error) {
+                console.error('Error parsing services string:', error);
+                return [];
+            }
+        }
+
+        // Helper function to extract service description from line
+        function extractServiceDescription(line) {
+            const colonIndex = line.indexOf(':');
+            const dollarIndex = line.indexOf('$');
+            
+            if (colonIndex > -1) {
+                const afterColon = line.substring(colonIndex + 1);
+                if (dollarIndex > colonIndex) {
+                    return afterColon.substring(0, dollarIndex - colonIndex - 1).trim();
+                }
+                return afterColon.trim();
+            }
+            
+            return '';
+        }
+
+        // Test functions
+        function testHighConfidence() {
+            const testData = {
+                confidenceLevel: 'HIGH',
+                confidenceScore: 90,
+                confidenceFactors: [
+                    'Strong historical data match (95% similarity)',
+                    'Similar customer profile in same industry',
+                    'Proven service combination with high success rate',
+                    'Consistent market trends supporting prediction'
+                ]
+            };
+            
+            populateConfidenceDisplay(testData.confidenceLevel, testData.confidenceScore, testData.confidenceFactors);
+            showTestResults('High Confidence Test', testData);
+        }
+
+        function testMediumConfidence() {
+            const testData = {
+                confidenceLevel: 'MEDIUM',
+                confidenceScore: 65,
+                confidenceFactors: [
+                    'Moderate historical data available',
+                    'Some customer similarities found',
+                    'Standard service patterns identified',
+                    'General market alignment observed'
+                ]
+            };
+            
+            populateConfidenceDisplay(testData.confidenceLevel, testData.confidenceScore, testData.confidenceFactors);
+            showTestResults('Medium Confidence Test', testData);
+        }
+
+        function testLowConfidence() {
+            const testData = {
+                confidenceLevel: 'LOW',
+                confidenceScore: 35,
+                confidenceFactors: [
+                    'Limited historical data available',
+                    'Unique customer profile with few matches',
+                    'Novel service combination not previously tested',
+                    'Uncertain market conditions affecting prediction'
+                ]
+            };
+            
+            populateConfidenceDisplay(testData.confidenceLevel, testData.confidenceScore, testData.confidenceFactors);
+            showTestResults('Low Confidence Test', testData);
+        }
+
+        function testTopServices() {
+            const testData = {
+                servicesData: [
+                    {
+                        name: 'Amazon EC2',
+                        description: 'Scalable compute capacity for application hosting',
+                        cost: 2500
+                    },
+                    {
+                        name: 'Amazon RDS',
+                        description: 'Managed relational database service',
+                        cost: 1200
+                    },
+                    {
+                        name: 'Amazon S3',
+                        description: 'Object storage for data and static assets',
+                        cost: 800
+                    },
+                    {
+                        name: 'AWS Lambda',
+                        description: 'Serverless compute for event-driven processing',
+                        cost: 300
+                    },
+                    {
+                        name: 'Amazon CloudFront',
+                        description: 'Content delivery network for global distribution',
+                        cost: 450
+                    }
+                ]
+            };
+            
+            populateTopServicesDisplay(null, testData.servicesData);
+            showTestResults('Top Services Test', testData);
+        }
+
+        function testCompleteData() {
+            // Test both confidence and services together
+            testHighConfidence();
+            testTopServices();
+            
+            const testData = {
+                message: 'Complete data test - both confidence and services populated'
+            };
+            showTestResults('Complete Data Test', testData);
+        }
+
+        function clearDisplays() {
+            clearConfidenceDisplay();
+            clearTopServicesDisplay();
+            
+            const testResults = document.getElementById('testResults');
+            if (testResults) {
+                testResults.textContent = 'Displays cleared';
+            }
+        }
+
+        function showTestResults(testName, data) {
+            const testResults = document.getElementById('testResults');
+            if (testResults) {
+                testResults.textContent = `${testName}:\n${JSON.stringify(data, null, 2)}`;
+            }
+        }
+    </script>
+</body>
+</html>
