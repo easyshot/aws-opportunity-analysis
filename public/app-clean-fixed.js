@@ -938,7 +938,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Query Results length:", queryResults.length);
 
       // Update enhanced debug info for query results
-      updateQueryDebugInfo(queryResults);
+      updateQueryDebugInfo(queryResults, results.debug);
     }
 
     if (debugBedrockPayload) {
@@ -1430,7 +1430,7 @@ ${
   }
 
   // Enhanced debug information functions
-  function updateQueryDebugInfo(queryResults) {
+  function updateQueryDebugInfo(queryResults, debugInfo = {}) {
     try {
       let rowCount = 0;
       let dataSize = 0;
@@ -1443,26 +1443,31 @@ ${
         charCount = queryResults.length;
         dataSize = new Blob([queryResults]).size;
 
-        // Try to parse as JSON to count rows
-        try {
-          const parsed = JSON.parse(queryResults);
-          if (Array.isArray(parsed)) {
-            rowCount = parsed.length;
-          } else if (parsed && typeof parsed === "object") {
-            // If it's an object, check for common array properties
-            if (parsed.results && Array.isArray(parsed.results)) {
-              rowCount = parsed.results.length;
-            } else if (parsed.data && Array.isArray(parsed.data)) {
-              rowCount = parsed.data.length;
-            } else {
-              rowCount = 1; // Single object
+        // Use backend-calculated row count if available, otherwise parse
+        if (debugInfo.queryRowCount && debugInfo.queryRowCount !== '-') {
+          rowCount = parseInt(debugInfo.queryRowCount) || 0;
+        } else {
+          // Try to parse as JSON to count rows
+          try {
+            const parsed = JSON.parse(queryResults);
+            if (Array.isArray(parsed)) {
+              rowCount = parsed.length;
+            } else if (parsed && typeof parsed === "object") {
+              // If it's an object, check for common array properties
+              if (parsed.results && Array.isArray(parsed.results)) {
+                rowCount = parsed.results.length;
+              } else if (parsed.data && Array.isArray(parsed.data)) {
+                rowCount = parsed.data.length;
+              } else {
+                rowCount = 1; // Single object
+              }
             }
+          } catch (e) {
+            // If not JSON, try to count lines
+            rowCount = queryResults
+              .split("\n")
+              .filter((line) => line.trim()).length;
           }
-        } catch (e) {
-          // If not JSON, try to count lines
-          rowCount = queryResults
-            .split("\n")
-            .filter((line) => line.trim()).length;
         }
       }
 
@@ -1475,6 +1480,22 @@ ${
       if (queryDataSize) queryDataSize.textContent = formatBytes(dataSize);
       if (queryCharCount)
         queryCharCount.textContent = charCount.toLocaleString();
+
+      // Generate table view if we have query results
+      if (queryResults && queryResults !== "No query results found in response") {
+        try {
+          const parsed = JSON.parse(queryResults);
+          if (parsed && parsed.Rows && Array.isArray(parsed.Rows)) {
+            generateQueryTable(parsed);
+          } else {
+            clearQueryTable();
+          }
+        } catch (e) {
+          clearQueryTable();
+        }
+      } else {
+        clearQueryTable();
+      }
     } catch (error) {
       console.error("Error updating query debug info:", error);
     }

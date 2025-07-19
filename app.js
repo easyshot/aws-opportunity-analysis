@@ -12,6 +12,9 @@ const finalBedAnalysisPrompt = require('./automations/finalBedAnalysisPrompt-v3'
 // Middleware
 app.use(express.json());
 
+// Serve static files from public directory
+app.use(express.static('public'));
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
