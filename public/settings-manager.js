@@ -20,7 +20,7 @@ class SettingsManager {
         truncationMethod: 'character'
       },
       performance: {
-        analysisTimeout: 120,
+        analysisTimeout: 180,
         enableCaching: false
       },
       debug: {

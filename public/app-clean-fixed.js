@@ -267,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
       sqlQueryLimit: 200,
       truncationLimit: 400000,
       enableTruncation: true,
-      analysisTimeout: 120,
+      analysisTimeout: 180,
     };
 
     // Try to get settings from settings manager
@@ -452,45 +452,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Extracted metrics from fullAnalysis:", metrics);
       }
 
-      // Check for sections in different possible locations
-      if (!fullResponse) {
-        // Prioritize top-level section properties over nested sections
-        if (
-          results.methodology ||
-          results.findings ||
-          results.rationale ||
-          results.riskFactors ||
-          results.similarProjects
-        ) {
-          // Sections are at the top level
-          fullResponse = "";
-          if (results.methodology)
-            fullResponse += `===ANALYSIS METHODOLOGY===\n${results.methodology}\n\n`;
-          if (results.findings)
-            fullResponse += `===DETAILED FINDINGS===\n${results.findings}\n\n`;
-          if (results.rationale)
-            fullResponse += `===PREDICTION RATIONALE===\n${results.rationale}\n\n`;
-          if (results.riskFactors)
-            fullResponse += `===RISK FACTORS===\n${results.riskFactors}\n\n`;
-          if (results.similarProjects)
-            fullResponse += `===SIMILAR PROJECTS===\n${results.similarProjects}\n\n`;
-        } else if (results.sections) {
-          // Fallback to nested sections
-          const sections = results.sections;
-          fullResponse = "";
-          if (sections.methodology)
-            fullResponse += `===ANALYSIS METHODOLOGY===\n${sections.methodology}\n\n`;
-          if (sections.findings)
-            fullResponse += `===DETAILED FINDINGS===\n${sections.findings}\n\n`;
-          if (sections.rationale)
-            fullResponse += `===PREDICTION RATIONALE===\n${sections.rationale}\n\n`;
-          if (sections.riskFactors)
-            fullResponse += `===RISK FACTORS===\n${sections.riskFactors}\n\n`;
-          if (sections.similarProjectsRaw)
-            fullResponse += `===SIMILAR PROJECTS===\n${sections.similarProjectsRaw}\n\n`;
-        }
-      }
-
       // Populate projections from metrics
       console.log("Metrics object:", metrics);
       if (metrics) {
@@ -560,165 +521,96 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
 
-      // Populate analysis sections from full response
-      if (fullResponse) {
-        const sections = extractSections(fullResponse);
-
-        if (methodology && sections.methodology) {
-          methodology.innerHTML = formatSectionContent(sections.methodology);
-        }
-
-        if (findings && sections.findings) {
-          findings.innerHTML = formatSectionContent(sections.findings);
-        }
-
-        if (rationale && sections.rationale) {
-          rationale.innerHTML = formatSectionContent(sections.rationale);
-        }
-
-        if (riskFactors && sections.riskFactors) {
-          riskFactors.innerHTML = formatSectionContent(sections.riskFactors);
-        }
-
-        if (similarProjects && sections.similarProjects) {
-          similarProjects.innerHTML = formatSectionContent(
-            sections.similarProjects
-          );
-        }
-
-        if (fullAnalysis) {
-          fullAnalysis.innerHTML = formatSectionContent(fullResponse);
-        }
-
-        // Populate debug sections
-        if (debugFullResponse) {
-          debugFullResponse.value = fullResponse;
-        }
+      // FIXED: Prioritize individual section fields from backend response
+      // The backend is returning individual section fields, so use those directly
+      if (methodology && results.methodology) {
+        methodology.innerHTML = formatSectionContent(results.methodology);
+        console.log("✅ Methodology populated from backend field");
       }
 
-      // Alternative: Parse sections from fullAnalysis if individual sections are not available
+      if (findings && results.findings) {
+        findings.innerHTML = formatSectionContent(results.findings);
+        console.log("✅ Findings populated from backend field");
+      }
+
+      if (rationale && results.rationale) {
+        rationale.innerHTML = formatSectionContent(results.rationale);
+        console.log("✅ Rationale populated from backend field");
+      }
+
+      if (riskFactors && results.riskFactors) {
+        riskFactors.innerHTML = formatSectionContent(results.riskFactors);
+        console.log("✅ Risk factors populated from backend field");
+      }
+
+      if (similarProjects && results.similarProjects) {
+        similarProjects.innerHTML = formatSectionContent(
+          results.similarProjects
+        );
+        console.log("✅ Similar projects populated from backend field");
+      }
+
+      // Populate full analysis section
+      if (fullAnalysis) {
+        const fullAnalysisContent =
+          results.fullAnalysis ||
+          results.formattedSummaryText ||
+          "Full analysis not available";
+        fullAnalysis.innerHTML = formatSectionContent(fullAnalysisContent);
+        console.log("✅ Full analysis section populated");
+      }
+
+      // Populate debug sections
+      if (debugFullResponse) {
+        const debugContent =
+          results.fullAnalysis ||
+          results.formattedSummaryText ||
+          results.debug?.fullResponse ||
+          "No debug content available";
+        debugFullResponse.value = debugContent;
+        console.log("✅ Debug full response populated");
+      }
+
+      // Fallback: If individual sections are not available, try to extract from fullAnalysis
       if (
         results.fullAnalysis &&
         (!results.methodology || results.methodology.includes("not available"))
       ) {
-        console.log("Parsing sections from fullAnalysis field");
+        console.log("Parsing sections from fullAnalysis field as fallback");
         const sections = extractSections(results.fullAnalysis);
 
-        if (methodology && sections.methodology) {
+        if (methodology && sections.methodology && !results.methodology) {
           methodology.innerHTML = formatSectionContent(sections.methodology);
-          console.log("✅ Methodology extracted from fullAnalysis");
+          console.log("✅ Methodology extracted from fullAnalysis (fallback)");
         }
 
-        if (findings && sections.findings) {
+        if (findings && sections.findings && !results.findings) {
           findings.innerHTML = formatSectionContent(sections.findings);
-          console.log("✅ Findings extracted from fullAnalysis");
+          console.log("✅ Findings extracted from fullAnalysis (fallback)");
         }
 
-        if (rationale && sections.rationale) {
+        if (rationale && sections.rationale && !results.rationale) {
           rationale.innerHTML = formatSectionContent(sections.rationale);
-          console.log("✅ Rationale extracted from fullAnalysis");
+          console.log("✅ Rationale extracted from fullAnalysis (fallback)");
         }
 
-        if (riskFactors && sections.riskFactors) {
+        if (riskFactors && sections.riskFactors && !results.riskFactors) {
           riskFactors.innerHTML = formatSectionContent(sections.riskFactors);
-          console.log("✅ Risk factors extracted from fullAnalysis");
+          console.log("✅ Risk factors extracted from fullAnalysis (fallback)");
         }
 
-        if (similarProjects && sections.similarProjects) {
+        if (
+          similarProjects &&
+          sections.similarProjects &&
+          !results.similarProjects
+        ) {
           similarProjects.innerHTML = formatSectionContent(
             sections.similarProjects
           );
-          console.log("✅ Similar projects extracted from fullAnalysis");
+          console.log(
+            "✅ Similar projects extracted from fullAnalysis (fallback)"
+          );
         }
-      }
-
-      // Enhanced: Always try to extract detailed sections from fullAnalysis if present
-      let extractedSections = {};
-      if (results.fullAnalysis) {
-        extractedSections = extractSections(results.fullAnalysis);
-      }
-
-      // Helper to check if a value is generic/placeholder
-      function isGeneric(val, field) {
-        if (!val) return true;
-        const genericMap = {
-          methodology:
-            /analysis methodology not available|based on historical project data/i,
-          findings:
-            /key findings not available|strong market opportunity identified/i,
-          rationale: /rationale not available|comprehensive historical data/i,
-          riskFactors: /risk factors not available|low to medium risk profile/i,
-          similarProjects:
-            /similar projects not available|multiple comparable projects found/i,
-        };
-        return genericMap[field] && genericMap[field].test(val.trim());
-      }
-
-      // Populate individual sections with fallback to extracted detailed content
-      if (methodology) {
-        let content =
-          (results.sections && results.sections.methodology) ||
-          results.methodology;
-        if (!content || isGeneric(content, "methodology")) {
-          content =
-            extractedSections.methodology ||
-            "Analysis methodology not available";
-        }
-        methodology.innerHTML = formatSectionContent(content);
-        console.log("✅ Methodology section populated");
-      }
-
-      if (findings) {
-        let content =
-          (results.sections && results.sections.findings) || results.findings;
-        if (!content || isGeneric(content, "findings")) {
-          content = extractedSections.findings || "Key findings not available";
-        }
-        findings.innerHTML = formatSectionContent(content);
-        console.log("✅ Findings section populated");
-      }
-
-      if (rationale) {
-        let content =
-          (results.sections && results.sections.rationale) || results.rationale;
-        if (!content || isGeneric(content, "rationale")) {
-          content = extractedSections.rationale || "Rationale not available";
-        }
-        rationale.innerHTML = formatSectionContent(content);
-        console.log("✅ Rationale section populated");
-      }
-
-      if (riskFactors) {
-        let content =
-          (results.sections && results.sections.riskFactors) ||
-          results.riskFactors;
-        if (!content || isGeneric(content, "riskFactors")) {
-          content =
-            extractedSections.riskFactors || "Risk factors not available";
-        }
-        riskFactors.innerHTML = formatSectionContent(content);
-        console.log("✅ Risk factors section populated");
-      }
-
-      if (similarProjects) {
-        let content =
-          (results.sections && results.sections.similarProjects) ||
-          results.similarProjects;
-        if (!content || isGeneric(content, "similarProjects")) {
-          content =
-            extractedSections.similarProjects ||
-            "Similar projects not available";
-        }
-        similarProjects.innerHTML = formatSectionContent(content);
-        console.log("✅ Similar projects section populated");
-      }
-
-      if (fullAnalysis) {
-        // Use the complete analysis from the backend
-        const fullAnalysisContent =
-          results.fullAnalysis || "Full analysis not available";
-        fullAnalysis.innerHTML = formatSectionContent(fullAnalysisContent);
-        console.log("✅ Full analysis section populated");
       }
 
       // Populate additional sections
@@ -1444,7 +1336,7 @@ ${
         dataSize = new Blob([queryResults]).size;
 
         // Use backend-calculated row count if available, otherwise parse
-        if (debugInfo.queryRowCount && debugInfo.queryRowCount !== '-') {
+        if (debugInfo.queryRowCount && debugInfo.queryRowCount !== "-") {
           rowCount = parseInt(debugInfo.queryRowCount) || 0;
         } else {
           // Try to parse as JSON to count rows
@@ -1482,7 +1374,10 @@ ${
         queryCharCount.textContent = charCount.toLocaleString();
 
       // Generate table view if we have query results
-      if (queryResults && queryResults !== "No query results found in response") {
+      if (
+        queryResults &&
+        queryResults !== "No query results found in response"
+      ) {
         try {
           const parsed = JSON.parse(queryResults);
           if (parsed && parsed.Rows && Array.isArray(parsed.Rows)) {
