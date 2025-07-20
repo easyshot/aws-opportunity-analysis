@@ -198,14 +198,14 @@ function applyRowLimit(sqlQuery, limit) {
     // Also remove any duplicate LIMIT clauses that might exist
     modifiedQuery = modifiedQuery.replace(/\s+LIMIT\s+(\d+|{{[^}]+}})/gi, '');
     
-    // Add new LIMIT clause if not already present
-    if (!modifiedQuery.toUpperCase().includes('LIMIT')) {
+    // Add new LIMIT clause - check for actual LIMIT number, not just placeholder
+    if (!modifiedQuery.toUpperCase().match(/LIMIT\s+\d+/)) {
       modifiedQuery = modifiedQuery.trim() + ` LIMIT ${effectiveLimit}`;
     }
     
-    // Optimize query for performance by simplifying complex calculations
-    // Replace complex relevance scoring with simpler matching
-    if (modifiedQuery.includes('relevance_score') && modifiedQuery.length > 3000) {
+    // Query optimization DISABLED to preserve SQL logic and honor query limits
+    // This optimization was breaking the WHERE clause filtering and causing too many results
+    if (false && modifiedQuery.includes('relevance_score') && modifiedQuery.length > 3000) {
       console.log("PROCESS_RESULTS (SQL Query): Optimizing complex query for performance");
       
       // Simplify the relevance scoring to reduce computation

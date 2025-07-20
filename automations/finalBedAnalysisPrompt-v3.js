@@ -384,64 +384,17 @@ ${filledUserMessage}`;
       );
     } else if (needsEmergencyTruncation) {
       console.log(
-        `PROCESS_RESULTS (Analysis): ⚠️  EMERGENCY TRUNCATION: Message (${finalUserMessage.length} chars, ~${estimatedTokens} tokens) exceeds model limits`
+        `PROCESS_RESULTS (Analysis): ⚠️  EMERGENCY TRUNCATION NEEDED: Message (${finalUserMessage.length} chars, ~${estimatedTokens} tokens) exceeds model limits`
       );
       console.log(
-        `PROCESS_RESULTS (Analysis): User has truncation disabled, but applying emergency truncation to prevent API failure`
+        `PROCESS_RESULTS (Analysis): User has truncation disabled - respecting user preference to receive error instead of silent truncation`
       );
-
-      // Calculate emergency truncation to stay within model limits
-      const oppDetailsSize = enhancedUserMessage.indexOf("<project_data>");
-      const templateSize = filledUserMessage.length;
-      // Be more aggressive with emergency truncation - use 50% of emergency limit for data
-      const emergencyAvailableForData = Math.min(
-        EMERGENCY_CHAR_LIMIT * 0.5, // Use max 50% of emergency limit for query data
-        EMERGENCY_CHAR_LIMIT - oppDetailsSize - templateSize - 30000 // Or calculated available space with large buffer
+      
+      // Respect user's choice to disable truncation - throw error instead of truncating
+      throw new Error(
+        `Payload size (${finalUserMessage.length} chars, ~${estimatedTokens} tokens) exceeds Claude 3.5 Sonnet's ${CLAUDE_35_SONNET_MAX_INPUT_TOKENS} token limit. ` +
+        `To resolve: 1) Enable truncation in settings, 2) Reduce SQL query limit from ${params.settings?.sqlQueryLimit || 'default'} records, or 3) Increase truncation character limit above ${finalUserMessage.length} characters.`
       );
-
-      if (emergencyAvailableForData > 50000) {
-        const emergencyTruncatedResults = truncateQueryResults(
-          processedQueryResults,
-          Math.floor(emergencyAvailableForData)
-        );
-
-        finalUserMessage = `
-<opp_details>
-New Opportunity Information:
-- Customer Name: ${params.CustomerName || "Not specified"}
-- Region: ${params.region || "Not specified"}
-- Close Date: ${params.closeDate || "Not specified"}
-- Opportunity Name: ${params.oppName || "Not specified"}
-- Description: ${params.oppDescription || "Not specified"}
-- Industry: ${params.industry || "Not specified"}
-- Customer Segment: ${params.customerSegment || "Not specified"}
-- Partner Name: ${params.partnerName || "Not specified"}
-- Activity Focus: ${params.activityFocus || "Not specified"}
-- Business Description: ${params.businessDescription || "Not specified"}
-- Migration Phase: ${params.migrationPhase || "Not specified"}
-</opp_details>
-
-<project_data>
-Historical Project Dataset:
-${emergencyTruncatedResults}
-</project_data>
-
-${filledUserMessage}`;
-
-        const newEstimatedTokens = Math.ceil(
-          finalUserMessage.length / CHARS_PER_TOKEN
-        );
-        console.log(
-          `PROCESS_RESULTS (Analysis): Emergency truncation applied: ${finalUserMessage.length} chars (~${newEstimatedTokens} tokens)`
-        );
-        console.log(
-          `PROCESS_RESULTS (Analysis): Query results truncated from ${processedQueryResults.length} to ${emergencyTruncatedResults.length} characters`
-        );
-      } else {
-        console.log(
-          `PROCESS_RESULTS (Analysis): ❌ Cannot apply emergency truncation - insufficient space for meaningful data`
-        );
-      }
     } else if (!params.settings?.enableTruncation) {
       console.log(
         `PROCESS_RESULTS (Analysis): Truncation disabled, sending full message (${finalUserMessage.length} characters)`

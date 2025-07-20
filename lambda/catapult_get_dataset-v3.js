@@ -37,6 +37,16 @@ exports.handler = async (event) => {
     }
     
     console.log('Executing SQL query:', sqlQuery);
+    console.log('SQL query length:', sqlQuery.length);
+    console.log('SQL query contains LIMIT:', sqlQuery.toUpperCase().includes('LIMIT'));
+    
+    // Extract the LIMIT value from the query for debugging
+    const limitMatch = sqlQuery.match(/LIMIT\s+(\d+)/i);
+    if (limitMatch) {
+      console.log('SQL query LIMIT value:', limitMatch[1]);
+    } else {
+      console.log('No LIMIT clause found in SQL query');
+    }
     
     // Start query execution
     const startQueryCommand = new StartQueryExecutionCommand({
@@ -109,10 +119,14 @@ async function waitForQueryToComplete(queryExecutionId) {
 // Function to get query results
 async function getQueryResults(queryExecutionId) {
   const getQueryResultsCommand = new GetQueryResultsCommand({
-    QueryExecutionId: queryExecutionId
+    QueryExecutionId: queryExecutionId,
+    MaxResults: 1000 // Explicitly set max results to avoid default pagination issues
   });
   
   const results = await athena.send(getQueryResultsCommand);
+  
+  // Log for debugging
+  console.log('Athena query results - Row count:', results.ResultSet?.Rows?.length || 0);
   
   return {
     ResultSet: results.ResultSet

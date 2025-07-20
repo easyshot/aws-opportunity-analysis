@@ -156,7 +156,7 @@ app.post('/api/analyze', async (req, res) => {
           query: sqlQuery
         }),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Lambda execution timeout')), 30000) // Increased to 30 seconds
+          setTimeout(() => reject(new Error('Lambda execution timeout')), 60000) // Increased to 60 seconds for large datasets
         )
       ]);
       
