@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 4.1 - Methodology Display Functional Test</title>
+    <link rel="stylesheet" href="public/styles.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            padding: 10px 20px;
+            background: #232f3e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #1a252f;
+        }
+        .test-status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Task 4.1 - Methodology Display Functional Test</h1>
+        
+        <div class="test-section">
+            <h2>Test Controls</h2>
+            <div class="test-controls">
+                <button class="test-button" onclick="testMethodologyDisplay()">Test Methodology Display</button>
+                <button class="test-button" onclick="clearMethodologyDisplay()">Clear Methodology Display</button>
+                <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+            </div>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Methodology Section Display</h2>
+            
+            <!-- This is the actual methodology section from the main application -->
+            <div class="analysis-results-section">
+                <div class="result-section methodology-section">
+                    <h3 class="result-title">
+                        <span class="section-icon">🔬</span>
+                        Analysis Methodology
+                    </h3>
+                    <div class="result-content" id="methodologyContent">
+                        <div class="placeholder-content">
+                            <div class="placeholder-icon">📊</div>
+                            <p>Analysis methodology will appear here after running analysis...</p>
+                            <small>This section will show the approach, data sources, and confidence factors used in the analysis.</small>
+                        </div>
+                        <div class="methodology-details" style="display: none;">
+                            <div class="methodology-item analysis-approach-item">
+                                <div class="methodology-header">
+                                    <span class="methodology-icon">🎯</span>
+                                    <h4>Analysis Approach</h4>
+                                </div>
+                                <div class="methodology-text" id="analysisApproach">
+                                    <div class="approach-summary" id="approachSummary"></div>
+                                    <div class="approach-steps" id="approachSteps"></div>
+                                    <div class="approach-techniques" id="approachTechniques"></div>
+                                </div>
+                            </div>
+                            <div class="methodology-item data-sources-item">
+                                <div class="methodology-header">
+                                    <span class="methodology-icon">📚</span>
+                                    <h4>Data Sources</h4>
+                                </div>
+                                <div class="methodology-text" id="dataSources">
+                                    <div class="data-sources-list" id="dataSourcesList"></div>
+                                    <div class="data-quality-info" id="dataQualityInfo"></div>
+                                    <div class="data-coverage" id="dataCoverage"></div>
+                                </div>
+                            </div>
+                            <div class="methodology-item confidence-factors-item">
+                                <div class="methodology-header">
+                                    <span class="methodology-icon">📈</span>
+                                    <h4>Confidence Factors</h4>
+                                </div>
+                                <div class="methodology-text" id="confidenceFactors">
+                                    <div class="confidence-factors-list" id="confidenceFactorsList"></div>
+                                    <div class="confidence-scoring" id="confidenceScoring"></div>
+                                    <div class="confidence-limitations" id="confidenceLimitations"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="public/app.js"></script>
+    <script>
+        // Test methodology data
+        const testMethodologyData = {
+            analysisApproach: {
+                summary: "Historical data analysis using AWS Bedrock AI models to identify similar projects and predict opportunity outcomes.",
+                steps: [
+                    "Query generation using natural language processing",
+                    "Historical project data retrieval from AWS Athena",
+                    "Pattern matching and similarity analysis",
+                    "Statistical modeling for predictions",
+                    "Confidence scoring based on data quality"
+                ],
+                techniques: [
+                    "Machine Learning",
+                    "Natural Language Processing", 
+                    "Statistical Analysis",
+                    "Pattern Recognition",
+                    "Predictive Modeling"
+                ]
+            },
+            dataSources: [
+                {
+                    name: "Historical Project Database",
+                    description: "AWS Athena database containing historical opportunity and project data",
+                    icon: "🗄️"
+                },
+                {
+                    name: "AWS Bedrock AI Models",
+                    description: "Amazon Titan model for standard analysis",
+                    icon: "🤖"
+                },
+                {
+                    name: "Customer Input Data",
+                    description: "Analysis based on customer opportunity data",
+                    icon: "📝"
+                }
+            ],
+            dataQuality: {
+                coverage: "85%",
+                accuracy: "92%",
+                completeness: "78%"
+            },
+            confidenceFactors: [
+                {
+                    factor: "Historical Data Availability",
+                    impact: "high",
+                    description: "Sufficient historical projects for pattern matching"
+                },
+                {
+                    factor: "Customer Profile Match",
+                    impact: "medium", 
+                    description: "Similar customer segments and industries in historical data"
+                },
+                {
+                    factor: "Regional Data Coverage",
+                    impact: "medium",
+                    description: "Good coverage of projects in target region"
+                },
+                {
+                    factor: "Service Pattern Recognition",
+                    impact: "high",
+                    description: "Strong patterns in service usage for similar opportunities"
+                }
+            ],
+            scoring: {
+                formula: "Confidence = (Data_Quality × 0.4) + (Pattern_Match × 0.3) + (Historical_Accuracy × 0.3)",
+                explanation: "Weighted scoring based on data quality, pattern matching strength, and historical prediction accuracy"
+            },
+            limitations: [
+                "Predictions based on historical patterns may not account for new market conditions",
+                "Limited data for highly specialized or unique customer requirements",
+                "Regional variations may affect accuracy for less common AWS regions",
+                "Service pricing and availability subject to change"
+            ]
+        };
+
+        // Test functions
+        function testMethodologyDisplay() {
+            try {
+                populateMethodologyDisplay(testMethodologyData);
+                updateTestResults('✅ Methodology display populated successfully', 'pass');
+            } catch (error) {
+                updateTestResults('❌ Error populating methodology display: ' + error.message, 'fail');
+            }
+        }
+
+        function runAllTests() {
+            const results = [];
+            
+            // Test 1: Check if elements exist
+            const methodologyContent = document.getElementById('methodologyContent');
+            results.push({
+                test: 'Methodology content element exists',
+                result: methodologyContent ? 'PASS' : 'FAIL',
+                status: methodologyContent ? 'pass' : 'fail'
+            });
+
+            // Test 2: Check if placeholder is visible initially
+            const placeholder = methodologyContent?.querySelector('.placeholder-content');
+            const isPlaceholderVisible = placeholder && placeholder.style.display !== 'none';
+            results.push({
+                test: 'Placeholder content visible initially',
+                result: isPlaceholderVisible ? 'PASS' : 'FAIL',
+                status: isPlaceholderVisible ? 'pass' : 'fail'
+            });
+
+            // Test 3: Test methodology display
+            try {
+                populateMethodologyDisplay(testMethodologyData);
+                const methodologyDetails = methodologyContent?.querySelector('.methodology-details');
+                const isDetailsVisible = methodologyDetails && methodologyDetails.style.display === 'grid';
+                results.push({
+                    test: 'Methodology details displayed after population',
+                    result: isDetailsVisible ? 'PASS' : 'FAIL',
+                    status: isDetailsVisible ? 'pass' : 'fail'
+                });
+            } catch (error) {
+                results.push({
+                    test: 'Methodology display function',
+                    result: 'FAIL - ' + error.message,
+                    status: 'fail'
+                });
+            }
+
+            // Test 4: Test clear functionality
+            try {
+                clearMethodologyDisplay();
+                const isPlaceholderVisibleAfterClear = placeholder && placeholder.style.display !== 'none';
+                results.push({
+                    test: 'Clear methodology display functionality',
+                    result: isPlaceholderVisibleAfterClear ? 'PASS' : 'FAIL',
+                    status: isPlaceholderVisibleAfterClear ? 'pass' : 'fail'
+                });
+            } catch (error) {
+                results.push({
+                    test: 'Clear methodology display function',
+                    result: 'FAIL - ' + error.message,
+                    status: 'fail'
+                });
+            }
+
+            // Display results
+            const resultsHTML = results.map(result => 
+                `<div class="test-status test-${result.status}">
+                    ${result.test}: ${result.result}
+                </div>`
+            ).join('');
+            
+            document.getElementById('testResults').innerHTML = resultsHTML;
+        }
+
+        function updateTestResults(message, status) {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = `<div class="test-status test-${status}">${message}</div>`;
+        }
+
+        // Run initial test on page load
+        window.addEventListener('load', function() {
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>

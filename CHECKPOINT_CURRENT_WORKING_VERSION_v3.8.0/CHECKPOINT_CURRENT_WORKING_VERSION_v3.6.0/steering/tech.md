@@ -1,0 +1,262 @@
+# AWS Bedrock Partner Management System - Technical Stack
+
+## Technology Stack
+
+- **Backend**: Node.js 18.x with Express (production-ready with full AWS integration using Converse API and SQL validation)
+- **Frontend**: Modern HTML5, CSS3, JavaScript (ES6+) with class-based architecture and PWA capabilities
+- **UI Framework**: Vanilla JavaScript with modern web standards (no external frameworks)
+- **Infrastructure**: AWS CDK (TypeScript) for Infrastructure as Code
+- **AWS Services** (Complete Integration):
+  - **AWS Bedrock**: AI/ML capabilities with Claude 3.5 Sonnet model using Converse API, Agent orchestration
+  - **AWS Lambda**: Serverless compute with specialized functions and shared utilities layer
+  - **Amazon Athena**: SQL queries against historical data with performance optimization
+  - **Amazon DynamoDB**: NoSQL database with Global Tables and Streams
+  - **Amazon S3**: Object storage with intelligent tiering and cross-region replication
+  - **Amazon CloudFront**: Global CDN with edge caching and security headers
+  - **AWS API Gateway**: REST API with throttling, caching, and CORS
+  - **Amazon EventBridge**: Event-driven architecture and workflow orchestration
+  - **Amazon OpenSearch Serverless**: Vector database for RAG enhancement
+  - **AWS Systems Manager**: Parameter Store for configuration management
+  - **AWS Secrets Manager**: Secure credential storage and rotation
+  - **Amazon CloudWatch**: Monitoring, logging, and alerting
+  - **AWS X-Ray**: Distributed tracing and performance analysis
+
+## Dependencies (Production Ready)
+
+- **AWS SDK v3** (Complete Integration):
+
+  - @aws-sdk/client-athena: SQL query execution
+  - @aws-sdk/client-bedrock-agent: AI agent orchestration
+  - @aws-sdk/client-bedrock-agent-runtime: Agent runtime execution
+  - @aws-sdk/client-bedrock-runtime: AI model inference
+  - @aws-sdk/client-lambda: Serverless function invocation
+  - @aws-sdk/client-dynamodb: NoSQL database operations
+  - @aws-sdk/client-s3: Object storage operations
+  - @aws-sdk/client-cloudwatch: Monitoring and metrics
+  - @aws-sdk/client-ssm: Configuration management
+  - @aws-sdk/client-secrets-manager: Secure credential storage
+
+- **Backend** (Production Grade):
+
+  - express: Web server framework with security middleware
+  - dotenv: Environment variable management
+  - body-parser: Request body parsing and validation
+  - http-proxy-middleware: API proxying for frontend development
+  - cors: Cross-origin resource sharing configuration
+  - helmet: Security headers and protection
+
+- **Infrastructure** (AWS CDK):
+  - aws-cdk-lib: Infrastructure as Code framework
+  - constructs: CDK construct library
+  - @aws-cdk/aws-lambda-nodejs: Node.js Lambda constructs
+
+## Development Dependencies
+
+- nodemon: Auto-restart during development
+- concurrently: Run multiple npm scripts simultaneously
+- jest: Testing framework for unit and integration tests
+- eslint: Code quality and style enforcement
+- prettier: Code formatting
+
+## Modern Frontend Architecture
+
+### Current Active Interface
+
+- **Primary Interface**: Partner Opportunity Intelligence page at `http://localhost:3123/` (fully functional)
+- **Main JavaScript**: `public/app-clean-fixed.js` with enhanced debug panels, SQL validation, sound notifications, and data consistency fixes
+- **Styling**: Modern CSS with animations, gradients, and responsive design
+- **Enhanced Debug Integration**: `public/enhanced-debug-integration.js` with separated SQL and analysis debug sections
+
+### UI Options Available
+
+- **Option A**: Clean Professional Layout (minimal, closest to legacy)
+- **Option B**: Enhanced Interactive Layout (modern with tabs and animations)
+- **Option C**: Modern Dashboard Layout (active - full-featured with real-time updates and debug panels)
+
+### Frontend Features (Current Active)
+
+- **Real-time Form Validation**: Instant feedback with visual indicators
+- **Auto-save Functionality**: localStorage integration for data persistence
+- **Progress Tracking**: Live completion percentage with animated progress bar
+- **Character Counter**: Smart description validation with color coding
+- **Interactive Animations**: Smooth transitions and hover effects
+- **Responsive Design**: Mobile-first approach with flexible layouts
+- **Modern CSS**: CSS Grid, Flexbox, custom properties, and animations
+- **Accessibility**: ARIA labels, keyboard navigation, and screen reader support
+- **Sound Notification System**: Visual completion notifications with user-configurable toggle
+- **Enhanced Debug Information Panels**: Comprehensive debugging interface featuring:
+  - **Separated Debug Sections**: Clear distinction between SQL generation and analysis generation processes
+  - **Query Results Statistics**: Row count, character count, and data size tracking
+  - **Interactive Table View**: Spreadsheet-like display with toggle controls
+  - **Real-time Data Monitoring**: Live updates of query metrics and payload sizes
+  - **Truncation Visibility**: Clear indication of data truncation with size management
+  - **Multi-format Display**: Toggle between raw JSON and formatted table views
+  - **SQL Validation Feedback**: Real-time display of SQL corrections and syntax fixes
+  - **Model ID Accuracy**: Correct model identification for each process type
+  - **Data Consistency**: Accurate MRR extraction and payload field mapping
+
+### JavaScript Architecture
+
+- **Class-based Structure**: ES6+ classes for organized code architecture
+- **Event-driven Design**: Modern event handling with proper delegation
+- **Async/Await Pattern**: Modern promise handling for API calls
+- **State Management**: localStorage for client-side state persistence
+- **Error Handling**: Comprehensive error handling with user-friendly messages
+- **Loading States**: Visual feedback during processing with animated indicators
+- **Debug Integration**: Real-time data flow tracing and payload inspection
+- **Sound Notifications**: Visual completion notifications with user control
+- **Data Consistency**: Fixed MRR extraction and analysis payload field mapping
+
+## Build & Run Commands
+
+```bash
+# Install all dependencies
+npm install
+
+# Development (Local with Real AWS Integration)
+npm run dev-all                    # Start both backend and frontend servers (recommended)
+npm run dev                        # Backend only (port 8123) - production backend with SQL validation
+npm run dev-frontend               # Frontend only (port 3123) - Partner Opportunity Intelligence page
+npm run debug                      # Backend in debug mode with comprehensive mock data
+
+# Production Deployment
+npm run cdk:deploy                 # Deploy complete AWS infrastructure
+npm run lambda:deploy              # Deploy Lambda functions only
+npm run dynamodb:deploy           # Deploy database infrastructure
+npm run bedrock-agent:deploy      # Deploy AI orchestration
+npm run knowledge-base:deploy     # Deploy RAG enhancement
+
+# Enterprise Multi-Environment Deployment
+npm run deploy:infrastructure      # Deploy complete multi-environment infrastructure
+npm run deploy:task-2             # Deploy Task 2 infrastructure components
+npm run deploy:lambda             # Deploy Lambda functions across environments
+npm run deploy:dynamodb           # Deploy DynamoDB infrastructure
+npm run deploy:eventbridge        # Deploy EventBridge infrastructure
+
+# Testing and Validation
+npm run test:comprehensive         # Run complete test suite
+npm run test:comprehensive:all     # Run all comprehensive tests
+npm run test:comprehensive:quick   # Run quick comprehensive tests
+npm run test:health               # Health check validation
+npm run test:performance          # Performance testing
+npm run test:scenarios            # Run test scenarios
+npm run test:diagnostics          # Run diagnostic tests
+npm run validate:all              # Complete system validation
+npm run test:prerequisites        # Test deployment prerequisites
+npm run test:error-handling       # Test error handling and monitoring
+npm run test:framework            # Validate testing framework
+npm run test:production           # Test production startup
+npm run test:validation-tools     # Test validation tools
+
+# Monitoring and Diagnostics
+npm run validate:aws              # AWS connectivity validation
+npm run validate:bedrock          # Bedrock service validation
+npm run validate:infrastructure   # Infrastructure health check
+npm run validate:lambda           # Validate Lambda functions
+npm run validate:security         # Security validation
+npm run validate:production       # Production readiness validation
+npm run validate:task-6           # Validate Task 6 implementation
+npm run validate:task-6-simple    # Simple Task 6 validation
+
+# Multi-Environment Management
+node scripts/deploy-multi-environment.js    # Deploy all environments
+node scripts/provision-environment.js       # Provision new environment
+node scripts/validate-infrastructure.js     # Validate infrastructure
+
+# Debugging and Troubleshooting
+npm run debug:data-flow           # Trace data flow from frontend to Bedrock
+npm run debug:payload-inspection  # Inspect Bedrock payloads and responses
+npm run debug:query-validation    # Validate SQL queries and results
+```
+
+## Environment Configuration
+
+Required environment variables in `.env` file:
+
+```
+# AWS Credentials
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+
+# Bedrock Prompt IDs
+CATAPULT_QUERY_PROMPT_ID=Y6T66EI3GZ
+CATAPULT_ANALYSIS_PROMPT_ID=arn:aws:bedrock:us-east-1:701976266286:prompt/FDUHITJIME:4
+
+# Lambda Function
+CATAPULT_GET_DATASET_LAMBDA=catapult_get_dataset
+
+# Athena Configuration
+ATHENA_DATABASE=default
+ATHENA_OUTPUT_LOCATION=s3://aws-athena-query-results/
+
+# Debug Configuration
+ENABLE_DEBUG_PANELS=true
+ENABLE_ENHANCED_LOGGING=true
+DEBUG_LOG_LEVEL=info
+```
+
+- Ensure all prompt IDs are correct and match those configured in AWS Bedrock.
+- Lambda function must have permissions for Athena and S3 as described in the README.
+- Debug configuration enables enhanced troubleshooting capabilities.
+
+## Server Configuration
+
+- **Backend server**: Runs on port 8123 by default (using app.js for production with SQL validation)
+- **Frontend server**: Runs on port 3123 by default with proxy configuration
+- **API Proxy**: Frontend automatically proxies `/api/*` requests to backend
+- **Static Assets**: Frontend server serves static files from `/public` directory
+- **Debug Mode**: Enhanced logging and payload inspection for troubleshooting
+
+## Application URLs
+
+- **Main Application**: `http://localhost:3123/` (Partner Opportunity Intelligence page with enhanced debug features and sound notifications)
+- **Alternative Options**:
+  - Option A: `http://localhost:3123/index-compact-option-a.html` (Clean Professional)
+  - Option B: `http://localhost:3123/index-compact-option-b.html` (Enhanced Interactive)
+  - Option C: `http://localhost:3123/index-compact-option-c.html` (Modern Dashboard)
+- **Compact Interface**: `http://localhost:3123/index-compact.html` (Alternative modern interface)
+
+## Data Processing Specifications
+
+### Input Field Specifications
+
+- **Customer Region**: Geographic regions (United States, Canada, Germany, Japan, etc.) - NOT AWS regions
+- **Time to Launch**: Measured in months to achieve 80% of projected AWS Annual Recurring Revenue
+- **Description Validation**: Minimum 50 characters with real-time character counting
+- **Form Completion**: Real-time progress tracking with percentage completion
+
+### Analysis Output Specifications
+
+- **Six Core Analysis Areas**: Methodology, Findings, Risk Factors, Similar Projects, Rationale, Full Analysis
+- **Dedicated Sections**: Separate Funding Options and Follow-On Opportunities sections
+- **Top AWS Services**: Interactive service cards with icons, costs, and descriptions
+- **Confidence Assessment**: Animated gauge with color-coded confidence levels (0-100%)
+- **Debug Information**: Real-time display of data flow and processing steps with separated sections
+- **Sound Notifications**: Visual completion notifications with user control
+
+## Performance Optimizations
+
+- **Minimal Dependencies**: Streamlined package.json for faster installation and startup
+- **Efficient DOM Manipulation**: Modern JavaScript with minimal DOM queries
+- **CSS Animations**: Hardware-accelerated CSS transitions and transforms
+- **Lazy Loading**: Progressive content loading for better perceived performance
+- **Caching Strategy**: localStorage for form data and intelligent API caching
+- **Debug Performance**: Optimized debug information display without impacting user experience
+- **SQL Validation**: Automatic correction of AI-generated SQL syntax errors for improved reliability
+- **Sound System**: Visual notifications optimized for accessibility and performance
+
+## Browser Compatibility
+
+- **Modern Browsers**: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- **Mobile Support**: iOS Safari 13+, Chrome Mobile 80+
+- **Progressive Enhancement**: Graceful degradation for older browsers
+- **Responsive Design**: Mobile-first approach with flexible breakpoints
+
+## Development Workflow
+
+- **Primary Interface**: Partner Opportunity Intelligence page at `http://localhost:3123/` for all development
+- **Testing**: All three UI options maintained for comparison and testing
+- **Debug Integration**: Enhanced debug rebuild with separated SQL and analysis sections
+- **Sound Notifications**: Visual completion notifications with user control
+- **Data Consistency**: Fixed MRR extraction and analysis payload field mapping

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Initialization Test</title>
+</head>
+<body>
+    <h1>Class Initialization Test</h1>
+    <button onclick="testFunction()">Test Function</button>
+    <div id="output"></div>
+    
+    <script>
+        function testFunction() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>Testing global functions...</p>';
+            
+            // Test if global functions exist
+            const functions = ['analyzeOpportunity', 'clearForm', 'exportData', 'printReport', 'loadSampleData', 'toggleTheme'];
+            
+            functions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    output.innerHTML += `<p style="color: green;">✓ ${funcName} is available</p>`;
+                } else {
+                    output.innerHTML += `<p style="color: red;">✗ ${funcName} is NOT available</p>`;
+                }
+            });
+        }
+    </script>
+    
+    <script src="app-compact-option-c.js"></script>
+</body>
+</html>

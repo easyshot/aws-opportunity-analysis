@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Enhanced Button Functionality</title>
+    <link rel="stylesheet" href="public/styles.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .test-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .primary-button {
+            background-color: #232f3e;
+            color: white;
+        }
+        .secondary-button {
+            background-color: #ff9900;
+            color: #232f3e;
+        }
+        .tertiary-button {
+            background-color: #28a745;
+            color: white;
+        }
+        .outline-button {
+            background-color: transparent;
+            color: #232f3e;
+            border: 2px solid #232f3e;
+        }
+        #status {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enhanced Button Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>Task 6.4 Implementation Test</h2>
+        <p>This test verifies the enhanced action button functionality including:</p>
+        <ul>
+            <li>Button states and loading indicators for all analysis types</li>
+            <li>Export functionality for comprehensive results</li>
+            <li>Form reset with confirmation dialog</li>
+        </ul>
+    </div>
+
+    <!-- Mock form elements for testing -->
+    <form id="opportunityForm" style="display: none;">
+        <input type="text" id="CustomerName" value="Test Customer">
+        <input type="text" id="oppName" value="Test Opportunity">
+        <textarea id="oppDescription">Test description</textarea>
+    </form>
+
+    <!-- Mock output elements -->
+    <div style="display: none;">
+        <div id="oppArrOut">$950,000</div>
+        <div id="oppMrrOut">$79,167</div>
+        <div id="oppLaunchDateOut">2024-06-15</div>
+        <div id="oppProjectDurationOut">8 months</div>
+        <div id="oppConfidenceOut">HIGH</div>
+        <div id="oppServicesOut">EC2, S3, RDS</div>
+        <div id="textSummary">Test analysis summary</div>
+        <div id="progress-container" style="display: none;">
+            <div id="progress-message"></div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>1. Button State Management Test</h3>
+        <div class="test-buttons">
+            <button type="button" id="oppDetQueryButtonV3" class="test-button primary-button">
+                <span class="button-text">Analyze (Standard)</span>
+                <span class="button-spinner"></span>
+            </button>
+            <button type="button" id="oppDetQueryButtonV4" class="test-button secondary-button">
+                <span class="button-text">Analyze (Nova Premier)</span>
+                <span class="button-spinner"></span>
+            </button>
+            <button type="button" id="fundingAnalysisButton" class="test-button tertiary-button">
+                <span class="button-text">Funding Analysis</span>
+                <span class="button-spinner"></span>
+            </button>
+        </div>
+        <p><strong>Expected:</strong> Clicking any analysis button should show loading state, disable other buttons, and complete after 3 seconds.</p>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Export Functionality Test</h3>
+        <div class="test-buttons">
+            <button type="button" id="exportResultsButton" class="test-button outline-button" disabled>
+                Export Results
+            </button>
+        </div>
+        <p><strong>Expected:</strong> Button should be disabled initially, enabled after analysis completes, and download a comprehensive report when clicked.</p>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Form Reset with Confirmation Test</h3>
+        <div class="test-buttons">
+            <button type="button" id="resetFormButton" class="test-button outline-button">
+                Reset Form
+            </button>
+            <button type="button" id="nextOpportunityButton" class="test-button outline-button">
+                Next Opportunity
+            </button>
+        </div>
+        <p><strong>Expected:</strong> Clicking reset should show confirmation dialog. If results exist, should offer export option.</p>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Manual State Testing</h3>
+        <div class="test-buttons">
+            <button type="button" onclick="testButtonStates('ready')" class="test-button">Ready State</button>
+            <button type="button" onclick="testButtonStates('analyzing-standard')" class="test-button">Analyzing Standard</button>
+            <button type="button" onclick="testButtonStates('analyzing-nova')" class="test-button">Analyzing Nova</button>
+            <button type="button" onclick="testButtonStates('analyzing-funding')" class="test-button">Analyzing Funding</button>
+            <button type="button" onclick="testButtonStates('completed')" class="test-button">Completed</button>
+            <button type="button" onclick="testButtonStates('error')" class="test-button">Error State</button>
+        </div>
+    </div>
+
+    <div id="status">
+        <strong>Status:</strong> <span id="statusText">Ready for testing</span>
+    </div>
+
+    <!-- Mock functions for testing -->
+    <script>
+        // Mock functions that might be called
+        function getFormData() {
+            return {
+                CustomerName: 'Test Customer',
+                oppName: 'Test Opportunity',
+                oppDescription: 'Test description',
+                region: 'us-east-1',
+                closeDate: '2024-12-31'
+            };
+        }
+
+        function clearUIFields() {
+            console.log('UI fields cleared');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Test function for manual state testing
+        function testButtonStates(state) {
+            if (typeof updateButtonStates === 'function') {
+                updateButtonStates(state);
+                document.getElementById('statusText').textContent = `Testing ${state} state`;
+            } else {
+                document.getElementById('statusText').textContent = 'Enhanced functionality not loaded yet';
+            }
+        }
+
+        // Status monitoring
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof updateButtonStates === 'function') {
+                    document.getElementById('statusText').textContent = 'Enhanced button functionality loaded successfully!';
+                } else {
+                    document.getElementById('statusText').textContent = 'Enhanced functionality not detected - check console for errors';
+                }
+            }, 1000);
+        });
+    </script>
+
+    <!-- Load the enhanced functionality -->
+    <script src="public/app.js"></script>
+</body>
+</html>

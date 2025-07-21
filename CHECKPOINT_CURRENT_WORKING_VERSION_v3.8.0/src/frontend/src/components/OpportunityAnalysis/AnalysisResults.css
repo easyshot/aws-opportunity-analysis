@@ -1,0 +1,488 @@
+/* Analysis Results Styles */
+.analysis-results {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.no-results {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.results-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 2rem;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.results-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #232f3e;
+  margin: 0;
+}
+
+.export-button {
+  background: #ff9900;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-button:hover {
+  background: #e68a00;
+  transform: translateY(-1px);
+}
+
+/* Metrics Section */
+.metrics-section {
+  padding: 2rem;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.metrics-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #232f3e;
+  margin-bottom: 1.5rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #232f3e;
+}
+
+.confidence-high {
+  color: #28a745;
+}
+
+.confidence-medium {
+  color: #ffc107;
+}
+
+.confidence-low {
+  color: #dc3545;
+}
+
+.confidence-unknown {
+  color: #6c757d;
+}
+
+/* Services Section */
+.services-section {
+  padding: 2rem;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.services-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #232f3e;
+  margin-bottom: 1rem;
+}
+
+.services-content {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Analysis Sections */
+.analysis-sections {
+  padding: 2rem;
+}
+
+.analysis-section {
+  margin-bottom: 2rem;
+}
+
+.analysis-section:last-child {
+  margin-bottom: 0;
+}
+
+.analysis-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #232f3e;
+  margin-bottom: 1rem;
+}
+
+.section-content {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1.5rem;
+  line-height: 1.6;
+  color: #495057;
+  white-space: pre-wrap;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Similar Projects */
+.similar-projects {
+  display: grid;
+  gap: 1rem;
+}
+
+.project-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.project-card h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #232f3e;
+  margin-bottom: 1rem;
+}
+
+.project-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.project-details div {
+  color: #495057;
+}
+
+.project-details strong {
+  color: #232f3e;
+}
+
+/* Funding and Follow-on Sections */
+.funding-section,
+.followon-section {
+  padding: 2rem;
+  border-top: 1px solid #f8f9fa;
+}
+
+.funding-section h3,
+.followon-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #232f3e;
+  margin-bottom: 1rem;
+}
+
+.collapsible-section {
+  margin-bottom: 1.5rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background: #f8f9fa;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  overflow: hidden;
+}
+.collapsible-section summary {
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 1rem 1.5rem;
+  outline: none;
+  background: #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+}
+.collapsible-content {
+  padding: 1.5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.75em;
+  border-radius: 12px;
+  font-size: 0.95em;
+  font-weight: 600;
+  margin-right: 0.5em;
+  margin-bottom: 0.2em;
+}
+.badge-success { background: #d1fae5; color: #065f46; }
+.badge-info { background: #e0f2fe; color: #0369a1; }
+.badge-warning { background: #fef9c3; color: #92400e; }
+.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-date { background: #ede9fe; color: #5b21b6; }
+.badge-unknown { background: #f3f4f6; color: #6b7280; }
+
+.placeholder {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.similar-projects-table-wrapper {
+  overflow-x: auto;
+}
+.similar-projects-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.similar-projects-table th, .similar-projects-table td {
+  border: 1px solid #dee2e6;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.95em;
+}
+.similar-projects-table th {
+  background: #f1f5f9;
+  font-weight: 700;
+}
+.similar-projects-table tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .results-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+    padding: 1.5rem;
+  }
+  
+  .export-button {
+    width: 100%;
+  }
+  
+  .metrics-section,
+  .services-section,
+  .analysis-sections,
+  .funding-section,
+  .followon-section {
+    padding: 1.5rem;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .project-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-content {
+    padding: 1rem;
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .results-header {
+    padding: 1rem;
+  }
+  
+  .results-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .metrics-section,
+  .services-section,
+  .analysis-sections,
+  .funding-section,
+  .followon-section {
+    padding: 1rem;
+  }
+  
+  .metric-card {
+    padding: 1rem;
+  }
+  
+  .metric-value {
+    font-size: 1.25rem;
+  }
+  
+  .services-content,
+  .section-content {
+    font-size: 0.8125rem;
+    padding: 0.75rem;
+  }
+  
+  .project-card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 800px) {
+  .collapsible-content, .section-content {
+    padding: 1rem;
+  }
+  .similar-projects-table th, .similar-projects-table td {
+    padding: 0.5rem 0.5rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .analysis-results {
+    background: #2d2d2d;
+    color: #e0e0e0;
+  }
+  
+  .results-header {
+    background: linear-gradient(135deg, #3d3d3d 0%, #4a4a4a 100%);
+    border-bottom-color: #4a4a4a;
+  }
+  
+  .results-header h2 {
+    color: #ffffff;
+  }
+  
+  .metrics-section,
+  .services-section,
+  .analysis-sections,
+  .funding-section,
+  .followon-section {
+    border-bottom-color: #3d3d3d;
+    border-top-color: #3d3d3d;
+  }
+  
+  .metrics-section h3,
+  .services-section h3,
+  .analysis-section h3,
+  .funding-section h3,
+  .followon-section h3 {
+    color: #ffffff;
+  }
+  
+  .metric-card {
+    background: #3d3d3d;
+    border-color: #4a4a4a;
+  }
+  
+  .metric-label {
+    color: #b0b0b0;
+  }
+  
+  .metric-value {
+    color: #ffffff;
+  }
+  
+  .services-content,
+  .section-content {
+    background: #3d3d3d;
+    border-color: #4a4a4a;
+    color: #e0e0e0;
+  }
+  
+  .project-card {
+    background: #3d3d3d;
+    border-color: #4a4a4a;
+  }
+  
+  .project-card h4 {
+    color: #ffffff;
+  }
+  
+  .project-details div {
+    color: #e0e0e0;
+  }
+  
+  .project-details strong {
+    color: #ffffff;
+  }
+  
+  .no-results {
+    color: #b0b0b0;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .analysis-results {
+    border: 2px solid #000000;
+  }
+  
+  .metric-card,
+  .project-card {
+    border-width: 2px;
+  }
+  
+  .export-button {
+    border: 2px solid #ff6600;
+    background: #ff6600;
+  }
+  
+  .confidence-high {
+    color: #00ff00;
+  }
+  
+  .confidence-medium {
+    color: #ffff00;
+  }
+  
+  .confidence-low {
+    color: #ff0000;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .analysis-results {
+    background: none;
+    box-shadow: none;
+    border: 1px solid #000000;
+  }
+  
+  .results-header {
+    background: none;
+  }
+  
+  .export-button {
+    display: none;
+  }
+  
+  .section-content {
+    max-height: none;
+    overflow: visible;
+    background: none;
+    border: 1px solid #000000;
+  }
+  
+  .metric-card,
+  .project-card {
+    background: none;
+    border: 1px solid #000000;
+  }
+}

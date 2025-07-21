@@ -1,0 +1,207 @@
+{
+  "Comment": "AWS Opportunity Analysis Main Workflow",
+  "StartAt": "ClearPreviousResults",
+  "States": {
+    "ClearPreviousResults": {
+      "Type": "Pass",
+      "Comment": "Clear any previous analysis results",
+      "Parameters": {
+        "opportunityDetails.$": "$.opportunityDetails",
+        "analysisOptions.$": "$.analysisOptions",
+        "cleared": true
+      },
+      "Next": "GenerateQuery"
+    },
+    "GenerateQuery": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Comment": "Generate SQL query using Bedrock",
+      "Parameters": {
+        "FunctionName": "${QueryGenerationLambdaArn}",
+        "Payload": {
+          "CustomerName.$": "$.opportunityDetails.CustomerName",
+          "region.$": "$.opportunityDetails.region",
+          "closeDate.$": "$.opportunityDetails.closeDate",
+          "oppName.$": "$.opportunityDetails.oppName",
+          "oppDescription.$": "$.opportunityDetails.oppDescription"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "QueryGenerationFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "ResultPath": "$.queryResult",
+      "Next": "ExecuteQuery"
+    },
+    "ExecuteQuery": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Comment": "Execute SQL query via Lambda to retrieve historical data",
+      "Parameters": {
+        "FunctionName": "${DataRetrievalLambdaArn}",
+        "Payload": {
+          "query.$": "$.queryResult.Payload.processResults"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "DataRetrievalFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "ResultPath": "$.dataResult",
+      "Next": "AnalysisChoice"
+    },
+    "AnalysisChoice": {
+      "Type": "Choice",
+      "Comment": "Choose analysis model based on configuration",
+      "Choices": [
+        {
+          "Variable": "$.analysisOptions.useNovaPremier",
+          "BooleanEquals": true,
+          "Next": "AnalyzeWithNovaPremier"
+        }
+      ],
+      "Default": "AnalyzeWithStandardModel"
+    },
+    "AnalyzeWithStandardModel": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Comment": "Analyze data using standard Bedrock model",
+      "Parameters": {
+        "FunctionName": "${StandardAnalysisLambdaArn}",
+        "Payload": {
+          "CustomerName.$": "$.opportunityDetails.CustomerName",
+          "region.$": "$.opportunityDetails.region",
+          "closeDate.$": "$.opportunityDetails.closeDate",
+          "oppName.$": "$.opportunityDetails.oppName",
+          "oppDescription.$": "$.opportunityDetails.oppDescription",
+          "queryResults.$": "$.dataResult.Payload.processResults"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "AnalysisFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "ResultPath": "$.analysisResult",
+      "Next": "FormatResults"
+    },
+    "AnalyzeWithNovaPremier": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Comment": "Analyze data using Nova Premier Bedrock model",
+      "Parameters": {
+        "FunctionName": "${NovaAnalysisLambdaArn}",
+        "Payload": {
+          "CustomerName.$": "$.opportunityDetails.CustomerName",
+          "region.$": "$.opportunityDetails.region",
+          "closeDate.$": "$.opportunityDetails.closeDate",
+          "oppName.$": "$.opportunityDetails.oppName",
+          "oppDescription.$": "$.opportunityDetails.oppDescription",
+          "queryResults.$": "$.dataResult.Payload.processResults"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "AnalysisFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "ResultPath": "$.analysisResult",
+      "Next": "FormatResults"
+    },
+    "FormatResults": {
+      "Type": "Pass",
+      "Comment": "Format final results for response",
+      "Parameters": {
+        "status": "success",
+        "metrics.$": "$.analysisResult.Payload.metrics",
+        "sections.$": "$.analysisResult.Payload.sections",
+        "formattedSummaryText.$": "$.analysisResult.Payload.formattedSummaryText",
+        "orchestrationType": "step-functions",
+        "executionArn.$": "$$.Execution.Name",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    },
+    "QueryGenerationFailed": {
+      "Type": "Pass",
+      "Comment": "Handle query generation failure",
+      "Parameters": {
+        "status": "error",
+        "error": "Query generation failed",
+        "message.$": "$.error.Cause",
+        "orchestrationType": "step-functions",
+        "failedAt": "QueryGeneration",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    },
+    "DataRetrievalFailed": {
+      "Type": "Pass",
+      "Comment": "Handle data retrieval failure",
+      "Parameters": {
+        "status": "error",
+        "error": "Data retrieval failed",
+        "message.$": "$.error.Cause",
+        "orchestrationType": "step-functions",
+        "failedAt": "DataRetrieval",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    },
+    "AnalysisFailed": {
+      "Type": "Pass",
+      "Comment": "Handle analysis failure",
+      "Parameters": {
+        "status": "error",
+        "error": "Analysis failed",
+        "message.$": "$.error.Cause",
+        "orchestrationType": "step-functions",
+        "failedAt": "Analysis",
+        "timestamp.$": "$$.State.EnteredTime"
+      },
+      "End": true
+    }
+  }
+}

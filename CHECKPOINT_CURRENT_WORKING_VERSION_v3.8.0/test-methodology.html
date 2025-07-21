@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Methodology Display</title>
+    <link rel="stylesheet" href="public/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Methodology Display Test</h1>
+        
+        <!-- Test the methodology section structure -->
+        <div class="analysis-results-section">
+            <div class="result-section methodology-section">
+                <h3 class="result-title">
+                    <span class="section-icon">🔬</span>
+                    Analysis Methodology
+                </h3>
+                <div class="result-content" id="methodologyContent">
+                    <div class="placeholder-content">
+                        <div class="placeholder-icon">📊</div>
+                        <p>Analysis methodology will appear here after running analysis...</p>
+                        <small>This section will show the approach, data sources, and confidence factors used in the analysis.</small>
+                    </div>
+                    <div class="methodology-details" style="display: none;">
+                        <div class="methodology-item analysis-approach-item">
+                            <div class="methodology-header">
+                                <span class="methodology-icon">🎯</span>
+                                <h4>Analysis Approach</h4>
+                            </div>
+                            <div class="methodology-text" id="analysisApproach">
+                                <div class="approach-summary" id="approachSummary"></div>
+                                <div class="approach-steps" id="approachSteps"></div>
+                                <div class="approach-techniques" id="approachTechniques"></div>
+                            </div>
+                        </div>
+                        <div class="methodology-item data-sources-item">
+                            <div class="methodology-header">
+                                <span class="methodology-icon">📚</span>
+                                <h4>Data Sources</h4>
+                            </div>
+                            <div class="methodology-text" id="dataSources">
+                                <div class="data-sources-list" id="dataSourcesList"></div>
+                                <div class="data-quality-info" id="dataQualityInfo"></div>
+                                <div class="data-coverage" id="dataCoverage"></div>
+                            </div>
+                        </div>
+                        <div class="methodology-item confidence-factors-item">
+                            <div class="methodology-header">
+                                <span class="methodology-icon">📈</span>
+                                <h4>Confidence Factors</h4>
+                            </div>
+                            <div class="methodology-text" id="confidenceFactors">
+                                <div class="confidence-factors-list" id="confidenceFactorsList"></div>
+                                <div class="confidence-scoring" id="confidenceScoring"></div>
+                                <div class="confidence-limitations" id="confidenceLimitations"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="testMethodologyDisplay()">Test Methodology Display</button>
+        <button onclick="clearMethodologyDisplay()">Clear Methodology Display</button>
+    </div>
+
+    <script>
+        // Test methodology data
+        const testMethodologyData = {
+            analysisApproach: {
+                summary: "Historical data analysis using AWS Bedrock AI models to identify similar projects and predict opportunity outcomes.",
+                steps: [
+                    "Query generation using natural language processing",
+                    "Historical project data retrieval from AWS Athena",
+                    "Pattern matching and similarity analysis",
+                    "Statistical modeling for predictions",
+                    "Confidence scoring based on data quality"
+                ],
+                techniques: [
+                    "Machine Learning",
+                    "Natural Language Processing", 
+                    "Statistical Analysis",
+                    "Pattern Recognition",
+                    "Predictive Modeling"
+                ]
+            },
+            dataSources: [
+                {
+                    name: "Historical Project Database",
+                    description: "AWS Athena database containing historical opportunity and project data",
+                    icon: "🗄️"
+                },
+                {
+                    name: "AWS Bedrock AI Models",
+                    description: "Amazon Titan model for standard analysis",
+                    icon: "🤖"
+                },
+                {
+                    name: "Customer Input Data",
+                    description: "Analysis based on customer opportunity data",
+                    icon: "📝"
+                }
+            ],
+            dataQuality: {
+                coverage: "85%",
+                accuracy: "92%",
+                completeness: "78%"
+            },
+            confidenceFactors: [
+                {
+                    factor: "Historical Data Availability",
+                    impact: "high",
+                    description: "Sufficient historical projects for pattern matching"
+                },
+                {
+                    factor: "Customer Profile Match",
+                    impact: "medium", 
+                    description: "Similar customer segments and industries in historical data"
+                },
+                {
+                    factor: "Regional Data Coverage",
+                    impact: "medium",
+                    description: "Good coverage of projects in target region"
+                },
+                {
+                    factor: "Service Pattern Recognition",
+                    impact: "high",
+                    description: "Strong patterns in service usage for similar opportunities"
+                }
+            ],
+            scoring: {
+                formula: "Confidence = (Data_Quality × 0.4) + (Pattern_Match × 0.3) + (Historical_Accuracy × 0.3)",
+                explanation: "Weighted scoring based on data quality, pattern matching strength, and historical prediction accuracy"
+            },
+            limitations: [
+                "Predictions based on historical patterns may not account for new market conditions",
+                "Limited data for highly specialized or unique customer requirements",
+                "Regional variations may affect accuracy for less common AWS regions",
+                "Service pricing and availability subject to change"
+            ]
+        };
+
+        // Test functions
+        function testMethodologyDisplay() {
+            populateMethodologyDisplay(testMethodologyData);
+        }
+
+        // Include the methodology functions from app.js
+        function populateMethodologyDisplay(methodologyData) {
+            const methodologyContent = document.getElementById('methodologyContent');
+            const placeholderContent = methodologyContent?.querySelector('.placeholder-content');
+            const methodologyDetails = methodologyContent?.querySelector('.methodology-details');
+            
+            if (!methodologyContent) {
+                console.warn('Methodology content element not found');
+                return;
+            }
+            
+            if (!methodologyData || Object.keys(methodologyData).length === 0) {
+                clearMethodologyDisplay();
+                return;
+            }
+            
+            // Hide placeholder and show methodology details
+            if (placeholderContent) {
+                placeholderContent.style.display = 'none';
+            }
+            if (methodologyDetails) {
+                methodologyDetails.style.display = 'grid';
+            }
+            
+            // Populate Analysis Approach
+            populateAnalysisApproach(methodologyData.analysisApproach || methodologyData.approach);
+            
+            // Populate Data Sources
+            populateDataSources(methodologyData.dataSources || methodologyData.sources, methodologyData);
+            
+            // Populate Confidence Factors
+            populateConfidenceFactorsSection(methodologyData.confidenceFactors || methodologyData.factors, methodologyData);
+        }
+
+        function populateAnalysisApproach(approachData) {
+            const approachSummary = document.getElementById('approachSummary');
+            const approachSteps = document.getElementById('approachSteps');
+            const approachTechniques = document.getElementById('approachTechniques');
+            
+            if (!approachData) return;
+            
+            // Populate summary
+            if (approachSummary && approachData.summary) {
+                approachSummary.textContent = approachData.summary;
+            }
+            
+            // Populate steps
+            if (approachSteps && approachData.steps) {
+                const stepsHTML = `
+                    <ul>
+                        ${approachData.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ul>
+                `;
+                approachSteps.innerHTML = stepsHTML;
+            }
+            
+            // Populate techniques
+            if (approachTechniques && approachData.techniques) {
+                const techniquesHTML = approachData.techniques.map(technique => 
+                    `<span class="technique-tag">${technique}</span>`
+                ).join('');
+                approachTechniques.innerHTML = techniquesHTML;
+            }
+        }
+
+        function populateDataSources(sourcesData, methodologyData) {
+            const dataSourcesList = document.getElementById('dataSourcesList');
+            const dataQualityInfo = document.getElementById('dataQualityInfo');
+            const dataCoverage = document.getElementById('dataCoverage');
+            
+            if (!sourcesData) return;
+            
+            // Populate data sources list
+            if (dataSourcesList && Array.isArray(sourcesData)) {
+                const sourcesHTML = sourcesData.map(source => `
+                    <div class="data-source-item">
+                        <div class="data-source-icon">${source.icon || '📊'}</div>
+                        <div class="data-source-info">
+                            <div class="data-source-name">${source.name}</div>
+                            <div class="data-source-description">${source.description}</div>
+                        </div>
+                    </div>
+                `).join('');
+                dataSourcesList.innerHTML = sourcesHTML;
+            }
+            
+            // Populate data quality info
+            if (dataQualityInfo && methodologyData?.dataQuality) {
+                dataQualityInfo.innerHTML = `
+                    <strong>Data Quality Assessment:</strong><br>
+                    Our analysis is based on high-quality historical data with regular validation and updates.
+                    Data sources are continuously monitored for accuracy and completeness.
+                `;
+            }
+            
+            // Populate data coverage metrics
+            if (dataCoverage && methodologyData?.dataQuality) {
+                const quality = methodologyData.dataQuality;
+                dataCoverage.innerHTML = `
+                    <div class="coverage-item">
+                        <span class="coverage-value">${quality.coverage || '85%'}</span>
+                        <span class="coverage-label">Coverage</span>
+                    </div>
+                    <div class="coverage-item">
+                        <span class="coverage-value">${quality.accuracy || '92%'}</span>
+                        <span class="coverage-label">Accuracy</span>
+                    </div>
+                    <div class="coverage-item">
+                        <span class="coverage-value">${quality.completeness || '78%'}</span>
+                        <span class="coverage-label">Complete</span>
+                    </div>
+                `;
+            }
+        }
+
+        function populateConfidenceFactorsSection(factorsData, methodologyData) {
+            const confidenceFactorsList = document.getElementById('confidenceFactorsList');
+            const confidenceScoring = document.getElementById('confidenceScoring');
+            const confidenceLimitations = document.getElementById('confidenceLimitations');
+            
+            if (!factorsData) return;
+            
+            // Populate confidence factors list
+            if (confidenceFactorsList && Array.isArray(factorsData)) {
+                const factorsHTML = factorsData.map(factor => `
+                    <div class="confidence-factor-item">
+                        <div class="factor-impact ${factor.impact || 'medium'}">${factor.impact || 'medium'}</div>
+                        <div class="factor-description">
+                            <strong>${factor.factor || factor.name}:</strong> ${factor.description}
+                        </div>
+                    </div>
+                `).join('');
+                confidenceFactorsList.innerHTML = factorsHTML;
+            }
+            
+            // Populate confidence scoring
+            if (confidenceScoring && methodologyData?.scoring) {
+                confidenceScoring.innerHTML = `
+                    <strong>Confidence Scoring Method:</strong><br>
+                    ${methodologyData.scoring.explanation}<br>
+                    <div class="scoring-formula">${methodologyData.scoring.formula}</div>
+                `;
+            }
+            
+            // Populate limitations
+            if (confidenceLimitations && methodologyData?.limitations) {
+                const limitationsHTML = methodologyData.limitations.map(limitation => 
+                    `<div class="limitation-item">${limitation}</div>`
+                ).join('');
+                confidenceLimitations.innerHTML = limitationsHTML;
+            }
+        }
+
+        function clearMethodologyDisplay() {
+            const methodologyContent = document.getElementById('methodologyContent');
+            const placeholderContent = methodologyContent?.querySelector('.placeholder-content');
+            const methodologyDetails = methodologyContent?.querySelector('.methodology-details');
+            
+            if (placeholderContent) {
+                placeholderContent.style.display = 'block';
+            }
+            if (methodologyDetails) {
+                methodologyDetails.style.display = 'none';
+            }
+            
+            // Clear individual sections
+            clearAnalysisApproach();
+            clearDataSources();
+            clearConfidenceFactorsSection();
+        }
+
+        function clearAnalysisApproach() {
+            const approachSummary = document.getElementById('approachSummary');
+            const approachSteps = document.getElementById('approachSteps');
+            const approachTechniques = document.getElementById('approachTechniques');
+            
+            if (approachSummary) approachSummary.textContent = '';
+            if (approachSteps) approachSteps.innerHTML = '';
+            if (approachTechniques) approachTechniques.innerHTML = '';
+        }
+
+        function clearDataSources() {
+            const dataSourcesList = document.getElementById('dataSourcesList');
+            const dataQualityInfo = document.getElementById('dataQualityInfo');
+            const dataCoverage = document.getElementById('dataCoverage');
+            
+            if (dataSourcesList) dataSourcesList.innerHTML = '';
+            if (dataQualityInfo) dataQualityInfo.innerHTML = '';
+            if (dataCoverage) dataCoverage.innerHTML = '';
+        }
+
+        function clearConfidenceFactorsSection() {
+            const confidenceFactorsList = document.getElementById('confidenceFactorsList');
+            const confidenceScoring = document.getElementById('confidenceScoring');
+            const confidenceLimitations = document.getElementById('confidenceLimitations');
+            
+            if (confidenceFactorsList) confidenceFactorsList.innerHTML = '';
+            if (confidenceScoring) confidenceScoring.innerHTML = '';
+            if (confidenceLimitations) confidenceLimitations.innerHTML = '';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 4.4: Architecture Display Test</title>
+    <link rel="stylesheet" href="public/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Task 4.4: Architecture Recommendations Display Test</h1>
+        
+        <div class="result-section architecture-section">
+            <h3 class="result-title">
+                <span class="section-icon">🏗️</span>
+                Architecture Recommendations
+                <span class="architecture-count">7</span>
+            </h3>
+            <div class="result-content">
+                <div class="architecture-display">
+                    <div class="architecture-summary">
+                        <div class="summary-stats">
+                            <span class="stat-item">
+                                <span class="stat-label">Components:</span>
+                                <span class="stat-value">25</span>
+                            </span>
+                            <span class="stat-item">
+                                <span class="stat-label">Services:</span>
+                                <span class="stat-value">18</span>
+                            </span>
+                            <span class="stat-item">
+                                <span class="stat-label">Complexity:</span>
+                                <span class="stat-value high">HIGH</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="architecture-sections">
+                        <div class="arch-section">
+                            <div class="arch-section-header" data-section="networkFoundation">
+                                <div class="arch-section-title">
+                                    <span class="arch-icon">🌐</span>
+                                    <h4>Network Foundation</h4>
+                                    <span class="component-count">2</span>
+                                </div>
+                                <div class="arch-section-controls">
+                                    <button type="button" class="expand-toggle">
+                                        <span class="expand-icon">▼</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="arch-content expandable expanded" id="networkFoundation">
+                                <div class="arch-components">
+                                    <div class="arch-component">
+                                        <div class="component-info">
+                                            <div class="component-name">Amazon VPC</div>
+                                            <div class="component-description">Virtual Private Cloud for isolated resources</div>
+                                        </div>
+                                        <div class="component-badge recommended">Required</div>
+                                    </div>
+                                    <div class="arch-component">
+                                        <div class="component-info">
+                                            <div class="component-name">AWS Direct Connect</div>
+                                            <div class="component-description">Dedicated network connection</div>
+                                        </div>
+                                        <div class="component-badge optional">Optional</div>
+                                    </div>
+                                </div>
+                                <div class="arch-links">
+                                    <h5>AWS Service Documentation</h5>
+                                    <div class="aws-service-links">
+                                        <a href="https://docs.aws.amazon.com/vpc/" target="_blank" class="aws-service-link">Amazon VPC</a>
+                                        <a href="https://docs.aws.amazon.com/directconnect/" target="_blank" class="aws-service-link">AWS Direct Connect</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="architecture-actions">
+                        <button type="button" class="arch-action-btn">Expand All</button>
+                        <button type="button" class="arch-action-btn">Collapse All</button>
+                        <button type="button" class="arch-action-btn">Export Architecture</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Architecture display test loaded!');
+                
+                document.querySelectorAll('.arch-section-header').forEach(header => {
+                    header.addEventListener('click', function() {
+                        const content = this.nextElementSibling;
+                        const icon = this.querySelector('.expand-icon');
+                        
+                        if (content.classList.contains('expanded')) {
+                            content.classList.remove('expanded');
+                            icon.style.transform = 'rotate(-90deg)';
+                        } else {
+                            content.classList.add('expanded');
+                            icon.style.transform = 'rotate(0deg)';
+                        }
+                    });
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

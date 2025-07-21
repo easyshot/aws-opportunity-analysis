@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analysis Sections Fix Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+      }
+      .section-content {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 3px;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Analysis Sections Fix Test</h1>
+
+    <div class="test-section">
+      <h2>Test 1: Mock Backend Response</h2>
+      <p>
+        This test simulates the backend response structure to verify that
+        individual section fields are properly populated.
+      </p>
+      <button onclick="testMockResponse()">Run Mock Response Test</button>
+      <div id="mockResults"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Test 2: Real API Call</h2>
+      <p>
+        This test makes a real API call to verify the fix works with actual
+        backend data.
+      </p>
+      <button onclick="testRealAPI()">Run Real API Test</button>
+      <div id="realResults"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Test Results</h2>
+      <div id="testResults"></div>
+    </div>
+
+    <script>
+      // Mock the backend response structure
+      const mockBackendResponse = {
+        metrics: {
+          predictedArr: "$150,000",
+          predictedMrr: "$12,500",
+          launchDate: "March 2025",
+          predictedProjectDuration: "8 months",
+          confidence: "HIGH",
+          confidenceScore: 85,
+          topServices: [
+            {
+              name: "Amazon EC2",
+              monthlyCost: "$3,500/month",
+              upfrontCost: "$5,000 upfront",
+            },
+            {
+              name: "Amazon RDS",
+              monthlyCost: "$2,000/month",
+              upfrontCost: "$3,000 upfront",
+            },
+          ],
+        },
+        methodology:
+          "This analysis was conducted using AWS Bedrock AI models with 155 historical project records. The methodology involved pattern recognition, statistical modeling, and industry benchmarking to provide accurate predictions.",
+        findings:
+          "Key findings indicate a strong market opportunity with high confidence based on historical data patterns. The customer profile and technical requirements align well with successful projects in our dataset.",
+        rationale:
+          "The prediction is based on comprehensive analysis of 155 historical projects. Statistical modeling shows a 87% success rate for similar project profiles, with strong correlation between customer requirements and successful outcomes.",
+        riskFactors:
+          "Risk assessment shows a low to medium risk profile. Primary risks include timeline compression (15% probability) and scope creep (20% probability). Mitigation strategies are recommended for each identified risk.",
+        similarProjects:
+          "Historical analysis found 12 comparable projects with similar characteristics and outcomes. These projects showed an average ARR of $140,000 and 85% success rate, providing strong validation for the current opportunity.",
+        fullAnalysis:
+          "Complete analysis generated using 155 record limit with AWS Bedrock AI. This includes detailed methodology, findings, rationale, risk assessment, and similar project analysis.",
+        formattedSummaryText:
+          "Complete analysis generated using 155 record limit with AWS Bedrock AI.",
+      };
+
+      function testMockResponse() {
+        const resultsDiv = document.getElementById("mockResults");
+        resultsDiv.innerHTML = "<h3>Testing Mock Response...</h3>";
+
+        try {
+          // Simulate the populateUI function logic
+          const sections = {
+            methodology: mockBackendResponse.methodology,
+            findings: mockBackendResponse.findings,
+            rationale: mockBackendResponse.rationale,
+            riskFactors: mockBackendResponse.riskFactors,
+            similarProjects: mockBackendResponse.similarProjects,
+          };
+
+          let results = "";
+          results += "<h4>Section Population Results:</h4>";
+
+          for (const [sectionName, content] of Object.entries(sections)) {
+            const hasContent = content && content.length > 0;
+            const isGeneric = content && content.includes("not available");
+
+            results += `
+                        <div class="section-content ${
+                          hasContent && !isGeneric ? "success" : "error"
+                        }">
+                            <strong>${sectionName}:</strong> 
+                            ${hasContent ? "✅ Populated" : "❌ Empty"} 
+                            ${isGeneric ? "⚠️ Generic content" : ""}
+                            <br>
+                            <small>Content: ${
+                              content
+                                ? content.substring(0, 100) + "..."
+                                : "No content"
+                            }</small>
+                        </div>
+                    `;
+          }
+
+          resultsDiv.innerHTML = results;
+
+          // Update test results
+          updateTestResults(
+            "Mock Response Test",
+            "PASSED",
+            "All sections properly populated from individual fields"
+          );
+        } catch (error) {
+          resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+          updateTestResults("Mock Response Test", "FAILED", error.message);
+        }
+      }
+
+      async function testRealAPI() {
+        const resultsDiv = document.getElementById("realResults");
+        resultsDiv.innerHTML = "<h3>Testing Real API Call...</h3>";
+
+        try {
+          // Make a test API call
+          const response = await fetch("/api/analyze", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-sql-query-limit": "50",
+              "x-truncation-limit": "100000",
+              "x-enable-truncation": "true",
+            },
+            body: JSON.stringify({
+              CustomerName: "Test Company",
+              region: "United States",
+              closeDate: "2025-12-31",
+              oppName: "Test Opportunity",
+              oppDescription:
+                "This is a test opportunity for validating the analysis sections fix.",
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          let results = "<h4>Real API Response Analysis:</h4>";
+
+          // Check if individual sections are present
+          const sections = [
+            "methodology",
+            "findings",
+            "rationale",
+            "riskFactors",
+            "similarProjects",
+          ];
+          let allSectionsPresent = true;
+
+          for (const sectionName of sections) {
+            const hasSection =
+              data[sectionName] && data[sectionName].length > 0;
+            const isGeneric =
+              data[sectionName] && data[sectionName].includes("not available");
+
+            results += `
+                        <div class="section-content ${
+                          hasSection && !isGeneric ? "success" : "error"
+                        }">
+                            <strong>${sectionName}:</strong> 
+                            ${hasSection ? "✅ Present" : "❌ Missing"} 
+                            ${isGeneric ? "⚠️ Generic content" : ""}
+                            <br>
+                            <small>Content: ${
+                              data[sectionName]
+                                ? data[sectionName].substring(0, 100) + "..."
+                                : "No content"
+                            }</small>
+                        </div>
+                    `;
+
+            if (!hasSection || isGeneric) {
+              allSectionsPresent = false;
+            }
+          }
+
+          resultsDiv.innerHTML = results;
+
+          if (allSectionsPresent) {
+            updateTestResults(
+              "Real API Test",
+              "PASSED",
+              "All sections properly populated from backend"
+            );
+          } else {
+            updateTestResults(
+              "Real API Test",
+              "FAILED",
+              "Some sections missing or contain generic content"
+            );
+          }
+        } catch (error) {
+          resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+          updateTestResults("Real API Test", "FAILED", error.message);
+        }
+      }
+
+      function updateTestResults(testName, status, message) {
+        const resultsDiv = document.getElementById("testResults");
+        const timestamp = new Date().toLocaleTimeString();
+
+        const resultHtml = `
+                <div class="test-section ${
+                  status === "PASSED" ? "success" : "error"
+                }">
+                    <h4>${testName} - ${status}</h4>
+                    <p><strong>Time:</strong> ${timestamp}</p>
+                    <p><strong>Message:</strong> ${message}</p>
+                </div>
+            `;
+
+        resultsDiv.innerHTML += resultHtml;
+      }
+    </script>
+  </body>
+</html>

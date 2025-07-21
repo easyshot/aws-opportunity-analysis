@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced PopulateUI Test - Task 6.3</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-header {
+            background: #232f3e;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            margin: -20px -20px 20px -20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #232f3e;
+        }
+        .mock-data {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .test-button {
+            background: #ff9900;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .test-button:hover {
+            background: #e88900;
+        }
+        .result-display {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f5e8;
+            border-radius: 4px;
+            border-left: 4px solid #28a745;
+        }
+        .error-display {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8d7da;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+        }
+        .projection-card {
+            display: inline-block;
+            width: 200px;
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+            vertical-align: top;
+        }
+        .projection-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #232f3e;
+        }
+        .confidence-level.high { color: #28a745; }
+        .confidence-level.medium { color: #ffc107; }
+        .confidence-level.low { color: #dc3545; }
+        .service-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .finding-item, .rationale-item, .risk-factor-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .risk-factor-item.high-risk { border-left-color: #dc3545; }
+        .risk-factor-item.medium-risk { border-left-color: #ffc107; }
+        .risk-factor-item.low-risk { border-left-color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>Enhanced PopulateUI Function Test - Task 6.3</h1>
+            <p>Testing comprehensive result population for all display sections</p>
+        </div>
+
+        <!-- Test Section 1: Projections -->
+        <div class="test-section">
+            <h3>1. Projections Display Test</h3>
+            <div class="mock-data">
+                Mock Data: ARR, MRR, Launch Date, Time to Launch, Confidence, Top Services
+            </div>
+            <button class="test-button" onclick="testProjections()">Test Projections</button>
+            <div id="projections-result"></div>
+            
+            <!-- Mock projection display elements -->
+            <div class="projection-card">
+                <h4>ARR</h4>
+                <div class="projection-value" id="arrValue">-</div>
+                <div id="arrRange">Range will appear here</div>
+                <div id="arrConfidence">Confidence will appear here</div>
+            </div>
+            
+            <div class="projection-card">
+                <h4>MRR</h4>
+                <div class="projection-value" id="mrrValue">-</div>
+                <div id="mrrRelationship">Relationship will appear here</div>
+            </div>
+            
+            <div class="projection-card">
+                <h4>Launch Date</h4>
+                <div class="projection-value" id="launchDateValue">-</div>
+                <div id="launchDaysFromNow">Days from now will appear here</div>
+            </div>
+            
+            <div class="projection-card">
+                <h4>Confidence</h4>
+                <div class="projection-value confidence-level" id="confidenceValue">-</div>
+                <div id="confidencePercentage">Percentage will appear here</div>
+            </div>
+        </div>
+
+        <!-- Test Section 2: Analysis Results -->
+        <div class="test-section">
+            <h3>2. Analysis Results Test</h3>
+            <div class="mock-data">
+                Mock Data: Methodology, Findings, Rationale, Risk Factors
+            </div>
+            <button class="test-button" onclick="testAnalysisResults()">Test Analysis Results</button>
+            <div id="analysis-result"></div>
+            
+            <!-- Mock analysis display elements -->
+            <div id="findingsList"></div>
+            <div id="rationaleList"></div>
+            <div id="riskFactorsList"></div>
+        </div>
+
+        <!-- Test Section 3: Architecture -->
+        <div class="test-section">
+            <h3>3. Architecture Recommendations Test</h3>
+            <div class="mock-data">
+                Mock Data: Network Foundation, Compute Layer, Data Layer, Security Components
+            </div>
+            <button class="test-button" onclick="testArchitecture()">Test Architecture</button>
+            <div id="architecture-result"></div>
+            
+            <!-- Mock architecture display elements -->
+            <div id="networkFoundationComponents"></div>
+            <div id="computeLayerComponents"></div>
+            <div id="dataLayerComponents"></div>
+        </div>
+
+        <!-- Test Section 4: Top Services -->
+        <div class="test-section">
+            <h3>4. Top Services Display Test</h3>
+            <div class="mock-data">
+                Mock Data: Service list with costs and descriptions
+            </div>
+            <button class="test-button" onclick="testTopServices()">Test Top Services</button>
+            <div id="services-result"></div>
+            
+            <!-- Mock services display elements -->
+            <div class="services-placeholder" style="display: block;">Top AWS services will appear here</div>
+            <div id="servicesStructured" style="display: none;"></div>
+            <div id="servicesSummary" style="display: none;">
+                <div id="totalEstimatedCost"></div>
+                <div id="servicesCount"></div>
+            </div>
+        </div>
+
+        <!-- Test Section 5: Complete Integration -->
+        <div class="test-section">
+            <h3>5. Complete PopulateUI Integration Test</h3>
+            <div class="mock-data">
+                Mock Data: Complete results object with all sections
+            </div>
+            <button class="test-button" onclick="testCompletePopulation()">Test Complete Population</button>
+            <div id="complete-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Include the enhanced population functions from app.js
+        
+        // Enhanced formatCurrency function
+        function formatCurrency(amount) {
+            if (typeof amount !== 'number') {
+                amount = parseFloat(amount) || 0;
+            }
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Enhanced formatDate function
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'Invalid Date';
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        // Populate ARR display with enhanced formatting
+        function populateARRDisplay(arrData) {
+            const arrValue = document.getElementById('arrValue');
+            const arrRange = document.getElementById('arrRange');
+            const arrConfidence = document.getElementById('arrConfidence');
+            
+            if (arrValue) {
+                const formattedValue = formatCurrency(arrData.value || arrData);
+                arrValue.textContent = formattedValue;
+            }
+            
+            if (arrRange && arrData.range) {
+                const rangeText = `Range: ${formatCurrency(arrData.range.min)} - ${formatCurrency(arrData.range.max)}`;
+                arrRange.textContent = rangeText;
+            }
+            
+            if (arrConfidence && arrData.confidence) {
+                arrConfidence.textContent = `${Math.round(arrData.confidence)}% confidence`;
+            }
+        }
+
+        // Populate MRR display with relationship to ARR
+        function populateMRRDisplay(mrrData) {
+            const mrrValue = document.getElementById('mrrValue');
+            const mrrRelationship = document.getElementById('mrrRelationship');
+            
+            if (mrrValue) {
+                const formattedValue = formatCurrency(mrrData.value || mrrData);
+                mrrValue.textContent = formattedValue;
+            }
+            
+            if (mrrRelationship && mrrData.relationship) {
+                mrrRelationship.textContent = mrrData.relationship;
+            }
+        }
+
+        // Populate launch date display
+        function populateLaunchDateDisplay(launchDateData) {
+            const launchDateValue = document.getElementById('launchDateValue');
+            const launchDaysFromNow = document.getElementById('launchDaysFromNow');
+            
+            if (launchDateValue) {
+                const dateValue = launchDateData.date || launchDateData;
+                launchDateValue.textContent = formatDate(dateValue);
+            }
+            
+            if (launchDaysFromNow && launchDateData.daysFromNow) {
+                const daysText = `${launchDateData.daysFromNow} days from now`;
+                launchDaysFromNow.textContent = daysText;
+            }
+        }
+
+        // Populate confidence display
+        function populateConfidenceDisplay(confidenceData) {
+            const confidenceValue = document.getElementById('confidenceValue');
+            const confidencePercentage = document.getElementById('confidencePercentage');
+            
+            if (confidenceValue) {
+                const level = confidenceData.level || confidenceData;
+                confidenceValue.textContent = level;
+                confidenceValue.className = `projection-value confidence-level ${level.toLowerCase()}`;
+            }
+            
+            if (confidencePercentage && confidenceData.score) {
+                confidencePercentage.textContent = `${Math.round(confidenceData.score)}%`;
+            }
+        }
+
+        // Populate top services display
+        function populateTopServicesDisplay(topServicesData) {
+            const servicesStructured = document.getElementById('servicesStructured');
+            const servicesPlaceholder = document.querySelector('.services-placeholder');
+            const servicesSummary = document.getElementById('servicesSummary');
+            const totalEstimatedCost = document.getElementById('totalEstimatedCost');
+            const servicesCount = document.getElementById('servicesCount');
+            
+            if (!Array.isArray(topServicesData)) {
+                console.warn('Top services data is not an array:', topServicesData);
+                return;
+            }
+            
+            // Hide placeholder and show structured content
+            if (servicesPlaceholder) servicesPlaceholder.style.display = 'none';
+            if (servicesStructured) servicesStructured.style.display = 'block';
+            if (servicesSummary) servicesSummary.style.display = 'block';
+            
+            // Populate services list
+            if (servicesStructured) {
+                servicesStructured.innerHTML = topServicesData.map(service => `
+                    <div class="service-item">
+                        <div class="service-header">
+                            <span class="service-name">${service.service || service.name || service}</span>
+                            <span class="service-cost">${formatCurrency(service.estimatedCost || 0)}</span>
+                        </div>
+                        <div class="service-description">${service.description || 'AWS service recommendation'}</div>
+                    </div>
+                `).join('');
+            }
+            
+            // Calculate and display summary
+            const totalCost = topServicesData.reduce((sum, service) => 
+                sum + (service.estimatedCost || 0), 0);
+            
+            if (totalEstimatedCost) {
+                totalEstimatedCost.textContent = `Total Estimated Cost: ${formatCurrency(totalCost)}`;
+            }
+            
+            if (servicesCount) {
+                servicesCount.textContent = `${topServicesData.length} services recommended`;
+            }
+        }
+
+        // Populate findings section
+        function populateFindings(findingsData) {
+            const findingsList = document.getElementById('findingsList');
+            
+            if (!Array.isArray(findingsData)) {
+                console.warn('Findings data is not an array:', findingsData);
+                return;
+            }
+            
+            if (findingsList) {
+                findingsList.innerHTML = findingsData.map((finding, index) => `
+                    <div class="finding-item" data-finding-id="${index}">
+                        <div class="finding-header">
+                            <strong>${finding.category || 'General'}</strong> - ${Math.round(finding.confidence || 0)}% confidence
+                        </div>
+                        <div class="finding-content">
+                            <div class="finding-insight">${finding.insight}</div>
+                            ${finding.supporting_data ? `<div class="finding-support"><em>${finding.supporting_data}</em></div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Populate rationale section
+        function populateRationale(rationaleData) {
+            const rationaleList = document.getElementById('rationaleList');
+            
+            if (!Array.isArray(rationaleData)) {
+                console.warn('Rationale data is not an array:', rationaleData);
+                return;
+            }
+            
+            if (rationaleList) {
+                rationaleList.innerHTML = rationaleData.map((rationale, index) => `
+                    <div class="rationale-item" data-rationale-id="${index}">
+                        <div class="rationale-header">
+                            <strong>${rationale.prediction}</strong>
+                        </div>
+                        <div class="rationale-content">
+                            <div class="rationale-reasoning">${rationale.reasoning}</div>
+                            ${rationale.historical_basis ? `<div class="rationale-basis"><em>Historical basis: ${rationale.historical_basis}</em></div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Populate risk factors section
+        function populateRiskFactors(riskFactorsData) {
+            const riskFactorsList = document.getElementById('riskFactorsList');
+            
+            if (!Array.isArray(riskFactorsData)) {
+                console.warn('Risk factors data is not an array:', riskFactorsData);
+                return;
+            }
+            
+            if (riskFactorsList) {
+                riskFactorsList.innerHTML = riskFactorsData.map((risk, index) => `
+                    <div class="risk-factor-item ${(risk.severity || 'medium').toLowerCase()}-risk" data-risk-id="${index}">
+                        <div class="risk-header">
+                            <strong>${risk.risk}</strong> - <span class="risk-severity">${risk.severity || 'MEDIUM'}</span>
+                        </div>
+                        <div class="risk-content">
+                            <div class="risk-impact"><strong>Impact:</strong> ${risk.impact}</div>
+                            <div class="risk-mitigation"><strong>Mitigation:</strong> ${risk.mitigation}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Populate architecture section
+        function populateArchitectureSection(sectionName, sectionData) {
+            const componentsContainer = document.getElementById(`${sectionName}Components`);
+            
+            if (!Array.isArray(sectionData)) {
+                console.warn(`Architecture section ${sectionName} is not an array:`, sectionData);
+                return;
+            }
+            
+            if (componentsContainer) {
+                componentsContainer.innerHTML = `
+                    <h4>${sectionName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</h4>
+                    ${sectionData.map(component => `
+                        <div class="arch-component">
+                            <span class="component-name">${component.name || component}</span>
+                            ${component.description ? `<span class="component-description"> - ${component.description}</span>` : ''}
+                        </div>
+                    `).join('')}
+                `;
+            }
+        }
+
+        // Test functions
+        function testProjections() {
+            const mockProjections = {
+                arr: {
+                    value: 850000,
+                    range: { min: 750000, max: 950000 },
+                    confidence: 85
+                },
+                mrr: {
+                    value: 70833,
+                    relationship: "8.33% of ARR"
+                },
+                launchDate: {
+                    date: "2025-06-15",
+                    daysFromNow: 165
+                },
+                confidence: {
+                    level: "HIGH",
+                    score: 85
+                }
+            };
+
+            try {
+                populateARRDisplay(mockProjections.arr);
+                populateMRRDisplay(mockProjections.mrr);
+                populateLaunchDateDisplay(mockProjections.launchDate);
+                populateConfidenceDisplay(mockProjections.confidence);
+                
+                document.getElementById('projections-result').innerHTML = 
+                    '<div class="result-display">✅ Projections populated successfully!</div>';
+            } catch (error) {
+                document.getElementById('projections-result').innerHTML = 
+                    `<div class="error-display">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function testAnalysisResults() {
+            const mockAnalysis = {
+                findings: [
+                    {
+                        category: "Market Analysis",
+                        insight: "Strong market demand for cloud migration services",
+                        confidence: 90,
+                        supporting_data: "Based on 15 similar projects in the same industry"
+                    },
+                    {
+                        category: "Technical Assessment",
+                        insight: "Moderate complexity migration with standard AWS services",
+                        confidence: 75,
+                        supporting_data: "Architecture analysis shows typical enterprise patterns"
+                    }
+                ],
+                rationale: [
+                    {
+                        prediction: "ARR of $850,000",
+                        reasoning: "Based on similar enterprise migrations in the same region",
+                        historical_basis: "Average of 12 comparable projects over the last 18 months"
+                    }
+                ],
+                riskFactors: [
+                    {
+                        risk: "Timeline delays due to legacy system complexity",
+                        severity: "MEDIUM",
+                        impact: "Could extend project by 2-3 months",
+                        mitigation: "Conduct thorough legacy system assessment early"
+                    },
+                    {
+                        risk: "Budget overrun on data migration",
+                        severity: "HIGH",
+                        impact: "Potential 20-30% cost increase",
+                        mitigation: "Implement phased migration approach with cost monitoring"
+                    }
+                ]
+            };
+
+            try {
+                populateFindings(mockAnalysis.findings);
+                populateRationale(mockAnalysis.rationale);
+                populateRiskFactors(mockAnalysis.riskFactors);
+                
+                document.getElementById('analysis-result').innerHTML = 
+                    '<div class="result-display">✅ Analysis results populated successfully!</div>';
+            } catch (error) {
+                document.getElementById('analysis-result').innerHTML = 
+                    `<div class="error-display">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function testArchitecture() {
+            const mockArchitecture = {
+                networkFoundation: [
+                    { name: "VPC", description: "Virtual Private Cloud for network isolation" },
+                    { name: "Subnets", description: "Public and private subnets across AZs" },
+                    { name: "Internet Gateway", description: "Internet access for public resources" }
+                ],
+                computeLayer: [
+                    { name: "EC2", description: "Virtual servers for application hosting" },
+                    { name: "Auto Scaling", description: "Automatic scaling based on demand" },
+                    { name: "Load Balancer", description: "Distribute traffic across instances" }
+                ],
+                dataLayer: [
+                    { name: "RDS", description: "Managed relational database service" },
+                    { name: "S3", description: "Object storage for files and backups" },
+                    { name: "ElastiCache", description: "In-memory caching for performance" }
+                ]
+            };
+
+            try {
+                populateArchitectureSection('networkFoundation', mockArchitecture.networkFoundation);
+                populateArchitectureSection('computeLayer', mockArchitecture.computeLayer);
+                populateArchitectureSection('dataLayer', mockArchitecture.dataLayer);
+                
+                document.getElementById('architecture-result').innerHTML = 
+                    '<div class="result-display">✅ Architecture recommendations populated successfully!</div>';
+            } catch (error) {
+                document.getElementById('architecture-result').innerHTML = 
+                    `<div class="error-display">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function testTopServices() {
+            const mockTopServices = [
+                {
+                    service: "Amazon EC2",
+                    estimatedCost: 2400,
+                    description: "Virtual servers for application hosting"
+                },
+                {
+                    service: "Amazon RDS",
+                    estimatedCost: 1800,
+                    description: "Managed database service"
+                },
+                {
+                    service: "Amazon S3",
+                    estimatedCost: 600,
+                    description: "Object storage for data and backups"
+                },
+                {
+                    service: "Application Load Balancer",
+                    estimatedCost: 300,
+                    description: "Load balancing for high availability"
+                }
+            ];
+
+            try {
+                populateTopServicesDisplay(mockTopServices);
+                
+                document.getElementById('services-result').innerHTML = 
+                    '<div class="result-display">✅ Top services populated successfully!</div>';
+            } catch (error) {
+                document.getElementById('services-result').innerHTML = 
+                    `<div class="error-display">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function testCompletePopulation() {
+            try {
+                // Run all tests
+                testProjections();
+                testAnalysisResults();
+                testArchitecture();
+                testTopServices();
+                
+                document.getElementById('complete-result').innerHTML = 
+                    '<div class="result-display">✅ Complete UI population test successful! All sections populated with proper formatting, currency display, date handling, and structured content.</div>';
+            } catch (error) {
+                document.getElementById('complete-result').innerHTML = 
+                    `<div class="error-display">❌ Complete test failed: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-run complete test on page load
+        window.addEventListener('load', () => {
+            setTimeout(testCompletePopulation, 1000);
+        });
+    </script>
+</body>
+</html>

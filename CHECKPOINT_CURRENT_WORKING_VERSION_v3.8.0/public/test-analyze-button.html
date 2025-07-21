@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Analyze Button</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 10px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Analyze Button Test</h1>
+    
+    <div class="test-section">
+        <h2>Backend API Test</h2>
+        <button onclick="testBackendAPI()">Test Backend API</button>
+        <div id="backendResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Frontend Form Test</h2>
+        <form id="testForm">
+            <input type="text" id="customerName" placeholder="Customer Name" value="Test Customer"><br>
+            <select id="region">
+                <option value="United States">United States</option>
+            </select><br>
+            <input type="date" id="closeDate" value="2025-12-31"><br>
+            <input type="text" id="opportunityName" placeholder="Opportunity Name" value="Test Opportunity"><br>
+            <textarea id="description" placeholder="Description">This is a test description with more than fifty characters to meet the minimum requirement for validation.</textarea><br>
+        </form>
+        <button onclick="testAnalyzeFunction()">Test Analyze Function</button>
+        <div id="frontendResult"></div>
+    </div>
+
+    <script>
+        async function testBackendAPI() {
+            const resultDiv = document.getElementById('backendResult');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerName: 'Test Customer',
+                        region: 'United States',
+                        closeDate: '2025-12-31',
+                        opportunityName: 'Test Opportunity',
+                        description: 'This is a test description with more than fifty characters to meet the minimum requirement for validation.'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = '<div class="success">✓ Backend API working! Response received.</div>';
+                    console.log('Backend response:', data);
+                } else {
+                    resultDiv.innerHTML = '<div class="error">✗ Backend API failed with status: ' + response.status + '</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">✗ Backend API error: ' + error.message + '</div>';
+                console.error('Backend test error:', error);
+            }
+        }
+        
+        function testAnalyzeFunction() {
+            const resultDiv = document.getElementById('frontendResult');
+            resultDiv.innerHTML = 'Testing...';
+            
+            // Check if the analyze function exists
+            if (typeof window.analyzeOpportunity === 'function') {
+                resultDiv.innerHTML = '<div class="success">✓ analyzeOpportunity function exists</div>';
+                
+                // Try to call it
+                try {
+                    window.analyzeOpportunity();
+                    resultDiv.innerHTML += '<div class="success">✓ analyzeOpportunity function called successfully</div>';
+                } catch (error) {
+                    resultDiv.innerHTML += '<div class="error">✗ Error calling analyzeOpportunity: ' + error.message + '</div>';
+                }
+            } else {
+                resultDiv.innerHTML = '<div class="error">✗ analyzeOpportunity function not found</div>';
+            }
+        }
+    </script>
+</body>
+</html>

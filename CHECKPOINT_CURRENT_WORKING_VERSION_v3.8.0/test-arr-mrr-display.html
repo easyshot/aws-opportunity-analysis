@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ARR and MRR Display</title>
+    <link rel="stylesheet" href="public/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Test ARR and MRR Display Implementation</h1>
+        
+        <!-- Test Projections Section -->
+        <div class="projections-section">
+            <h2>Test Opportunity Projections</h2>
+            <div class="projections-grid">
+                <!-- ARR Display Test -->
+                <div class="projection-card arr-card">
+                    <h3>Annual Recurring Revenue</h3>
+                    <div class="projection-value" id="projectedARR">
+                        <span class="value" id="arrValue">-</span>
+                        <span class="confidence-range" id="arrRange">Confidence range will appear here</span>
+                        <div class="currency-details">
+                            <span class="formatted-currency" id="arrFormatted"></span>
+                            <span class="confidence-score" id="arrConfidence"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MRR Display Test -->
+                <div class="projection-card mrr-card">
+                    <h3>Monthly Recurring Revenue</h3>
+                    <div class="projection-value" id="projectedMRR">
+                        <span class="value" id="mrrValue">-</span>
+                        <span class="relationship" id="mrrRelationship">Relationship to ARR will appear here</span>
+                        <div class="currency-details">
+                            <span class="formatted-currency" id="mrrFormatted"></span>
+                            <span class="arr-relationship" id="mrrArrRelation"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Controls -->
+        <div class="test-controls" style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px;">
+            <h3>Test Controls</h3>
+            <button onclick="testARRMRRDisplay()" style="padding: 10px 20px; background: #232f3e; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Test ARR/MRR Display
+            </button>
+            <button onclick="clearDisplays()" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                Clear Displays
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Copy the relevant functions from app.js for testing
+        function formatCurrency(value, currency = 'USD') {
+            if (!value || isNaN(parseFloat(value))) {
+                return '-';
+            }
+            
+            const numericValue = parseFloat(value.toString().replace(/[^0-9.-]/g, ''));
+            
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currency,
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(numericValue);
+        }
+
+        function calculateConfidenceRange(arrValue, confidenceLevel) {
+            if (!arrValue || isNaN(parseFloat(arrValue))) {
+                return { min: 0, max: 0, range: 'N/A' };
+            }
+            
+            const numericValue = parseFloat(arrValue.toString().replace(/[^0-9.-]/g, ''));
+            let variancePercent = 0.2; // Default 20% variance
+            
+            // Adjust variance based on confidence level
+            switch (confidenceLevel?.toUpperCase()) {
+                case 'HIGH':
+                    variancePercent = 0.1; // 10% variance for high confidence
+                    break;
+                case 'MEDIUM':
+                    variancePercent = 0.2; // 20% variance for medium confidence
+                    break;
+                case 'LOW':
+                    variancePercent = 0.3; // 30% variance for low confidence
+                    break;
+                default:
+                    variancePercent = 0.2;
+            }
+            
+            const variance = numericValue * variancePercent;
+            const min = numericValue - variance;
+            const max = numericValue + variance;
+            
+            return {
+                min: min,
+                max: max,
+                range: `${formatCurrency(min)} - ${formatCurrency(max)}`
+            };
+        }
+
+        function calculateMRRRelationship(arrValue, mrrValue) {
+            if (!arrValue || !mrrValue || isNaN(parseFloat(arrValue)) || isNaN(parseFloat(mrrValue))) {
+                return 'Relationship unavailable';
+            }
+            
+            const numericARR = parseFloat(arrValue.toString().replace(/[^0-9.-]/g, ''));
+            const numericMRR = parseFloat(mrrValue.toString().replace(/[^0-9.-]/g, ''));
+            
+            const expectedMRR = numericARR / 12;
+            const percentage = (numericMRR / expectedMRR) * 100;
+            
+            if (Math.abs(percentage - 100) < 5) {
+                return `${percentage.toFixed(1)}% of expected ARR/12 (aligned)`;
+            } else if (percentage > 100) {
+                return `${percentage.toFixed(1)}% of expected ARR/12 (above expected)`;
+            } else {
+                return `${percentage.toFixed(1)}% of expected ARR/12 (below expected)`;
+            }
+        }
+
+        function populateARRDisplay(arrValue, confidenceLevel, confidenceScore) {
+            const arrValueElement = document.getElementById('arrValue');
+            const arrRangeElement = document.getElementById('arrRange');
+            const arrFormattedElement = document.getElementById('arrFormatted');
+            const arrConfidenceElement = document.getElementById('arrConfidence');
+            
+            if (!arrValue || arrValue === 'N/A' || arrValue === '-') {
+                if (arrValueElement) arrValueElement.textContent = '-';
+                if (arrRangeElement) arrRangeElement.textContent = 'Confidence range will appear here';
+                if (arrFormattedElement) arrFormattedElement.textContent = '';
+                if (arrConfidenceElement) arrConfidenceElement.textContent = '';
+                return;
+            }
+            
+            // Format the main ARR value
+            const formattedARR = formatCurrency(arrValue);
+            if (arrValueElement) arrValueElement.textContent = formattedARR;
+            if (arrFormattedElement) arrFormattedElement.textContent = formattedARR;
+            
+            // Calculate and display confidence range
+            const confidenceRange = calculateConfidenceRange(arrValue, confidenceLevel);
+            if (arrRangeElement) {
+                arrRangeElement.textContent = `Confidence Range: ${confidenceRange.range}`;
+            }
+            
+            // Display confidence score
+            if (arrConfidenceElement && confidenceScore) {
+                arrConfidenceElement.textContent = `Confidence: ${confidenceLevel || 'MEDIUM'} (${confidenceScore}%)`;
+                arrConfidenceElement.className = `confidence-score ${(confidenceLevel || 'MEDIUM').toLowerCase()}`;
+            }
+        }
+
+        function populateMRRDisplay(mrrValue, arrValue, confidenceLevel) {
+            const mrrValueElement = document.getElementById('mrrValue');
+            const mrrRelationshipElement = document.getElementById('mrrRelationship');
+            const mrrFormattedElement = document.getElementById('mrrFormatted');
+            const mrrArrRelationElement = document.getElementById('mrrArrRelation');
+            
+            if (!mrrValue || mrrValue === 'N/A' || mrrValue === '-') {
+                if (mrrValueElement) mrrValueElement.textContent = '-';
+                if (mrrRelationshipElement) mrrRelationshipElement.textContent = 'Relationship to ARR will appear here';
+                if (mrrFormattedElement) mrrFormattedElement.textContent = '';
+                if (mrrArrRelationElement) mrrArrRelationElement.textContent = '';
+                return;
+            }
+            
+            // Format the main MRR value
+            const formattedMRR = formatCurrency(mrrValue);
+            if (mrrValueElement) mrrValueElement.textContent = formattedMRR;
+            if (mrrFormattedElement) mrrFormattedElement.textContent = formattedMRR;
+            
+            // Calculate and display relationship to ARR
+            const relationship = calculateMRRRelationship(arrValue, mrrValue);
+            if (mrrRelationshipElement) {
+                mrrRelationshipElement.textContent = relationship;
+            }
+            
+            // Display ARR relationship details
+            if (mrrArrRelationElement && arrValue) {
+                const numericARR = parseFloat(arrValue.toString().replace(/[^0-9.-]/g, ''));
+                const expectedMRR = numericARR / 12;
+                mrrArrRelationElement.textContent = `Expected MRR: ${formatCurrency(expectedMRR)}`;
+            }
+        }
+
+        // Test function
+        function testARRMRRDisplay() {
+            // Test data
+            const testARR = 1200000; // $1.2M ARR
+            const testMRR = 95000;   // $95K MRR (slightly below expected $100K)
+            const confidenceLevel = 'HIGH';
+            const confidenceScore = 85;
+
+            // Populate displays
+            populateARRDisplay(testARR, confidenceLevel, confidenceScore);
+            populateMRRDisplay(testMRR, testARR, confidenceLevel);
+
+            console.log('Test data populated:');
+            console.log('ARR:', formatCurrency(testARR));
+            console.log('MRR:', formatCurrency(testMRR));
+            console.log('Confidence:', confidenceLevel, confidenceScore + '%');
+        }
+
+        // Clear function
+        function clearDisplays() {
+            populateARRDisplay(null);
+            populateMRRDisplay(null);
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            console.log('ARR/MRR Display Test Page Loaded');
+            console.log('Click "Test ARR/MRR Display" to see the implementation in action');
+        });
+    </script>
+</body>
+</html>

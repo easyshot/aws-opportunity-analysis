@@ -1,0 +1,242 @@
+/* Main App Styles */
+.App {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* Authentication Styles */
+.auth-header {
+  text-align: center;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #232f3e 0%, #1a2532 100%);
+  color: white;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+}
+
+.auth-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.auth-header p {
+  font-size: 1rem;
+  opacity: 0.9;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.auth-footer {
+  text-align: center;
+  padding: 1rem 0;
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 2rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Amplify Authenticator Customizations */
+.amplify-authenticator {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.amplify-authenticator [data-amplify-authenticator-signin],
+.amplify-authenticator [data-amplify-authenticator-signup] {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Form Field Customizations */
+.amplify-field-group__field-wrapper {
+  margin-bottom: 1rem;
+}
+
+.amplify-input {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.amplify-input:focus {
+  border-color: #ff9900;
+  box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+}
+
+.amplify-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+/* Button Customizations */
+.amplify-button--primary {
+  background: linear-gradient(135deg, #232f3e 0%, #1a2532 100%);
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.amplify-button--primary:hover {
+  background: linear-gradient(135deg, #1a2532 0%, #0f1419 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.amplify-button--link {
+  color: #ff9900;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.amplify-button--link:hover {
+  color: #e68a00;
+  text-decoration: underline;
+}
+
+/* Social Provider Buttons */
+.amplify-button[data-variation="primary"][data-provider] {
+  margin-bottom: 0.5rem;
+  background-color: white;
+  color: #495057;
+  border: 1px solid #ced4da;
+}
+
+.amplify-button[data-variation="primary"][data-provider]:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+/* Tab Customizations */
+.amplify-tabs {
+  margin-bottom: 2rem;
+}
+
+.amplify-tabs-item {
+  font-weight: 600;
+  color: #6c757d;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+.amplify-tabs-item[data-state="active"] {
+  color: #232f3e;
+  border-bottom-color: #ff9900;
+}
+
+/* Error and Success Messages */
+.amplify-alert {
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.amplify-alert--error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.amplify-alert--info {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+}
+
+/* Loading States */
+.amplify-loader {
+  border-color: #ff9900;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .auth-header {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .auth-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .auth-header p {
+    font-size: 0.875rem;
+  }
+  
+  .amplify-authenticator [data-amplify-authenticator-signin],
+  .amplify-authenticator [data-amplify-authenticator-signup] {
+    padding: 1.5rem;
+    margin: 0 1rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .amplify-authenticator {
+    background-color: #1a1a1a;
+  }
+  
+  .amplify-authenticator [data-amplify-authenticator-signin],
+  .amplify-authenticator [data-amplify-authenticator-signup] {
+    background-color: #2d2d2d;
+    color: #ffffff;
+  }
+  
+  .amplify-input {
+    background-color: #3d3d3d;
+    border-color: #555555;
+    color: #ffffff;
+  }
+  
+  .amplify-label {
+    color: #e0e0e0;
+  }
+}
+
+/* Accessibility Improvements */
+.amplify-button:focus,
+.amplify-input:focus,
+.amplify-tabs-item:focus {
+  outline: 2px solid #ff9900;
+  outline-offset: 2px;
+}
+
+/* Animation for smooth transitions */
+.amplify-authenticator * {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom loading animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.amplify-authenticator [data-amplify-authenticator-signin],
+.amplify-authenticator [data-amplify-authenticator-signup] {
+  animation: fadeIn 0.3s ease-out;
+}

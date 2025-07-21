@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Similar Projects Table Test</title>
+    <link rel="stylesheet" href="public/styles.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-button {
+            background: #ff9900;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .test-button:hover {
+            background: #e68900;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Similar Projects Table Test</h1>
+        <p>This page tests the enhanced similar projects table functionality.</p>
+        
+        <button class="test-button" onclick="loadTestData()">Load Test Data</button>
+        <button class="test-button" onclick="clearTestData()">Clear Data</button>
+        
+        <!-- Similar Projects Section -->
+        <div class="result-section similar-projects-section">
+            <h3 class="result-title">
+                <span class="section-icon">📊</span>
+                Similar Projects
+                <span class="projects-count" id="projectsCount" style="display: none;"></span>
+            </h3>
+            <div class="result-content" id="similarProjectsContent">
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">🔍</div>
+                    <p>Similar historical projects will be displayed here after analysis...</p>
+                    <small>This section will show comparable projects with detailed metrics and expandable information.</small>
+                </div>
+                <div class="projects-table-container" style="display: none;">
+                    <div class="table-controls">
+                        <div class="controls-row">
+                            <div class="search-container">
+                                <input type="text" id="projectsSearch" placeholder="Search projects by name, customer, or industry..." class="search-input">
+                                <button type="button" id="clearSearch" class="clear-search-btn" style="display: none;">×</button>
+                            </div>
+                            <div class="filter-container">
+                                <select id="industryFilter" class="filter-select">
+                                    <option value="">All Industries</option>
+                                </select>
+                                <select id="regionFilter" class="filter-select">
+                                    <option value="">All Regions</option>
+                                </select>
+                                <select id="projectsSort" class="sort-select">
+                                    <option value="">Sort by...</option>
+                                    <option value="similarity-desc">Similarity (High to Low)</option>
+                                    <option value="similarity-asc">Similarity (Low to High)</option>
+                                    <option value="arr-desc">ARR (High to Low)</option>
+                                    <option value="arr-asc">ARR (Low to High)</option>
+                                    <option value="mrr-desc">MRR (High to Low)</option>
+                                    <option value="mrr-asc">MRR (Low to High)</option>
+                                    <option value="date-desc">Close Date (Recent)</option>
+                                    <option value="date-asc">Close Date (Oldest)</option>
+                                    <option value="name-asc">Project Name (A-Z)</option>
+                                    <option value="name-desc">Project Name (Z-A)</option>
+                                    <option value="customer-asc">Customer (A-Z)</option>
+                                    <option value="customer-desc">Customer (Z-A)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-info">
+                            <span id="filteredCount" class="filtered-count"></span>
+                            <div class="table-actions">
+                                <button type="button" id="expandAllProjects" class="table-action-btn">Expand All</button>
+                                <button type="button" id="collapseAllProjects" class="table-action-btn">Collapse All</button>
+                                <button type="button" id="exportProjects" class="table-action-btn">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="projects-table" id="projectsTable">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-sort="expand">
+                                        <span class="expand-icon">▼</span>
+                                    </th>
+                                    <th class="sortable" data-sort="name">
+                                        Project Name
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                    <th class="sortable" data-sort="customer">
+                                        Customer
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                    <th class="sortable" data-sort="industry">
+                                        Industry
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                    <th class="sortable" data-sort="region">
+                                        Region
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                    <th class="sortable" data-sort="arr">
+                                        ARR
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                    <th class="sortable" data-sort="mrr">
+                                        MRR
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                    <th class="sortable" data-sort="services">
+                                        Top Services
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                    <th class="sortable" data-sort="date">
+                                        Close Date
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                    <th class="sortable" data-sort="similarity">
+                                        Similarity
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="projectsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-pagination" id="tablePagination" style="display: none;">
+                        <div class="pagination-info">
+                            <span id="paginationInfo"></span>
+                        </div>
+                        <div class="pagination-controls">
+                            <button type="button" id="prevPage" class="pagination-btn" disabled>Previous</button>
+                            <div class="page-numbers" id="pageNumbers"></div>
+                            <button type="button" id="nextPage" class="pagination-btn" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="public/app.js"></script>
+    <script>
+        function loadTestData() {
+            const testData = `--- Project 1 ---
+Project Name: Cloud Migration Initiative
+Customer: TechCorp Solutions
+Industry: Technology
+Region: us-east-1
+ARR: 850000
+MRR: 70833
+Services: EC2, S3, RDS, Lambda
+Close Date: 2023-08-15
+Description: Complete infrastructure migration to AWS with modernization
+
+--- Project 2 ---
+Project Name: Digital Transformation
+Customer: Healthcare Plus
+Industry: Healthcare
+Region: us-west-2
+ARR: 1200000
+MRR: 100000
+Services: EC2, S3, RDS, CloudFront, Route53
+Close Date: 2023-11-22
+Description: Legacy system modernization and cloud adoption
+
+--- Project 3 ---
+Project Name: Analytics Platform
+Customer: Financial Services Inc
+Industry: Financial Services
+Region: eu-west-1
+ARR: 650000
+MRR: 54167
+Services: Redshift, S3, Lambda, API Gateway
+Close Date: 2024-01-10
+Description: Data analytics platform implementation
+
+--- Project 4 ---
+Project Name: E-commerce Modernization
+Customer: Retail Giant Corp
+Industry: Retail
+Region: us-east-1
+ARR: 950000
+MRR: 79167
+Services: EC2, S3, RDS, ElastiCache, CloudFront
+Close Date: 2023-09-30
+Description: E-commerce platform modernization with microservices
+
+--- Project 5 ---
+Project Name: Data Lake Implementation
+Customer: Manufacturing Solutions
+Industry: Manufacturing
+Region: us-west-1
+ARR: 750000
+MRR: 62500
+Services: S3, Glue, Athena, QuickSight, Lambda
+Close Date: 2024-02-14
+Description: Enterprise data lake and analytics implementation`;
+
+            // Trigger the similar projects table population
+            if (typeof populateSimilarProjectsTable === 'function') {
+                populateSimilarProjectsTable(testData);
+            } else {
+                console.log('Function not available, simulating...');
+                // Simulate the function call
+                const mockResults = { sections: { similarProjectsRaw: testData } };
+                if (typeof populateUI === 'function') {
+                    populateUI(mockResults);
+                }
+            }
+        }
+
+        function clearTestData() {
+            const container = document.querySelector('.projects-table-container');
+            const placeholder = document.querySelector('#similarProjectsContent .placeholder-content');
+            const projectsCount = document.getElementById('projectsCount');
+            
+            if (container) container.style.display = 'none';
+            if (placeholder) placeholder.style.display = 'block';
+            if (projectsCount) {
+                projectsCount.style.display = 'none';
+                projectsCount.textContent = '';
+            }
+        }
+    </script>
+</body>
+</html>

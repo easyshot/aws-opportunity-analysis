@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Opportunity Intelligence - Option B</title>
+    <link rel="stylesheet" href="styles-compact-option-b.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <h1>🤝 Partner Opportunity Intelligence</h1>
+            <span class="version-badge">v2.0</span>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="exportData()">📊 Export</button>
+            <button class="header-btn" onclick="printReport()">🖨️ Print</button>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <!-- Left Column: Input Form -->
+        <div class="left-column">
+            <section class="input-section">
+                <div class="section-header">
+                    <h2>📝 Opportunity Details</h2>
+                    <div class="progress-indicator" id="formProgress">0/5</div>
+                </div>
+                
+                <div class="form-container">
+                    <div class="form-group">
+                        <label class="form-label">Customer Name *</label>
+                        <input type="text" id="customerName" class="form-input" placeholder="Enter customer name">
+                        <div class="field-hint">Primary customer or organization name</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Customer Region *</label>
+                        <select id="region" class="form-select">
+                            <option value="">Select Customer Region</option>
+                            <option value="United States">🇺🇸 United States</option>
+                            <option value="Canada">🇨🇦 Canada</option>
+                            <option value="Germany">🇩🇪 Germany</option>
+                            <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                            <option value="France">🇫🇷 France</option>
+                            <option value="Japan">🇯🇵 Japan</option>
+                            <option value="Australia">🇦🇺 Australia</option>
+                            <option value="Brazil">🇧🇷 Brazil</option>
+                            <option value="India">🇮🇳 India</option>
+                            <option value="Singapore">🇸🇬 Singapore</option>
+                        </select>
+                        <div class="field-hint">Customer's primary geographic location</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Close Date *</label>
+                        <input type="date" id="closeDate" class="form-input">
+                        <div class="field-hint">Expected contract signing date</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Opportunity Name *</label>
+                        <input type="text" id="opportunityName" class="form-input" placeholder="Brief opportunity title">
+                        <div class="field-hint">Concise name for this opportunity</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description *</label>
+                        <textarea id="description" class="form-textarea" rows="5" placeholder="Detailed description of the opportunity, business requirements, technical needs, and expected outcomes..."></textarea>
+                        <div class="field-hint">Comprehensive opportunity details</div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn-analyze" onclick="analyzeOpportunity()">
+                        <span class="btn-icon">🔍</span>
+                        Analyze Opportunity
+                    </button>
+                    <button class="btn-clear" onclick="clearForm()">Clear Form</button>
+                    <button class="btn-sample" onclick="loadSampleData()">Load Sample</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Projections -->
+        <div class="right-column">
+            <section class="projections-section">
+                <div class="section-header">
+                    <h2>📈 Opportunity Projections</h2>
+                    <div class="status-indicator" id="analysisStatus">Ready</div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card arr">
+                        <div class="metric-icon">💰</div>
+                        <div class="metric-content">
+                            <label>Predicted ARR</label>
+                            <div class="metric-value" id="predictedArr">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card mrr">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-content">
+                            <label>Predicted MRR</label>
+                            <div class="metric-value" id="predictedMrr">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card launch">
+                        <div class="metric-icon">🚀</div>
+                        <div class="metric-content">
+                            <label>Launch Date</label>
+                            <div class="metric-value" id="launchDate">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card timeline">
+                        <div class="metric-icon">⏱️</div>
+                        <div class="metric-content">
+                            <label>Time to Launch</label>
+                            <div class="metric-value" id="timeToLaunch">-</div>
+                            <div class="metric-unit">months</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Top AWS Services Section -->
+                <div class="services-section">
+                    <h3>☁️ Top AWS Services</h3>
+                    <div class="services-container" id="topServices">
+                        <div class="services-placeholder">Service recommendations will appear after analysis</div>
+                    </div>
+                </div>
+                
+                <!-- Confidence Section -->
+                <div class="confidence-section">
+                    <h3>🎯 Confidence Assessment</h3>
+                    <div class="confidence-container">
+                        <div class="confidence-meter">
+                            <div class="confidence-score" id="confidenceScore">-</div>
+                            <div class="confidence-label" id="confidenceLabel">-</div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidenceFill"></div>
+                            </div>
+                        </div>
+                        <div class="confidence-factors" id="confidenceFactors"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Analysis Results Section -->
+    <div class="analysis-container" id="analysisContainer" style="display: none;">
+        <section class="analysis-section">
+            <div class="section-header">
+                <h2>🔬 Opportunity Analysis</h2>
+                <div class="analysis-tabs">
+                    <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+                    <button class="tab-btn" onclick="showTab('details')">Details</button>
+                </div>
+            </div>
+            
+            <div class="tab-content active" id="overview-tab">
+                <div class="analysis-grid">
+                    <div class="analysis-card methodology">
+                        <div class="card-header">
+                            <h3>🔍 Methodology</h3>
+                        </div>
+                        <div class="card-content" id="methodology">
+                            <div class="content-placeholder">Analysis methodology will appear here...</div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-card findings">
+                        <div class="card-header">
+                            <h3>📋 Findings</h3>
+                        </div>
+                        <div class="card-content" id="findings">
+                            <div class="content-placeholder">Key findings will appear here...</div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-card risks">
+                        <div class="card-header">
+                            <h3>⚠️ Risk Factors</h3>
+                        </div>
+                        <div class="card-content" id="riskFactors">
+                            <div class="content-placeholder">Risk assessment will appear here...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="details-tab">
+                <div class="analysis-grid">
+                    <div class="analysis-card similar">
+                        <div class="card-header">
+                            <h3>📊 Similar Projects</h3>
+                        </div>
+                        <div class="card-content" id="similarProjects">
+                            <div class="content-placeholder">Historical matches will appear here...</div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-card rationale">
+                        <div class="card-header">
+                            <h3>💡 Rationale</h3>
+                        </div>
+                        <div class="card-content" id="rationale">
+                            <div class="content-placeholder">Analysis rationale will appear here...</div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-card full">
+                        <div class="card-header">
+                            <h3>📄 Full Analysis</h3>
+                        </div>
+                        <div class="card-content" id="fullAnalysis">
+                            <div class="content-placeholder">Complete analysis will appear here...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Funding Options Section -->
+        <section class="funding-section">
+            <div class="section-header">
+                <h2>💳 Funding Options</h2>
+                <div class="section-badge">Financial Planning</div>
+            </div>
+            <div class="funding-container" id="fundingOptions">
+                <div class="content-placeholder">Funding recommendations will appear here...</div>
+            </div>
+        </section>
+
+        <!-- Follow-On Opportunities Section -->
+        <section class="followon-section">
+            <div class="section-header">
+                <h2>🔄 Follow-On Opportunities</h2>
+                <div class="section-badge">Future Growth</div>
+            </div>
+            <div class="followon-container" id="followOnOpportunities">
+                <div class="content-placeholder">Future opportunities will appear here...</div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app-compact-option-b.js"></script>
+</body>
+</html>

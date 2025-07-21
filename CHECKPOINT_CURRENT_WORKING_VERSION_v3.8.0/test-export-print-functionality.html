@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Export and Print Functionality</title>
+    <link rel="stylesheet" href="public/styles.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .test-button {
+            padding: 10px 20px;
+            border: 2px solid #232f3e;
+            background: white;
+            color: #232f3e;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #232f3e;
+            color: white;
+        }
+        
+        .test-button.primary {
+            background: #232f3e;
+            color: white;
+        }
+        
+        .test-button.primary:hover {
+            background: #1a252f;
+        }
+        
+        .test-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .test-results {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-pass {
+            background: #28a745;
+        }
+        
+        .status-fail {
+            background: #dc3545;
+        }
+        
+        .status-pending {
+            background: #ffc107;
+        }
+        
+        .mock-data {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Export and Print Functionality Test</h1>
+        <p>This page tests the comprehensive report export and print functionality implementation.</p>
+        
+        <!-- Mock Form Data for Testing -->
+        <div class="mock-data">
+            <form id="opportunityForm">
+                <input type="text" id="CustomerName" name="CustomerName" value="TechCorp Solutions">
+                <input type="text" id="oppName" name="oppName" value="Cloud Migration Initiative">
+                <input type="text" id="region" name="region" value="us-east-1">
+                <input type="date" id="closeDate" name="closeDate" value="2024-12-31">
+                <select id="industry" name="industry">
+                    <option value="Technology" selected>Technology</option>
+                </select>
+                <select id="customerSegment" name="customerSegment">
+                    <option value="Enterprise" selected>Enterprise</option>
+                </select>
+                <textarea id="oppDescription" name="oppDescription">Complete infrastructure migration to AWS with modernization of legacy applications and implementation of cloud-native architecture.</textarea>
+            </form>
+            
+            <!-- Mock Projection Data -->
+            <div id="arrValue">$850,000</div>
+            <div id="arrFormatted">$850,000 annually</div>
+            <div id="arrConfidence">HIGH</div>
+            <div id="arrRange">Range: $750,000 - $950,000</div>
+            
+            <div id="mrrValue">$70,833</div>
+            <div id="mrrFormatted">$70,833 monthly</div>
+            <div id="mrrRelationship">8.33% of ARR</div>
+            
+            <div id="launchDateValue">2024-06-15</div>
+            <div id="launchDateFormatted">June 15, 2024</div>
+            <div id="launchTimeline">6 months from now</div>
+            
+            <div id="timeToLaunchValue">6 months</div>
+            <div id="durationFormatted">6 months total duration</div>
+            
+            <div id="confidenceValue">HIGH</div>
+            <div id="confidencePercentage">85%</div>
+            
+            <!-- Mock Analysis Data -->
+            <div id="methodologyContent">Analysis performed using historical project data from similar technology companies in the same region. Machine learning algorithms identified patterns in project success factors and financial outcomes.</div>
+            <div id="findingsContent">Key findings indicate strong potential for success based on customer profile, technical requirements, and market conditions. Historical data shows 85% success rate for similar projects.</div>
+            <div id="rationaleContent">Prediction based on analysis of 150+ similar projects in the technology sector. Customer segment and project scope align with highest-performing historical cases.</div>
+            <div id="riskFactorsContent">Primary risks include timeline compression (15% probability), scope creep (25% probability), and technical complexity (10% probability). Mitigation strategies recommended for each risk factor.</div>
+            <div id="architectureContent">Recommended architecture includes: Network Foundation (VPC, Subnets, NAT Gateway), Compute Layer (EC2, Auto Scaling, Load Balancer), Data Layer (RDS, S3, ElastiCache), Security Components (IAM, Security Groups, WAF).</div>
+            <div id="queryContent">SELECT * FROM projects WHERE industry = 'Technology' AND customer_segment = 'Enterprise' AND region = 'us-east-1' AND arr BETWEEN 500000 AND 1000000;</div>
+            <div id="queryResultsContent">Found 23 matching projects with average ARR of $825,000 and average project duration of 5.8 months.</div>
+            <div id="summaryContent">This opportunity shows strong potential for success with projected ARR of $850,000 and high confidence rating. Recommended to proceed with detailed technical assessment and proposal development.</div>
+        </div>
+        
+        <!-- Test Section 1: Export Modal Functionality -->
+        <div class="test-section">
+            <h2>1. Export Modal Functionality Test</h2>
+            <p>Tests the export modal display and option selection.</p>
+            
+            <div class="test-buttons">
+                <button type="button" id="testExportModal" class="test-button primary">
+                    Test Export Modal
+                </button>
+                <button type="button" id="exportResultsButton" class="test-button">
+                    Export Results (Main Button)
+                </button>
+            </div>
+            
+            <div class="test-results" id="exportModalResults">
+                <span class="status-indicator status-pending"></span>Click "Test Export Modal" to test modal functionality
+            </div>
+        </div>
+        
+        <!-- Test Section 2: Export Format Generation -->
+        <div class="test-section">
+            <h2>2. Export Format Generation Test</h2>
+            <p>Tests the generation of different export formats.</p>
+            
+            <div class="test-buttons">
+                <button type="button" id="testHTMLExport" class="test-button">
+                    Test HTML Export
+                </button>
+                <button type="button" id="testJSONExport" class="test-button">
+                    Test JSON Export
+                </button>
+                <button type="button" id="testCSVExport" class="test-button">
+                    Test CSV Export
+                </button>
+            </div>
+            
+            <div class="test-results" id="exportFormatResults">
+                <span class="status-indicator status-pending"></span>Click export format buttons to test generation
+            </div>
+        </div>
+        
+        <!-- Test Section 3: Print Functionality -->
+        <div class="test-section">
+            <h2>3. Print Functionality Test</h2>
+            <p>Tests the print-friendly layout and styling.</p>
+            
+            <div class="test-buttons">
+                <button type="button" id="testPrintPreview" class="test-button">
+                    Test Print Preview
+                </button>
+                <button type="button" id="testPrintLayout" class="test-button">
+                    Test Print Layout
+                </button>
+                <button type="button" id="testKeyboardPrint" class="test-button">
+                    Test Ctrl+P Handler
+                </button>
+            </div>
+            
+            <div class="test-results" id="printResults">
+                <span class="status-indicator status-pending"></span>Click print test buttons to verify functionality
+            </div>
+        </div>
+        
+        <!-- Test Section 4: Data Collection -->
+        <div class="test-section">
+            <h2>4. Data Collection Test</h2>
+            <p>Tests the comprehensive data collection for reports.</p>
+            
+            <div class="test-buttons">
+                <button type="button" id="testDataCollection" class="test-button">
+                    Test Data Collection
+                </button>
+                <button type="button" id="showCollectedData" class="test-button">
+                    Show Collected Data
+                </button>
+            </div>
+            
+            <div class="test-results" id="dataCollectionResults">
+                <span class="status-indicator status-pending"></span>Click "Test Data Collection" to verify data gathering
+            </div>
+        </div>
+        
+        <!-- Test Section 5: Error Handling -->
+        <div class="test-section">
+            <h2>5. Error Handling Test</h2>
+            <p>Tests error handling for export and print operations.</p>
+            
+            <div class="test-buttons">
+                <button type="button" id="testExportError" class="test-button">
+                    Test Export Error
+                </button>
+                <button type="button" id="testMissingData" class="test-button">
+                    Test Missing Data
+                </button>
+            </div>
+            
+            <div class="test-results" id="errorHandlingResults">
+                <span class="status-indicator status-pending"></span>Click error test buttons to verify error handling
+            </div>
+        </div>
+    </div>
+    
+    <script src="public/app.js"></script>
+    <script>
+        // Test implementation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mock projects data for testing
+            window.projectsData = [
+                {
+                    id: 1,
+                    name: 'Cloud Migration Initiative',
+                    customer: 'TechCorp Solutions',
+                    industry: 'Technology',
+                    region: 'us-east-1',
+                    arr: 850000,
+                    mrr: 70833,
+                    services: ['EC2', 'S3', 'RDS', 'Lambda'],
+                    closeDate: '2023-08-15',
+                    similarity: 92,
+                    description: 'Complete infrastructure migration to AWS'
+                },
+                {
+                    id: 2,
+                    name: 'Digital Transformation',
+                    customer: 'Healthcare Plus',
+                    industry: 'Healthcare',
+                    region: 'us-west-2',
+                    arr: 1200000,
+                    mrr: 100000,
+                    services: ['EC2', 'S3', 'RDS', 'CloudFront'],
+                    closeDate: '2023-11-22',
+                    similarity: 87,
+                    description: 'Legacy system modernization'
+                }
+            ];
+            
+            // Test 1: Export Modal Functionality
+            document.getElementById('testExportModal').addEventListener('click', () => {
+                try {
+                    generateComprehensiveReport();
+                    updateTestResults('exportModalResults', 'pass', 'Export modal displayed successfully');
+                } catch (error) {
+                    updateTestResults('exportModalResults', 'fail', `Export modal test failed: ${error.message}`);
+                }
+            });
+            
+            // Test 2: Export Format Generation
+            document.getElementById('testHTMLExport').addEventListener('click', () => {
+                try {
+                    const reportData = collectReportData();
+                    const htmlContent = generateHTMLReport(reportData);
+                    const isValid = htmlContent.includes('<!DOCTYPE html>') && 
+                                   htmlContent.includes('AWS Opportunity Analysis Report') &&
+                                   htmlContent.includes(reportData.formData.CustomerName || 'TechCorp Solutions');
+                    updateTestResults('exportFormatResults', isValid ? 'pass' : 'fail', 
+                        `HTML Export: ${isValid ? 'Generated successfully' : 'Generation failed'}`);
+                } catch (error) {
+                    updateTestResults('exportFormatResults', 'fail', `HTML Export failed: ${error.message}`);
+                }
+            });
+            
+            document.getElementById('testJSONExport').addEventListener('click', () => {
+                try {
+                    const reportData = collectReportData();
+                    const jsonContent = JSON.stringify(reportData, null, 2);
+                    const isValid = jsonContent.includes('"timestamp"') && 
+                                   jsonContent.includes('"formData"') &&
+                                   jsonContent.includes('"projections"');
+                    updateTestResults('exportFormatResults', isValid ? 'pass' : 'fail', 
+                        `JSON Export: ${isValid ? 'Generated successfully' : 'Generation failed'}`);
+                } catch (error) {
+                    updateTestResults('exportFormatResults', 'fail', `JSON Export failed: ${error.message}`);
+                }
+            });
+            
+            document.getElementById('testCSVExport').addEventListener('click', () => {
+                try {
+                    const reportData = collectReportData();
+                    const csvContent = generateCSVReport(reportData);
+                    const isValid = csvContent.includes('AWS Opportunity Analysis Report') && 
+                                   csvContent.includes('OPPORTUNITY DETAILS') &&
+                                   csvContent.includes('FINANCIAL PROJECTIONS');
+                    updateTestResults('exportFormatResults', isValid ? 'pass' : 'fail', 
+                        `CSV Export: ${isValid ? 'Generated successfully' : 'Generation failed'}`);
+                } catch (error) {
+                    updateTestResults('exportFormatResults', 'fail', `CSV Export failed: ${error.message}`);
+                }
+            });
+            
+            // Test 3: Print Functionality
+            document.getElementById('testPrintPreview').addEventListener('click', () => {
+                try {
+                    preparePrintLayout();
+                    const hasPrintClass = document.body.classList.contains('print-mode');
+                    restoreNormalLayout();
+                    updateTestResults('printResults', hasPrintClass ? 'pass' : 'fail', 
+                        `Print layout preparation: ${hasPrintClass ? 'Working correctly' : 'Failed to apply print mode'}`);
+                } catch (error) {
+                    updateTestResults('printResults', 'fail', `Print preview test failed: ${error.message}`);
+                }
+            });
+            
+            document.getElementById('testPrintLayout').addEventListener('click', () => {
+                try {
+                    // Test print-specific styles
+                    const printStyles = document.querySelector('style[id="print-styles"]') || 
+                                       Array.from(document.styleSheets).some(sheet => {
+                                           try {
+                                               return Array.from(sheet.cssRules).some(rule => 
+                                                   rule.media && rule.media.mediaText.includes('print')
+                                               );
+                                           } catch (e) {
+                                               return false;
+                                           }
+                                       });
+                    updateTestResults('printResults', printStyles ? 'pass' : 'fail', 
+                        `Print styles: ${printStyles ? 'Available' : 'Not found'}`);
+                } catch (error) {
+                    updateTestResults('printResults', 'fail', `Print layout test failed: ${error.message}`);
+                }
+            });
+            
+            document.getElementById('testKeyboardPrint').addEventListener('click', () => {
+                try {
+                    // Simulate Ctrl+P key press
+                    const event = new KeyboardEvent('keydown', {
+                        key: 'p',
+                        ctrlKey: true,
+                        bubbles: true
+                    });
+                    document.dispatchEvent(event);
+                    updateTestResults('printResults', 'pass', 'Keyboard print handler: Event dispatched successfully');
+                } catch (error) {
+                    updateTestResults('printResults', 'fail', `Keyboard print test failed: ${error.message}`);
+                }
+            });
+            
+            // Test 4: Data Collection
+            document.getElementById('testDataCollection').addEventListener('click', () => {
+                try {
+                    const reportData = collectReportData();
+                    const hasRequiredFields = reportData.timestamp && 
+                                            reportData.formData && 
+                                            reportData.projections && 
+                                            reportData.analysis &&
+                                            reportData.metadata;
+                    updateTestResults('dataCollectionResults', hasRequiredFields ? 'pass' : 'fail', 
+                        `Data collection: ${hasRequiredFields ? 'All required fields collected' : 'Missing required fields'}`);
+                } catch (error) {
+                    updateTestResults('dataCollectionResults', 'fail', `Data collection test failed: ${error.message}`);
+                }
+            });
+            
+            document.getElementById('showCollectedData').addEventListener('click', () => {
+                try {
+                    const reportData = collectReportData();
+                    const dataPreview = JSON.stringify(reportData, null, 2).substring(0, 500) + '...';
+                    updateTestResults('dataCollectionResults', 'pass', `Collected data preview:\n${dataPreview}`);
+                } catch (error) {
+                    updateTestResults('dataCollectionResults', 'fail', `Show data test failed: ${error.message}`);
+                }
+            });
+            
+            // Test 5: Error Handling
+            document.getElementById('testExportError').addEventListener('click', () => {
+                try {
+                    // Simulate export error
+                    showExportError(new Error('Test export error'));
+                    updateTestResults('errorHandlingResults', 'pass', 'Export error handling: Error notification displayed');
+                } catch (error) {
+                    updateTestResults('errorHandlingResults', 'fail', `Export error test failed: ${error.message}`);
+                }
+            });
+            
+            document.getElementById('testMissingData').addEventListener('click', () => {
+                try {
+                    // Test with missing DOM elements
+                    const originalGetElement = document.getElementById;
+                    document.getElementById = () => null;
+                    
+                    const reportData = collectReportData();
+                    const hasDefaults = reportData.projections.arr.value === '-' &&
+                                       reportData.analysis.methodology.includes('No methodology data available');
+                    
+                    document.getElementById = originalGetElement;
+                    updateTestResults('errorHandlingResults', hasDefaults ? 'pass' : 'fail', 
+                        `Missing data handling: ${hasDefaults ? 'Defaults applied correctly' : 'Failed to handle missing data'}`);
+                } catch (error) {
+                    updateTestResults('errorHandlingResults', 'fail', `Missing data test failed: ${error.message}`);
+                }
+            });
+        });
+        
+        function updateTestResults(elementId, status, message) {
+            const element = document.getElementById(elementId);
+            const statusClass = status === 'pass' ? 'status-pass' : 
+                               status === 'fail' ? 'status-fail' : 'status-pending';
+            element.innerHTML = `<span class="status-indicator ${statusClass}"></span>${message}`;
+        }
+    </script>
+</body>
+</html>

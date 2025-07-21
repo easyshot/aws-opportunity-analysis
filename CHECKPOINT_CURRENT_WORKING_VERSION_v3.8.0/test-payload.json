@@ -1,0 +1,19 @@
+{
+  "CustomerName": "Test Corporation",
+  "region": "United States", 
+  "closeDate": "2024-12-31",
+  "oppName": "Large Scale Cloud Migration Test",
+  "oppDescription": "This is a comprehensive test opportunity designed to trigger payload size analysis in our enhanced Bedrock logging system. We are testing various scenarios including large data payloads, complex migration requirements, database modernization, application refactoring, security implementations, performance optimizations, cost reduction strategies, and comprehensive cloud transformation initiatives. This description is intentionally verbose to increase the overall payload size and test the enhanced diagnostic capabilities we have implemented. The goal is to see our new comprehensive error analysis in action, including payload size analysis, token count estimation, risk assessment, and detailed error type identification. We want to understand exactly what happens when we approach or exceed various AWS Bedrock limits including the Claude 3.5 Sonnet input token limit of 200,000 tokens, the practical payload size limit of around 900KB, and the hard 1MB limit. This test will help us validate our enhanced logging system works correctly and provides the detailed diagnostics we need to troubleshoot issues effectively.",
+  "industry": "Technology",
+  "customerSegment": "Enterprise", 
+  "partnerName": "Test Partner",
+  "activityFocus": "Migration",
+  "businessDescription": "Test business description for comprehensive analysis",
+  "migrationPhase": "Assess",
+  "settings": {
+    "enableTruncation": true,
+    "sqlQueryLimit": 50,
+    "truncationLimit": 300000,
+    "analysisTimeout": 120
+  }
+}

@@ -1,0 +1,368 @@
+/* Settings Styles */
+.settings {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.settings-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #232f3e;
+  margin-bottom: 0.5rem;
+}
+
+.settings-header p {
+  font-size: 1.125rem;
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.settings-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.settings-section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #232f3e;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.5rem;
+}
+
+.setting-group {
+  margin-bottom: 1.5rem;
+}
+
+.setting-group:last-child {
+  margin-bottom: 0;
+}
+
+.setting-label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.setting-input,
+.setting-select {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #495057;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.setting-input:focus,
+.setting-select:focus {
+  border-color: #ff9900;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+}
+
+.setting-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: normal;
+  margin-bottom: 0;
+}
+
+.setting-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.setting-checkbox span {
+  font-size: 0.875rem;
+  color: #495057;
+}
+
+.setting-checkbox:hover span {
+  color: #232f3e;
+}
+
+/* Cache Management */
+.cache-info {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cache-stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.cache-stat:last-child {
+  margin-bottom: 0;
+}
+
+.cache-stat span:first-child {
+  color: #6c757d;
+}
+
+.cache-stat span:last-child {
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #232f3e 0%, #1a2532 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1a2532 0%, #0f1419 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(35, 47, 62, 0.3);
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+}
+
+/* Settings Actions */
+.settings-actions {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .settings-header {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .settings-header h1 {
+    font-size: 2rem;
+  }
+  
+  .settings-header p {
+    font-size: 1rem;
+  }
+  
+  .settings-section {
+    padding: 1.5rem;
+  }
+  
+  .setting-input,
+  .setting-select {
+    max-width: none;
+  }
+  
+  .settings-actions {
+    padding: 1.5rem 0;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-header {
+    padding: 1rem;
+  }
+  
+  .settings-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .settings-header p {
+    font-size: 0.875rem;
+  }
+  
+  .settings-section {
+    padding: 1rem;
+  }
+  
+  .setting-input,
+  .setting-select {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+  }
+  
+  .cache-info {
+    padding: 0.75rem;
+  }
+  
+  .btn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .settings-header {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+  }
+  
+  .settings-header h1 {
+    color: #ffffff;
+  }
+  
+  .settings-header p {
+    color: #b0b0b0;
+  }
+  
+  .settings-section {
+    background: #2d2d2d;
+    color: #e0e0e0;
+  }
+  
+  .settings-section h2 {
+    color: #ffffff;
+    border-bottom-color: #4a4a4a;
+  }
+  
+  .setting-label {
+    color: #e0e0e0;
+  }
+  
+  .setting-input,
+  .setting-select {
+    background-color: #3d3d3d;
+    border-color: #4a4a4a;
+    color: #e0e0e0;
+  }
+  
+  .setting-input:focus,
+  .setting-select:focus {
+    border-color: #ff9900;
+    box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+  }
+  
+  .setting-checkbox span {
+    color: #e0e0e0;
+  }
+  
+  .setting-checkbox:hover span {
+    color: #ffffff;
+  }
+  
+  .cache-info {
+    background: #3d3d3d;
+    border-color: #4a4a4a;
+  }
+  
+  .cache-stat span:first-child {
+    color: #b0b0b0;
+  }
+  
+  .cache-stat span:last-child {
+    color: #e0e0e0;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .settings-header {
+    background: #ffffff;
+    border: 2px solid #000000;
+  }
+  
+  .settings-header h1 {
+    color: #000000;
+  }
+  
+  .settings-section {
+    border: 2px solid #000000;
+  }
+  
+  .setting-input,
+  .setting-select {
+    border-width: 2px;
+  }
+  
+  .btn-primary {
+    background: #000000;
+  }
+  
+  .btn-danger {
+    background: #ff0000;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .settings-header {
+    background: none;
+    box-shadow: none;
+  }
+  
+  .settings-section {
+    background: none;
+    box-shadow: none;
+    border: 1px solid #000000;
+  }
+  
+  .settings-actions {
+    display: none;
+  }
+  
+  .btn {
+    display: none;
+  }
+}

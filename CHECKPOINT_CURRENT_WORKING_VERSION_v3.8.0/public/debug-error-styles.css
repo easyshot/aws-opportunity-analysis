@@ -1,0 +1,217 @@
+/* Enhanced Debug Error Styling */
+
+/* Debug value states */
+.debug-value {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+  transition: all 0.2s ease;
+}
+
+.debug-value.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.debug-value.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  font-weight: bold;
+}
+
+.debug-value.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+/* Validation errors section */
+.validation-errors {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
+.validation-errors h4 {
+  margin: 0 0 8px 0;
+  color: #721c24;
+  font-size: 1em;
+}
+
+.validation-errors ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.error-item {
+  color: #721c24;
+  margin: 4px 0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.85em;
+}
+
+/* Validation success section */
+.validation-success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  color: #155724;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Enhanced debug panels */
+.debug-panel {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+
+.debug-panel.error {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.debug-panel.success {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.debug-panel.warning {
+  border-color: #ffc107;
+  box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
+/* Debug panel headers */
+.debug-panel-header {
+  background-color: #f8f9fa;
+  padding: 12px 16px;
+  border-bottom: 1px solid #dee2e6;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.debug-panel.error .debug-panel-header {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.debug-panel.success .debug-panel-header {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.debug-panel.warning .debug-panel-header {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* Status indicators */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9em;
+}
+
+.status-indicator.error::before {
+  content: '🚨';
+}
+
+.status-indicator.success::before {
+  content: '✅';
+}
+
+.status-indicator.warning::before {
+  content: '⚠️';
+}
+
+/* Data freshness indicators */
+.data-freshness {
+  font-size: 0.8em;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.data-freshness.fresh {
+  color: #28a745;
+}
+
+.data-freshness.stale {
+  color: #dc3545;
+}
+
+/* Tooltip enhancements */
+.debug-value[title]:hover {
+  cursor: help;
+  transform: scale(1.02);
+}
+
+/* Dark mode support */
+[data-theme="dark"] .debug-value.success {
+  background-color: #1e4620;
+  color: #75dd79;
+  border-color: #2d5a2f;
+}
+
+[data-theme="dark"] .debug-value.error {
+  background-color: #4a1e1e;
+  color: #f5a3a3;
+  border-color: #5a2d2d;
+}
+
+[data-theme="dark"] .debug-value.warning {
+  background-color: #4a3d1e;
+  color: #f5d775;
+  border-color: #5a4a2d;
+}
+
+[data-theme="dark"] .validation-errors {
+  background-color: #4a1e1e;
+  border-color: #5a2d2d;
+}
+
+[data-theme="dark"] .validation-success {
+  background-color: #1e4620;
+  border-color: #2d5a2f;
+  color: #75dd79;
+}
+
+/* Animation for error states */
+@keyframes errorPulse {
+  0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+.debug-value.error {
+  animation: errorPulse 2s infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .debug-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .status-indicator {
+    font-size: 0.8em;
+  }
+  
+  .error-item {
+    font-size: 0.8em;
+    word-break: break-word;
+  }
+}

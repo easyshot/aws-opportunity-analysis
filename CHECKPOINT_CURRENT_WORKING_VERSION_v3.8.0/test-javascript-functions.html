@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Functions Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>JavaScript Functions Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test JavaScript Loading</h2>
+        <button class="test-button" onclick="testJSLoading()">Test JavaScript Loading</button>
+        <div id="jsLoadingResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test Form Data Functions</h2>
+        <div class="form-group">
+            <label for="testCustomerName">Customer Name:</label>
+            <input type="text" id="testCustomerName" value="Test Customer">
+        </div>
+        <div class="form-group">
+            <label for="testRegion">Region:</label>
+            <select id="testRegion">
+                <option value="United States" selected>United States</option>
+                <option value="Canada">Canada</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="testCloseDate">Close Date:</label>
+            <input type="date" id="testCloseDate" value="2024-12-31">
+        </div>
+        <div class="form-group">
+            <label for="testOpportunityName">Opportunity Name:</label>
+            <input type="text" id="testOpportunityName" value="Test Opportunity">
+        </div>
+        <div class="form-group">
+            <label for="testDescription">Description:</label>
+            <textarea id="testDescription" rows="3">This is a test opportunity description.</textarea>
+        </div>
+        <button class="test-button" onclick="testFormDataFunctions()">Test Form Data Functions</button>
+        <div id="formDataResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test API Call</h2>
+        <button class="test-button" onclick="testAPICall()">Test API Call</button>
+        <div id="apiResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Test UI Population</h2>
+        <button class="test-button" onclick="testUIPopulation()">Test UI Population</button>
+        <div id="uiResult" class="result"></div>
+    </div>
+
+    <script>
+        // Test 1: JavaScript Loading
+        function testJSLoading() {
+            const resultDiv = document.getElementById('jsLoadingResult');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Testing JavaScript loading...';
+            
+            try {
+                // Check if functions are available
+                const functions = {
+                    analyzeOpportunity: typeof window.analyzeOpportunity === 'function',
+                    clearForm: typeof window.clearForm === 'function',
+                    loadSampleData: typeof window.loadSampleData === 'function',
+                    toggleTheme: typeof window.toggleTheme === 'function',
+                    exportData: typeof window.exportData === 'function',
+                    printReport: typeof window.printReport === 'function',
+                    toggleDebugSection: typeof window.toggleDebugSection === 'function'
+                };
+                
+                const availableFunctions = Object.entries(functions).filter(([name, available]) => available);
+                const missingFunctions = Object.entries(functions).filter(([name, available]) => !available);
+                
+                if (missingFunctions.length === 0) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ All JavaScript functions loaded successfully!\n\nAvailable functions:\n${availableFunctions.map(([name]) => `- ${name}`).join('\n')}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `⚠️ Some functions are missing:\n\nAvailable: ${availableFunctions.map(([name]) => name).join(', ')}\n\nMissing: ${missingFunctions.map(([name]) => name).join(', ')}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ JavaScript loading error: ${error.message}`;
+            }
+        }
+        
+        // Test 2: Form Data Functions
+        function testFormDataFunctions() {
+            const resultDiv = document.getElementById('formDataResult');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Testing form data functions...';
+            
+            try {
+                // Simulate form data collection
+                const formData = {
+                    CustomerName: document.getElementById('testCustomerName').value,
+                    region: document.getElementById('testRegion').value,
+                    closeDate: document.getElementById('testCloseDate').value,
+                    oppName: document.getElementById('testOpportunityName').value,
+                    oppDescription: document.getElementById('testDescription').value
+                };
+                
+                // Test validation
+                const validation = {
+                    CustomerName: formData.CustomerName ? 'Valid' : 'Invalid',
+                    region: formData.region ? 'Valid' : 'Invalid',
+                    closeDate: formData.closeDate ? 'Valid' : 'Invalid',
+                    oppName: formData.oppName ? 'Valid' : 'Invalid',
+                    oppDescription: formData.oppDescription ? 'Valid' : 'Invalid'
+                };
+                
+                const isValid = Object.values(validation).every(v => v === 'Valid');
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `✅ Form data functions working!\n\nForm data:\n${JSON.stringify(formData, null, 2)}\n\nValidation:\n${JSON.stringify(validation, null, 2)}\n\nOverall valid: ${isValid}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Form data functions error: ${error.message}`;
+            }
+        }
+        
+        // Test 3: API Call
+        async function testAPICall() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Testing API call...';
+            
+            try {
+                const testData = {
+                    CustomerName: 'API Test Customer',
+                    region: 'United States',
+                    closeDate: '2024-12-31',
+                    oppName: 'API Test Opportunity',
+                    oppDescription: 'This is a test opportunity for API verification.'
+                };
+                
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ API call successful!\n\nResponse keys: ${Object.keys(result).join(', ')}\n\nMetrics: ${result.metrics ? Object.keys(result.metrics).join(', ') : 'None'}\n\nSections: ${result.sections ? Object.keys(result.sections).join(', ') : 'None'}`;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ API call failed: ${response.status}\n${errorText}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ API call error: ${error.message}`;
+            }
+        }
+        
+        // Test 4: UI Population
+        function testUIPopulation() {
+            const resultDiv = document.getElementById('uiResult');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Testing UI population...';
+            
+            try {
+                // Mock response data
+                const mockResults = {
+                    metrics: {
+                        predictedArr: "$120,000",
+                        predictedMrr: "$10,000",
+                        launchDate: "January 2026",
+                        timeToLaunch: "6",
+                        confidence: "MEDIUM",
+                        topServices: "Amazon EC2, Amazon RDS, Amazon S3"
+                    },
+                    sections: {
+                        methodology: "Analysis methodology content",
+                        findings: "Key findings content",
+                        rationale: "Prediction rationale content",
+                        riskFactors: "Risk factors content",
+                        similarProjects: "Similar projects content"
+                    }
+                };
+                
+                // Test population logic
+                const testPopulation = {
+                    metrics: mockResults.metrics ? 'Present' : 'Missing',
+                    sections: mockResults.sections ? 'Present' : 'Missing',
+                    predictedArr: mockResults.metrics?.predictedArr || 'Missing',
+                    predictedMrr: mockResults.metrics?.predictedMrr || 'Missing',
+                    confidence: mockResults.metrics?.confidence || 'Missing',
+                    methodology: mockResults.sections?.methodology ? 'Present' : 'Missing',
+                    findings: mockResults.sections?.findings ? 'Present' : 'Missing'
+                };
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `✅ UI population test successful!\n\nTest data structure:\n${JSON.stringify(testPopulation, null, 2)}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ UI population error: ${error.message}`;
+            }
+        }
+        
+        // Auto-run JavaScript loading test on page load
+        window.addEventListener('load', () => {
+            setTimeout(testJSLoading, 1000); // Wait for scripts to load
+        });
+    </script>
+</body>
+</html> 

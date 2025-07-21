@@ -1,0 +1,194 @@
+/* AWS Amplify UI Theme Customization */
+:root {
+  --amplify-colors-brand-primary-10: #232f3e;
+  --amplify-colors-brand-primary-80: #ff9900;
+  --amplify-colors-brand-primary-90: #ffb84d;
+  --amplify-colors-brand-primary-100: #ffd699;
+  --amplify-colors-background-primary: #ffffff;
+  --amplify-colors-background-secondary: #f8f9fa;
+  --amplify-colors-neutral-10: #232f3e;
+  --amplify-colors-neutral-20: #495057;
+  --amplify-colors-neutral-40: #6c757d;
+  --amplify-colors-neutral-60: #adb5bd;
+  --amplify-colors-neutral-80: #dee2e6;
+  --amplify-colors-neutral-90: #f8f9fa;
+  --amplify-radii-small: 4px;
+  --amplify-radii-medium: 8px;
+  --amplify-radii-large: 12px;
+  --amplify-space-xs: 0.25rem;
+  --amplify-space-small: 0.5rem;
+  --amplify-space-medium: 1rem;
+  --amplify-space-large: 1.5rem;
+  --amplify-space-xl: 2rem;
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Amazon Ember', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Amplify UI Component Overrides */
+.amplify-authenticator {
+  --amplify-components-authenticator-router-background-color: #f8f9fa;
+  --amplify-components-authenticator-router-border-color: #dee2e6;
+}
+
+.amplify-button--primary {
+  background-color: #232f3e !important;
+  border-color: #232f3e !important;
+}
+
+.amplify-button--primary:hover {
+  background-color: #1a2532 !important;
+  border-color: #1a2532 !important;
+}
+
+.amplify-button--link {
+  color: #ff9900 !important;
+}
+
+.amplify-button--link:hover {
+  color: #e68a00 !important;
+}
+
+.amplify-input:focus {
+  border-color: #ff9900 !important;
+  box-shadow: 0 0 0 2px rgba(255, 153, 0, 0.2) !important;
+}
+
+.amplify-tabs-item[data-state="active"] {
+  color: #232f3e !important;
+  border-bottom-color: #ff9900 !important;
+}
+
+/* Loading and Error States */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #ff9900;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
+.success-message {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
+.info-message {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .amplify-authenticator {
+    padding: 1rem;
+  }
+}
+
+/* Accessibility Improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus indicators */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #ff9900;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --amplify-colors-brand-primary-10: #000000;
+    --amplify-colors-brand-primary-80: #ff6600;
+    --amplify-colors-background-primary: #ffffff;
+    --amplify-colors-background-secondary: #f0f0f0;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

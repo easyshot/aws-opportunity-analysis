@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Partner Opportunity Intelligence</title>
+    <link rel="stylesheet" href="styles-compact-option-c.css" />
+    <link rel="stylesheet" href="settings-modal.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="app-container">
+      <header class="app-header">
+        <div class="header-content">
+          <h1>Partner Opportunity Intelligence</h1>
+          <div class="header-meta">
+            <span class="timestamp" id="currentTime"></span>
+            <div class="header-actions">
+              <button
+                class="action-btn settings"
+                title="Application Settings"
+                onclick="openSettingsModal()"
+              >
+                <span class="icon">⚙️</span>
+                Settings
+              </button>
+              <button class="theme-toggle" title="Toggle Dark/Light Mode">
+                <span class="icon">🌙</span>
+                <span class="theme-text">Dark</span>
+              </button>
+              <button
+                class="sound-toggle"
+                title="Toggle Sound Notifications"
+                id="soundToggle"
+              >
+                <span class="icon">🔊</span>
+                <span class="sound-text">Sound On</span>
+              </button>
+              <button class="action-btn export" title="Export Analysis">
+                <span class="icon">📊</span>
+                Export
+              </button>
+              <button class="action-btn print" title="Print Report">
+                <span class="icon">🖨️</span>
+                Print
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="content-grid">
+          <!-- Input Panel -->
+          <div class="input-panel">
+            <div class="panel-header">
+              <h2>Opportunity Details</h2>
+              <div class="completion-status" id="completionStatus">
+                <span class="status-text">0% Complete</span>
+                <div class="status-bar">
+                  <div class="status-fill" id="statusFill"></div>
+                </div>
+              </div>
+            </div>
+
+            <form class="opportunity-form" id="opportunityForm">
+              <div class="input-group">
+                <label for="customerName" class="input-label">
+                  Customer Name
+                  <span class="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="customerName"
+                  class="input-field"
+                  placeholder="Enter customer name"
+                  required
+                />
+              </div>
+
+              <div class="input-group">
+                <label for="region" class="input-label">
+                  Customer Region
+                  <span class="required">*</span>
+                </label>
+                <select id="region" class="input-field select-field" required>
+                  <option value="">Select Customer Region</option>
+                  <option value="United States">United States</option>
+                  <option value="Canada">Canada</option>
+                  <option value="Germany">Germany</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="France">France</option>
+                  <option value="Japan">Japan</option>
+                  <option value="Australia">Australia</option>
+                  <option value="Brazil">Brazil</option>
+                  <option value="India">India</option>
+                  <option value="Singapore">Singapore</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label for="closeDate" class="input-label">
+                  Close Date
+                  <span class="required">*</span>
+                </label>
+                <input
+                  type="date"
+                  id="closeDate"
+                  class="input-field"
+                  required
+                />
+              </div>
+
+              <div class="input-group">
+                <label for="opportunityName" class="input-label">
+                  Opportunity Name
+                  <span class="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="opportunityName"
+                  class="input-field"
+                  placeholder="Brief opportunity title"
+                  required
+                />
+              </div>
+
+              <div class="input-group">
+                <label for="description" class="input-label">
+                  Description
+                  <span class="required">*</span>
+                </label>
+                <textarea
+                  id="description"
+                  class="input-field textarea-field"
+                  rows="4"
+                  placeholder="Detailed description of the opportunity, business requirements, technical needs, and expected outcomes..."
+                  required
+                ></textarea>
+                <div class="char-counter" id="charCounter">0 characters</div>
+              </div>
+            </form>
+
+            <div class="action-panel">
+              <button class="primary-btn" id="analyzeBtn">
+                <span class="btn-icon">🔍</span>
+                <span class="btn-text">Analyze Opportunity</span>
+              </button>
+              <div class="secondary-actions">
+                <button class="secondary-btn" id="clearBtn">Clear</button>
+                <button class="secondary-btn" id="sampleBtn">Sample</button>
+              </div>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div
+              class="progress-section"
+              id="progressSection"
+              style="display: none"
+            >
+              <div class="progress-header">
+                <h3>Analysis Progress</h3>
+                <div class="progress-time" id="progressTime">Starting...</div>
+              </div>
+              <div class="progress-steps">
+                <div class="progress-step" id="step1">
+                  <div class="step-indicator">
+                    <div class="step-spinner" style="display: none"></div>
+                    <div class="step-check" style="display: none">✓</div>
+                  </div>
+                  <div class="step-content">
+                    <div class="step-title">Query Generation</div>
+                    <div class="step-description">
+                      Generating SQL query using AI models...
+                    </div>
+                  </div>
+                </div>
+                <div class="progress-step" id="step2">
+                  <div class="step-indicator">
+                    <div class="step-spinner" style="display: none"></div>
+                    <div class="step-check" style="display: none">✓</div>
+                  </div>
+                  <div class="step-content">
+                    <div class="step-title">Data Retrieval</div>
+                    <div class="step-description">
+                      Fetching historical project data sets...
+                    </div>
+                  </div>
+                </div>
+                <div class="progress-step" id="step3">
+                  <div class="step-indicator">
+                    <div class="step-spinner" style="display: none"></div>
+                    <div class="step-check" style="display: none">✓</div>
+                  </div>
+                  <div class="step-content">
+                    <div class="step-title">AI Analysis</div>
+                    <div class="step-description">
+                      Processing data with Bedrock AI models...
+                    </div>
+                  </div>
+                </div>
+                <div class="progress-step" id="step4">
+                  <div class="step-indicator">
+                    <div class="step-spinner" style="display: none"></div>
+                    <div class="step-check" style="display: none">✓</div>
+                  </div>
+                  <div class="step-content">
+                    <div class="step-title">Results Processing</div>
+                    <div class="step-description">
+                      Formatting and displaying final results...
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Panel -->
+          <div class="results-panel">
+            <div class="panel-header">
+              <h2>Projections & Analysis</h2>
+              <div class="analysis-status" id="analysisStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Ready</span>
+              </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="metrics-section">
+              <div class="metrics-row">
+                <div class="metric-box arr-metric">
+                  <div class="metric-label">Predicted ARR</div>
+                  <div class="metric-value" id="predictedArr">-</div>
+                  <div class="metric-trend" id="arrTrend"></div>
+                </div>
+                <div class="metric-box mrr-metric">
+                  <div class="metric-label">Predicted MRR</div>
+                  <div class="metric-value" id="predictedMrr">-</div>
+                  <div class="metric-trend" id="mrrTrend"></div>
+                </div>
+              </div>
+              <div class="metrics-row">
+                <div class="metric-box launch-metric">
+                  <div class="metric-label">Launch Date</div>
+                  <div class="metric-value" id="launchDate">-</div>
+                  <div class="metric-trend" id="launchTrend"></div>
+                </div>
+                <div class="metric-box timeline-metric">
+                  <div class="metric-label">Time to Launch</div>
+                  <div class="metric-value" id="timeToLaunch">-</div>
+                  <div class="metric-unit">months</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top AWS Services -->
+            <div class="services-section">
+              <h3 class="section-title">Top AWS Services</h3>
+              <div class="services-content" id="topServices">
+                <div class="empty-state">
+                  <div class="empty-icon">☁️</div>
+                  <div class="empty-text">
+                    Service recommendations will appear after analysis
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Confidence Assessment -->
+            <div class="confidence-section">
+              <h3 class="section-title">Confidence Assessment</h3>
+              <div class="confidence-display">
+                <div class="confidence-gauge">
+                  <div class="gauge-value" id="confidenceScore">-</div>
+                  <div class="gauge-label" id="confidenceLabel">-</div>
+                  <div class="gauge-bar">
+                    <div class="gauge-fill" id="confidenceFill"></div>
+                  </div>
+                </div>
+                <div class="confidence-details" id="confidenceFactors">
+                  <div class="empty-state small">
+                    <div class="empty-text">
+                      Confidence factors will appear after analysis
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Detailed Analysis Section -->
+      <section
+        class="detailed-analysis"
+        id="detailedAnalysis"
+        style="display: none"
+      >
+        <div class="analysis-header">
+          <h2>Detailed Opportunity Analysis</h2>
+          <div class="analysis-controls">
+            <button class="control-btn active" data-view="grid">
+              Grid View
+            </button>
+            <button class="control-btn" data-view="list">List View</button>
+          </div>
+        </div>
+
+        <div class="analysis-content grid-view" id="analysisContent">
+          <div class="analysis-item methodology">
+            <div class="item-header">
+              <h3>🔬 Methodology</h3>
+              <div class="item-status">Complete</div>
+            </div>
+            <div class="item-content" id="methodology">
+              <div class="loading-state">
+                Analysis methodology will appear here...
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-item findings">
+            <div class="item-header">
+              <h3>📊 Findings</h3>
+              <div class="item-status">Complete</div>
+            </div>
+            <div class="item-content" id="findings">
+              <div class="loading-state">Key findings will appear here...</div>
+            </div>
+          </div>
+
+          <div class="analysis-item risks">
+            <div class="item-header">
+              <h3>⚠️ Risk Factors</h3>
+              <div class="item-status">Complete</div>
+            </div>
+            <div class="item-content" id="riskFactors">
+              <div class="loading-state">
+                Risk assessment will appear here...
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-item similar">
+            <div class="item-header">
+              <h3>📈 Similar Projects</h3>
+              <div class="item-status">Complete</div>
+            </div>
+            <div class="item-content" id="similarProjects">
+              <div class="loading-state">
+                Historical matches will appear here...
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-item rationale">
+            <div class="item-header">
+              <h3>💡 Rationale</h3>
+              <div class="item-status">Complete</div>
+            </div>
+            <div class="item-content" id="rationale">
+              <div class="loading-state">
+                Analysis rationale will appear here...
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-item full-analysis">
+            <div class="item-header">
+              <h3>📋 Full Analysis</h3>
+              <div class="item-status">Complete</div>
+            </div>
+            <div class="item-content" id="fullAnalysis">
+              <div class="loading-state">
+                Complete analysis will appear here...
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Funding & Follow-On Sections -->
+      <section
+        class="additional-sections"
+        id="additionalSections"
+        style="display: none"
+      >
+        <div class="section-grid">
+          <div class="additional-section funding">
+            <div class="section-header">
+              <h2>💰 Funding Options</h2>
+              <div class="section-badge">Financial Planning</div>
+            </div>
+            <div class="section-content" id="fundingOptions">
+              <div class="loading-state">
+                Funding recommendations will appear here...
+              </div>
+            </div>
+          </div>
+
+          <div class="additional-section followon">
+            <div class="section-header">
+              <h2>🚀 Follow-On Opportunities</h2>
+              <div class="section-badge">Growth Planning</div>
+            </div>
+            <div class="section-content" id="followOnOpportunities">
+              <div class="loading-state">
+                Future opportunities will appear here...
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Enhanced Debug Section -->
+      <section
+        class="debug-section enhanced"
+        id="debugSection"
+        style="display: none"
+      >
+        <div class="debug-header">
+          <h2>🔧 Enhanced Debug Information</h2>
+          <div class="debug-controls">
+            <button class="debug-toggle">Toggle Debug</button>
+            <div class="enhanced-accuracy-indicator">
+              <span class="indicator-label">Enhanced Accuracy:</span>
+              <span class="indicator-value" id="enhancedAccuracyIndicator"
+                >ENABLED ✅</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="debug-content">
+          <!-- SQL GENERATION DEBUG SECTION -->
+          <div class="debug-section-separator">
+            <h2>🔍 SQL QUERY GENERATION DEBUG</h2>
+            <p class="section-description">
+              Debug information for the SQL query generation process using Nova
+              Pro model
+            </p>
+          </div>
+
+          <div class="debug-item">
+            <h3>1. SQL Query Generated</h3>
+            <textarea
+              id="debugSqlQuery"
+              class="debug-textarea"
+              readonly
+              placeholder="SQL query will appear here after analysis..."
+            ></textarea>
+          </div>
+
+          <div class="debug-item">
+            <h3>2. Query Results</h3>
+            <div class="debug-query-info">
+              <div class="query-stats">
+                <span class="stat-item">
+                  <strong>Row Count:</strong> <span id="queryRowCount">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Data Size:</strong> <span id="queryDataSize">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Characters:</strong>
+                  <span id="queryCharCount">-</span>
+                </span>
+              </div>
+              <div class="debug-view-controls">
+                <button
+                  class="debug-view-btn active"
+                  onclick="showQueryView('raw')"
+                  id="rawViewBtn"
+                >
+                  Raw JSON
+                </button>
+                <button
+                  class="debug-view-btn"
+                  onclick="showQueryView('table')"
+                  id="tableViewBtn"
+                >
+                  Table View
+                </button>
+              </div>
+            </div>
+            <div id="debugQueryRaw" class="debug-view active">
+              <textarea
+                id="debugQueryResults"
+                class="debug-textarea"
+                readonly
+                placeholder="Query results will appear here after analysis..."
+              ></textarea>
+            </div>
+            <div id="debugQueryTable" class="debug-view" style="display: none">
+              <div id="queryTableContainer" class="query-table-container">
+                <div class="table-placeholder">
+                  Table view will appear here after analysis...
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="debug-item enhanced">
+            <h3>🤖 SQL QUERY GENERATION PROCESS (ENHANCED)</h3>
+            <div class="enhanced-stats">
+              <div class="stat-group">
+                <span class="stat-item">
+                  <strong>Model ID:</strong> <span id="sqlModelId">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Actual Model ID:</strong>
+                  <span id="sqlActualModelId">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Prompt ID:</strong> <span id="sqlPromptId">-</span>
+                </span>
+              </div>
+              <div class="stat-group">
+                <span class="stat-item">
+                  <strong>Temperature:</strong>
+                  <span id="sqlTemperature">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Max Tokens:</strong> <span id="sqlMaxTokens">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Enhanced Accuracy:</strong>
+                  <span id="sqlAccuracyIndicator">-</span>
+                </span>
+              </div>
+            </div>
+            <div class="bedrock-process-status" id="sqlProcessStatus">
+              <div class="process-step">
+                <span class="step-icon">📝</span>
+                <span class="step-text">Template Processing</span>
+                <span class="step-status" id="sqlTemplateStatus">-</span>
+              </div>
+              <div class="process-step">
+                <span class="step-icon">🤖</span>
+                <span class="step-text">Bedrock Invocation</span>
+                <span class="step-status" id="sqlBedrockStatus">-</span>
+              </div>
+              <div class="process-step">
+                <span class="step-icon">⚙️</span>
+                <span class="step-text">Row Limit Applied</span>
+                <span class="step-status" id="sqlRowLimitStatus">-</span>
+              </div>
+            </div>
+            <textarea
+              id="debugSqlGeneration"
+              class="debug-textarea enhanced"
+              readonly
+              placeholder="Enhanced SQL generation process details will appear here..."
+            ></textarea>
+          </div>
+
+          <!-- ANALYSIS GENERATION DEBUG SECTION -->
+          <div class="debug-section-separator">
+            <h2>🧠 ANALYSIS GENERATION DEBUG</h2>
+            <p class="section-description">
+              Debug information for the full analysis generation process using
+              Claude 3.5 Sonnet model
+            </p>
+          </div>
+
+          <div class="debug-item enhanced">
+            <h3>🤖 ANALYSIS GENERATION PROCESS (ENHANCED)</h3>
+            <div class="enhanced-stats">
+              <div class="stat-group">
+                <span class="stat-item">
+                  <strong>Model ID:</strong> <span id="analysisModelId">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Actual Model ID:</strong>
+                  <span id="analysisActualModelId">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Prompt ID:</strong>
+                  <span id="analysisPromptId">-</span>
+                </span>
+              </div>
+              <div class="stat-group">
+                <span class="stat-item">
+                  <strong>Payload Size:</strong>
+                  <span id="analysisPayloadSize">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Token Estimate:</strong>
+                  <span id="analysisTokenEstimate">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Prompt Version:</strong>
+                  <span id="analysisPromptVersion">-</span>
+                </span>
+              </div>
+              <div class="stat-group">
+                <span class="stat-item">
+                  <strong>Duration:</strong>
+                  <span id="analysisDuration">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Timestamp:</strong>
+                  <span id="analysisTimestamp">-</span>
+                </span>
+              </div>
+            </div>
+            <div
+              class="bedrock-risk-assessment"
+              id="analysisRiskAssessment"
+              style="display: none"
+            >
+              <div class="risk-item">
+                <span class="risk-label">Payload Size Risk:</span>
+                <span class="risk-value" id="payloadSizeRisk">-</span>
+              </div>
+              <div class="risk-item">
+                <span class="risk-label">Token Count Risk:</span>
+                <span class="risk-value" id="tokenCountRisk">-</span>
+              </div>
+              <div class="risk-item">
+                <span class="risk-label">Duration Risk:</span>
+                <span class="risk-value" id="durationRisk">-</span>
+              </div>
+              <div class="risk-item">
+                <span class="risk-label">Overall Risk:</span>
+                <span class="risk-value" id="overallRisk">-</span>
+              </div>
+            </div>
+            <textarea
+              id="debugAnalysisGeneration"
+              class="debug-textarea enhanced"
+              readonly
+              placeholder="Enhanced analysis generation process details will appear here..."
+            ></textarea>
+          </div>
+
+          <div class="debug-item">
+            <h3>4. Complete Analysis Payload Sent to Bedrock</h3>
+            <div class="debug-payload-info">
+              <div class="payload-stats">
+                <span class="stat-item">
+                  <strong>Data Size:</strong>
+                  <span id="payloadDataSize">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Characters:</strong>
+                  <span id="payloadCharCount">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Query Rows:</strong>
+                  <span id="payloadRowCount">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Token Estimate:</strong>
+                  <span id="payloadTokenEstimate">-</span>
+                </span>
+              </div>
+              <div
+                class="truncation-status"
+                id="truncationStatus"
+                style="display: none"
+              >
+                <div class="truncation-alert">
+                  <span class="alert-icon">⚠️</span>
+                  <span class="alert-text">Data Truncation Applied</span>
+                  <span class="alert-reason" id="truncationReason">-</span>
+                </div>
+              </div>
+            </div>
+            <textarea
+              id="debugBedrockPayload"
+              class="debug-textarea"
+              readonly
+              placeholder="Complete payload sent to Bedrock will appear here after analysis..."
+            ></textarea>
+          </div>
+
+          <div class="debug-item">
+            <h3>5. Full Bedrock Analysis Response</h3>
+            <div class="debug-response-info">
+              <div class="response-stats">
+                <span class="stat-item">
+                  <strong>Characters:</strong>
+                  <span id="responseCharCount">-</span>
+                </span>
+                <span class="stat-item">
+                  <strong>Size:</strong> <span id="responseDataSize">-</span>
+                </span>
+              </div>
+            </div>
+            <textarea
+              id="debugFullResponse"
+              class="debug-textarea"
+              readonly
+              placeholder="Full Bedrock response will appear here after analysis..."
+            ></textarea>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="settings-modal" style="display: none">
+      <div class="settings-modal-overlay" onclick="closeSettingsModal()"></div>
+      <div class="settings-modal-content">
+        <div class="settings-header">
+          <h2>
+            <i class="fas fa-cog"></i>
+            Application Settings
+          </h2>
+          <button class="settings-close-btn" onclick="closeSettingsModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="settings-body">
+          <!-- Navigation Tabs -->
+          <div class="settings-nav">
+            <button class="settings-tab active" data-tab="data-processing">
+              <i class="fas fa-database"></i>
+              Data Processing
+            </button>
+            <button class="settings-tab" data-tab="performance">
+              <i class="fas fa-tachometer-alt"></i>
+              Performance
+            </button>
+            <button class="settings-tab" data-tab="debug">
+              <i class="fas fa-bug"></i>
+              Debug
+            </button>
+          </div>
+
+          <!-- Data Processing Tab -->
+          <div class="settings-content active" id="data-processing-tab">
+            <div class="settings-section">
+              <h3>SQL Query Configuration</h3>
+              <p class="settings-description">
+                Configure how historical data is retrieved and processed for
+                analysis.
+              </p>
+
+              <div class="setting-item">
+                <label for="sqlQueryLimit">
+                  <span class="setting-label">
+                    <i class="fas fa-list-ol"></i>
+                    SQL Query Limit
+                  </span>
+                  <span
+                    class="setting-help"
+                    title="Maximum number of historical records to retrieve from the database"
+                  >
+                    <i class="fas fa-question-circle"></i>
+                  </span>
+                </label>
+                <div class="setting-input-group">
+                  <input
+                    type="number"
+                    id="sqlQueryLimit"
+                    min="50"
+                    max="500"
+                    step="50"
+                    value="200"
+                  />
+                  <span class="setting-unit">records</span>
+                </div>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> The maximum number of
+                  historical projects retrieved from the database for analysis.
+                  <br />
+                  <strong>Impact:</strong> Higher values provide more
+                  comprehensive analysis but may increase processing time and
+                  data usage.
+                  <br />
+                  <strong>Recommended:</strong> 200 for balanced performance and
+                  accuracy.
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label for="queryResultsLimit">
+                  <span class="setting-label">
+                    <i class="fas fa-file-alt"></i>
+                    Query Results Character Limit
+                  </span>
+                  <span
+                    class="setting-help"
+                    title="Maximum characters in raw query results before processing"
+                  >
+                    <i class="fas fa-question-circle"></i>
+                  </span>
+                </label>
+                <div class="setting-input-group">
+                  <input
+                    type="number"
+                    id="queryResultsLimit"
+                    min="100000"
+                    max="2000000"
+                    step="100000"
+                    value="1000000"
+                  />
+                  <span class="setting-unit">characters</span>
+                </div>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> Maximum size of raw query
+                  results returned from the database.
+                  <br />
+                  <strong>Impact:</strong> Larger limits allow more detailed
+                  historical data but consume more memory and bandwidth.
+                  <br />
+                  <strong>Current:</strong>
+                  <span id="currentQueryResultsSize">Loading...</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>Data Truncation Logic</h3>
+              <p class="settings-description">
+                Control how large datasets are handled when sending data to AI
+                analysis.
+              </p>
+
+              <div class="setting-item">
+                <label class="setting-checkbox">
+                  <input type="checkbox" id="enableTruncation" checked />
+                  <span class="checkmark"></span>
+                  <span class="setting-label"
+                    >Enable Intelligent Truncation</span
+                  >
+                </label>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> Whether to automatically
+                  reduce data size when it exceeds AI model limits.
+                  <br />
+                  <strong>Impact:</strong> Prevents analysis failures but may
+                  reduce the amount of historical data analyzed.
+                </div>
+              </div>
+
+              <div class="setting-item" id="truncationSettings">
+                <label for="truncationLimit">
+                  <span class="setting-label">
+                    <i class="fas fa-cut"></i>
+                    Truncation Character Limit
+                  </span>
+                  <span
+                    class="setting-help"
+                    title="Maximum characters sent to AI analysis"
+                  >
+                    <i class="fas fa-question-circle"></i>
+                  </span>
+                </label>
+                <div class="setting-input-group">
+                  <input
+                    type="number"
+                    id="truncationLimit"
+                    min="200000"
+                    max="800000"
+                    step="50000"
+                    value="400000"
+                  />
+                  <span class="setting-unit">characters</span>
+                </div>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> Maximum data size sent to
+                  AI for analysis after truncation.
+                  <br />
+                  <strong>Impact:</strong> Higher values allow more
+                  comprehensive analysis but may hit AI model limits.
+                  <br />
+                  <strong>Current Usage:</strong>
+                  <span id="currentTruncationUsage">Loading...</span>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label for="truncationMethod">
+                  <span class="setting-label">
+                    <i class="fas fa-scissors"></i>
+                    Truncation Method
+                  </span>
+                </label>
+                <select id="truncationMethod">
+                  <option value="character">Character-based (Current)</option>
+                  <option value="record" disabled>
+                    Record-based (Coming Soon)
+                  </option>
+                  <option value="intelligent" disabled>
+                    Intelligent (Coming Soon)
+                  </option>
+                </select>
+                <div class="setting-description">
+                  <strong>Character-based:</strong> Cuts data at character limit
+                  (may split records).
+                  <br />
+                  <strong>Record-based:</strong> Preserves complete records up
+                  to the limit.
+                  <br />
+                  <strong>Intelligent:</strong> Prioritizes most relevant
+                  records within the limit.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Performance Tab -->
+          <div class="settings-content" id="performance-tab">
+            <div class="settings-section">
+              <h3>Analysis Performance</h3>
+              <p class="settings-description">
+                Optimize analysis speed and resource usage.
+              </p>
+
+              <div class="setting-item">
+                <label for="analysisTimeout">
+                  <span class="setting-label">
+                    <i class="fas fa-clock"></i>
+                    Analysis Timeout
+                  </span>
+                </label>
+                <div class="setting-input-group">
+                  <input
+                    type="number"
+                    id="analysisTimeout"
+                    min="30"
+                    max="300"
+                    step="30"
+                    value="120"
+                  />
+                  <span class="setting-unit">seconds</span>
+                </div>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> Maximum time to wait for
+                  analysis completion.
+                  <br />
+                  <strong>Impact:</strong> Longer timeouts allow complex
+                  analyses but may delay results.
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label class="setting-checkbox">
+                  <input type="checkbox" id="enableCaching" />
+                  <span class="checkmark"></span>
+                  <span class="setting-label"
+                    >Enable Result Caching (Coming Soon)</span
+                  >
+                </label>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> Cache analysis results for
+                  similar queries.
+                  <br />
+                  <strong>Impact:</strong> Faster responses for repeated
+                  analyses but uses more storage.
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>Current Performance Metrics</h3>
+              <div class="performance-metrics">
+                <div class="metric-card">
+                  <div class="metric-value" id="avgAnalysisTime">--</div>
+                  <div class="metric-label">Avg Analysis Time</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-value" id="dataProcessingRate">--</div>
+                  <div class="metric-label">Data Processing Rate</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-value" id="successRate">--</div>
+                  <div class="metric-label">Success Rate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Debug Tab -->
+          <div class="settings-content" id="debug-tab">
+            <div class="settings-section">
+              <h3>Debug Information</h3>
+              <p class="settings-description">
+                Control what debug information is displayed during analysis.
+              </p>
+
+              <div class="setting-item">
+                <label class="setting-checkbox">
+                  <input type="checkbox" id="showDebugPanels" checked />
+                  <span class="checkmark"></span>
+                  <span class="setting-label"
+                    >Show Debug Information Panels</span
+                  >
+                </label>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> Display detailed debug
+                  information during analysis.
+                  <br />
+                  <strong>Impact:</strong> Helpful for troubleshooting but may
+                  clutter the interface.
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label class="setting-checkbox">
+                  <input type="checkbox" id="showQueryDetails" checked />
+                  <span class="checkmark"></span>
+                  <span class="setting-label">Show SQL Query Details</span>
+                </label>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> Display the actual SQL
+                  query used for data retrieval.
+                  <br />
+                  <strong>Impact:</strong> Useful for understanding data
+                  selection logic.
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label class="setting-checkbox">
+                  <input type="checkbox" id="showDataMetrics" checked />
+                  <span class="checkmark"></span>
+                  <span class="setting-label"
+                    >Show Data Processing Metrics</span
+                  >
+                </label>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> Display character counts,
+                  row counts, and processing statistics.
+                  <br />
+                  <strong>Impact:</strong> Helps monitor data flow and identify
+                  truncation issues.
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label for="debugLogLevel">
+                  <span class="setting-label">
+                    <i class="fas fa-list"></i>
+                    Debug Log Level
+                  </span>
+                </label>
+                <select id="debugLogLevel">
+                  <option value="error">Error Only</option>
+                  <option value="warn">Warnings</option>
+                  <option value="info" selected>Information</option>
+                  <option value="debug">Detailed Debug</option>
+                </select>
+                <div class="setting-description">
+                  <strong>What it controls:</strong> Level of detail in debug
+                  console output.
+                  <br />
+                  <strong>Impact:</strong> Higher levels provide more
+                  information but may impact performance.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-footer">
+          <div class="settings-actions">
+            <button class="btn-secondary" onclick="resetSettingsToDefault()">
+              <i class="fas fa-undo"></i>
+              Reset to Defaults
+            </button>
+            <button class="btn-primary" onclick="saveSettings()">
+              <i class="fas fa-save"></i>
+              Save Settings
+            </button>
+          </div>
+          <div class="settings-status" id="settingsStatus"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="settings-manager.js"></script>
+    <script src="enhanced-debug-integration.js"></script>
+    <script src="bedrock-debug-functions.js"></script>
+    <script src="app-clean-fixed.js"></script>
+  </body>
+</html>

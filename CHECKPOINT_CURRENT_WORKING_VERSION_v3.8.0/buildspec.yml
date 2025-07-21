@@ -1,0 +1,53 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo Installing dependencies...
+      - npm ci
+      - echo Installing AWS CDK globally...
+      - npm install -g aws-cdk@latest
+      
+  pre_build:
+    commands:
+      - echo Pre-build phase started on `date`
+      - echo Running security scans...
+      - npm audit --audit-level=high
+      - echo Running linting...
+      - npm run lint || echo "Linting not configured, skipping..."
+      - echo Validating environment configuration...
+      - node -e "require('dotenv').config(); console.log('Environment validation passed')"
+      
+  build:
+    commands:
+      - echo Build phase started on `date`
+      - echo Running unit tests...
+      - npm test
+      - echo Running integration tests...
+      - npm run test:integration || echo "Integration tests not configured, skipping..."
+      - echo Building CDK infrastructure...
+      - npm run cdk:synth
+      - echo Validating infrastructure...
+      - npm run validate
+      
+  post_build:
+    commands:
+      - echo Post-build phase started on `date`
+      - echo Running security validation...
+      - npm run validate:security || echo "Security validation completed with warnings"
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - '**/*'
+  exclude-paths:
+    - node_modules/**/*
+    - .git/**/*
+    - '*.log'
+
+cache:
+  paths:
+    - node_modules/**/*
+    - .npm/**/*

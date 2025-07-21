@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Dark Mode Test</title>
+    <link rel="stylesheet" href="public/styles-compact-option-c.css">
+    <style>
+        .test-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        [data-theme="dark"] .test-info {
+            background: rgba(255,255,255,0.1);
+            color: #f7fafc;
+        }
+        
+        .header-test-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        [data-theme="dark"] .test-section {
+            background: #2d3748;
+            border-color: #4a5568;
+            color: #f7fafc;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <strong>Header Dark Mode Test</strong><br>
+        Current Theme: <span id="currentTheme">light</span><br>
+        Click the dark mode button to test header styling
+    </div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Partner Opportunity Intelligence</h1>
+                <div class="header-meta">
+                    <span class="timestamp" id="currentTime"></span>
+                    <div class="header-actions">
+                        <button class="action-btn export" onclick="testExport()" title="Export Analysis">
+                            <span class="icon">📊</span>
+                            Export
+                        </button>
+                        <button class="action-btn print" onclick="testPrint()" title="Print Report">
+                            <span class="icon">🖨️</span>
+                            Print
+                        </button>
+                        <button class="action-btn theme-toggle" onclick="toggleTheme()" title="Switch Theme">
+                            <span class="icon">🌙</span>
+                            <span class="theme-text">Dark</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="header-test-content">
+                <div class="test-section">
+                    <h2>Header Dark Mode Test</h2>
+                    <p>This page tests the header styling in dark mode. The header should:</p>
+                    <ul>
+                        <li>Have a darker gradient background</li>
+                        <li>Show white text with proper contrast</li>
+                        <li>Have properly styled action buttons</li>
+                        <li>Show the correct theme toggle icon and text</li>
+                    </ul>
+                </div>
+
+                <div class="test-section">
+                    <h3>Header Elements to Check:</h3>
+                    <ul>
+                        <li><strong>Title:</strong> "Partner Opportunity Intelligence" - should be white with shadow</li>
+                        <li><strong>Timestamp:</strong> Should be visible with proper contrast</li>
+                        <li><strong>Export Button:</strong> Should have glass-like appearance</li>
+                        <li><strong>Print Button:</strong> Should have glass-like appearance</li>
+                        <li><strong>Theme Toggle:</strong> Should show correct icon (🌙/☀️) and text</li>
+                    </ul>
+                </div>
+
+                <div class="test-section">
+                    <h3>Test Actions:</h3>
+                    <button onclick="testExport()" class="primary-btn">Test Export Function</button>
+                    <button onclick="testPrint()" class="primary-btn">Test Print Function</button>
+                    <button onclick="toggleTheme()" class="secondary-btn">Toggle Theme</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString();
+            document.getElementById('currentTime').textContent = timeString;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            const themeText = document.querySelector('.theme-text');
+            const icon = document.querySelector('.theme-toggle .icon');
+            const currentThemeSpan = document.getElementById('currentTheme');
+            
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            themeToggle.setAttribute('data-current-theme', newTheme);
+            
+            if (newTheme === 'dark') {
+                themeText.textContent = 'Light';
+                icon.textContent = '☀️';
+                currentThemeSpan.textContent = 'dark';
+            } else {
+                themeText.textContent = 'Dark';
+                icon.textContent = '🌙';
+                currentThemeSpan.textContent = 'light';
+            }
+            
+            console.log('Theme toggled to:', newTheme);
+        }
+
+        // Test functions
+        function testExport() {
+            alert('Export function would be called here');
+        }
+
+        function testPrint() {
+            alert('Print function would be called here');
+        }
+
+        // Initialize theme
+        document.addEventListener('DOMContentLoaded', function() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            const currentTheme = body.getAttribute('data-theme') || 'light';
+            
+            body.setAttribute('data-theme', currentTheme);
+            themeToggle.setAttribute('data-current-theme', currentTheme);
+            
+            document.getElementById('currentTheme').textContent = currentTheme;
+        });
+    </script>
+</body>
+</html> 

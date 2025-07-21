@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .metric-value { font-size: 18px; font-weight: bold; color: #333; }
+        .confidence-gauge { width: 200px; height: 20px; background: #eee; border-radius: 10px; }
+        .gauge-fill { height: 100%; background: #4CAF50; border-radius: 10px; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <h1>Frontend Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Test API Response</h2>
+        <button onclick="testAPI()">Test Backend API</button>
+        <pre id="apiResponse"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test UI Population</h2>
+        <div>Predicted ARR: <span class="metric-value" id="predictedArr">-</span></div>
+        <div>Predicted MRR: <span class="metric-value" id="predictedMrr">-</span></div>
+        <div>Launch Date: <span class="metric-value" id="launchDate">-</span></div>
+        <div>Time to Launch: <span class="metric-value" id="timeToLaunch">-</span> months</div>
+        <div>Confidence: <span class="metric-value" id="confidenceScore">-</span></div>
+        <div>Confidence Label: <span class="metric-value" id="confidenceLabel">-</span></div>
+        <div>Confidence Gauge: 
+            <div class="confidence-gauge">
+                <div class="gauge-fill" id="confidenceFill" style="width: 0%;"></div>
+            </div>
+        </div>
+        <button onclick="testUIPopulation()">Test UI Population</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Analysis Sections</h2>
+        <div><strong>Methodology:</strong> <div id="methodology">Not loaded</div></div>
+        <div><strong>Findings:</strong> <div id="findings">Not loaded</div></div>
+        <div><strong>Rationale:</strong> <div id="rationale">Not loaded</div></div>
+        <div><strong>Risk Factors:</strong> <div id="riskFactors">Not loaded</div></div>
+        <div><strong>Similar Projects:</strong> <div id="similarProjects">Not loaded</div></div>
+    </div>
+
+    <script>
+        // Helper functions from the main app
+        function getConfidenceLabel(confidence) {
+            if (typeof confidence === 'number') {
+                if (confidence >= 80) return 'High';
+                if (confidence >= 60) return 'Medium';
+                return 'Low';
+            }
+            
+            if (typeof confidence === 'string') {
+                const upper = confidence.toUpperCase();
+                if (upper === 'HIGH') return 'High';
+                if (upper === 'MEDIUM') return 'Medium';
+                if (upper === 'LOW') return 'Low';
+                return confidence;
+            }
+            
+            return 'Unknown';
+        }
+
+        function getConfidencePercentage(confidence) {
+            if (typeof confidence === 'number') {
+                return Math.min(100, Math.max(0, confidence));
+            }
+            
+            if (typeof confidence === 'string') {
+                const upper = confidence.toUpperCase();
+                if (upper === 'HIGH') return 85;
+                if (upper === 'MEDIUM') return 65;
+                if (upper === 'LOW') return 35;
+                
+                const parsed = parseFloat(confidence);
+                if (!isNaN(parsed)) {
+                    return Math.min(100, Math.max(0, parsed));
+                }
+            }
+            
+            return 0;
+        }
+
+        function formatCurrency(amount) {
+            if (!amount) return '-';
+            const num = parseFloat(amount.replace(/[$,]/g, ''));
+            if (isNaN(num)) return amount;
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(num);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return dateString;
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        async function testAPI() {
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-sql-query-limit': '200'
+                    },
+                    body: JSON.stringify({
+                        CustomerName: 'Test Corp',
+                        region: 'United States',
+                        closeDate: '2025-03-15',
+                        oppName: 'Test Opportunity',
+                        oppDescription: 'This is a test opportunity description with enough characters to meet the minimum requirements for analysis.'
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('apiResponse').textContent = JSON.stringify(data, null, 2);
+                
+                // Auto-populate UI with the response
+                populateUIWithData(data);
+                
+            } catch (error) {
+                document.getElementById('apiResponse').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        function populateUIWithData(results) {
+            console.log('Populating UI with:', results);
+            
+            const metrics = results.metrics;
+            if (!metrics) {
+                console.error('No metrics found in response');
+                return;
+            }
+
+            // Populate metrics
+            const predictedArr = document.getElementById('predictedArr');
+            const predictedMrr = document.getElementById('predictedMrr');
+            const launchDate = document.getElementById('launchDate');
+            const timeToLaunch = document.getElementById('timeToLaunch');
+            const confidenceScore = document.getElementById('confidenceScore');
+            const confidenceLabel = document.getElementById('confidenceLabel');
+            const confidenceFill = document.getElementById('confidenceFill');
+
+            if (predictedArr && metrics.predictedArr) {
+                predictedArr.textContent = formatCurrency(metrics.predictedArr);
+            }
+            
+            if (predictedMrr && metrics.predictedMrr) {
+                predictedMrr.textContent = formatCurrency(metrics.predictedMrr);
+            }
+            
+            if (launchDate && metrics.launchDate) {
+                launchDate.textContent = formatDate(metrics.launchDate);
+            }
+            
+            if (timeToLaunch && metrics.timeToLaunch) {
+                timeToLaunch.textContent = metrics.timeToLaunch;
+            }
+            
+            if (confidenceScore && (metrics.confidence || metrics.confidenceScore)) {
+                const scoreValue = metrics.confidenceScore || metrics.confidence;
+                confidenceScore.textContent = typeof scoreValue === 'number' ? scoreValue : metrics.confidence;
+            }
+            
+            if (confidenceLabel && (metrics.confidence || metrics.confidenceScore)) {
+                const confValue = metrics.confidence || metrics.confidenceScore;
+                confidenceLabel.textContent = getConfidenceLabel(confValue);
+            }
+            
+            if (confidenceFill && (metrics.confidence || metrics.confidenceScore)) {
+                const confValue = metrics.confidence || metrics.confidenceScore;
+                const percentage = getConfidencePercentage(confValue);
+                confidenceFill.style.width = `${percentage}%`;
+            }
+
+            // Populate sections
+            const methodology = document.getElementById('methodology');
+            const findings = document.getElementById('findings');
+            const rationale = document.getElementById('rationale');
+            const riskFactors = document.getElementById('riskFactors');
+            const similarProjects = document.getElementById('similarProjects');
+
+            if (methodology && results.methodology) {
+                methodology.textContent = results.methodology;
+            }
+            
+            if (findings && results.findings) {
+                findings.textContent = results.findings;
+            }
+            
+            if (rationale && results.rationale) {
+                rationale.textContent = results.rationale;
+            }
+            
+            if (riskFactors && results.riskFactors) {
+                riskFactors.textContent = results.riskFactors;
+            }
+            
+            if (similarProjects && results.similarProjects) {
+                similarProjects.textContent = results.similarProjects;
+            }
+        }
+
+        function testUIPopulation() {
+            // Test with mock data
+            const mockData = {
+                metrics: {
+                    predictedArr: "$150,000",
+                    predictedMrr: "$12,500",
+                    launchDate: "March 2025",
+                    timeToLaunch: "6",
+                    confidence: "HIGH",
+                    confidenceScore: 85,
+                    topServices: "Amazon EC2, Amazon RDS, Amazon S3"
+                },
+                methodology: "Test methodology content",
+                findings: "Test findings content",
+                rationale: "Test rationale content",
+                riskFactors: "Test risk factors content",
+                similarProjects: "Test similar projects content"
+            };
+            
+            populateUIWithData(mockData);
+        }
+    </script>
+</body>
+</html>

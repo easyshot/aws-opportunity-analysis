@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Opportunity Intelligence</title>
+    <link rel="stylesheet" href="styles-compact-option-c.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Partner Opportunity Intelligence</h1>
+                <div class="header-meta">
+                    <span class="timestamp" id="currentTime"></span>
+                    <div class="header-actions">
+                        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                            <span class="icon">🌙</span>
+                            <span class="theme-text">Dark</span>
+                        </button>
+                        <button class="action-btn export" onclick="exportData()" title="Export Analysis">
+                            <span class="icon">📊</span>
+                            Export
+                        </button>
+                        <button class="action-btn print" onclick="printReport()" title="Print Report">
+                            <span class="icon">🖨️</span>
+                            Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="content-grid">
+                <!-- Input Panel -->
+                <div class="input-panel">
+                    <div class="panel-header">
+                        <h2>Opportunity Details</h2>
+                        <div class="completion-status" id="completionStatus">
+                            <span class="status-text">0% Complete</span>
+                            <div class="status-bar">
+                                <div class="status-fill" id="statusFill"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form class="opportunity-form" id="opportunityForm">
+                        <div class="input-group">
+                            <label for="customerName" class="input-label">
+                                Customer Name
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="customerName" 
+                                class="input-field" 
+                                placeholder="Enter customer name"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="region" class="input-label">
+                                Customer Region
+                                <span class="required">*</span>
+                            </label>
+                            <select id="region" class="input-field select-field" required>
+                                <option value="">Select Customer Region</option>
+                                <option value="United States">United States</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Germany">Germany</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="France">France</option>
+                                <option value="Japan">Japan</option>
+                                <option value="Australia">Australia</option>
+                                <option value="Brazil">Brazil</option>
+                                <option value="India">India</option>
+                                <option value="Singapore">Singapore</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="closeDate" class="input-label">
+                                Close Date
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="date" 
+                                id="closeDate" 
+                                class="input-field"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="opportunityName" class="input-label">
+                                Opportunity Name
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="opportunityName" 
+                                class="input-field" 
+                                placeholder="Brief opportunity title"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="description" class="input-label">
+                                Description
+                                <span class="required">*</span>
+                            </label>
+                            <textarea 
+                                id="description" 
+                                class="input-field textarea-field" 
+                                rows="4" 
+                                placeholder="Detailed description of the opportunity, business requirements, technical needs, and expected outcomes..."
+                                required
+                            ></textarea>
+                            <div class="char-counter" id="charCounter">0 characters</div>
+                        </div>
+                    </form>
+                    
+                    <div class="action-panel">
+                        <button class="primary-btn" id="analyzeBtn" onclick="analyzeOpportunity()">
+                            <span class="btn-icon">🔍</span>
+                            <span class="btn-text">Analyze Opportunity</span>
+                        </button>
+                        <div class="secondary-actions">
+                            <button class="secondary-btn" onclick="clearForm()">Clear</button>
+                            <button class="secondary-btn" onclick="loadSampleData()">Sample</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="results-panel">
+                    <div class="panel-header">
+                        <h2>Projections & Analysis</h2>
+                        <div class="analysis-status" id="analysisStatus">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Metrics -->
+                    <div class="metrics-section">
+                        <div class="metrics-row">
+                            <div class="metric-box arr-metric">
+                                <div class="metric-label">Predicted ARR</div>
+                                <div class="metric-value" id="predictedArr">-</div>
+                                <div class="metric-trend" id="arrTrend"></div>
+                            </div>
+                            <div class="metric-box mrr-metric">
+                                <div class="metric-label">Predicted MRR</div>
+                                <div class="metric-value" id="predictedMrr">-</div>
+                                <div class="metric-trend" id="mrrTrend"></div>
+                            </div>
+                        </div>
+                        <div class="metrics-row">
+                            <div class="metric-box launch-metric">
+                                <div class="metric-label">Launch Date</div>
+                                <div class="metric-value" id="launchDate">-</div>
+                                <div class="metric-trend" id="launchTrend"></div>
+                            </div>
+                            <div class="metric-box timeline-metric">
+                                <div class="metric-label">Time to Launch</div>
+                                <div class="metric-value" id="timeToLaunch">-</div>
+                                <div class="metric-unit">months</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Top AWS Services -->
+                    <div class="services-section">
+                        <h3 class="section-title">Top AWS Services</h3>
+                        <div class="services-content" id="topServices">
+                            <div class="empty-state">
+                                <div class="empty-icon">☁️</div>
+                                <div class="empty-text">Service recommendations will appear after analysis</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Confidence Assessment -->
+                    <div class="confidence-section">
+                        <h3 class="section-title">Confidence Assessment</h3>
+                        <div class="confidence-display">
+                            <div class="confidence-gauge">
+                                <div class="gauge-value" id="confidenceScore">-</div>
+                                <div class="gauge-label" id="confidenceLabel">-</div>
+                                <div class="gauge-bar">
+                                    <div class="gauge-fill" id="confidenceFill"></div>
+                                </div>
+                            </div>
+                            <div class="confidence-details" id="confidenceFactors">
+                                <div class="empty-state small">
+                                    <div class="empty-text">Confidence factors will appear after analysis</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Detailed Analysis Section -->
+        <section class="detailed-analysis" id="detailedAnalysis" style="display: none;">
+            <div class="analysis-header">
+                <h2>Detailed Opportunity Analysis</h2>
+                <div class="analysis-controls">
+                    <button class="control-btn active" data-view="grid">Grid View</button>
+                    <button class="control-btn" data-view="list">List View</button>
+                </div>
+            </div>
+            
+            <div class="analysis-content grid-view" id="analysisContent">
+                <div class="analysis-item methodology">
+                    <div class="item-header">
+                        <h3>🔬 Methodology</h3>
+                        <div class="item-status">Complete</div>
+                    </div>
+                    <div class="item-content" id="methodology">
+                        <div class="loading-state">Analysis methodology will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-item findings">
+                    <div class="item-header">
+                        <h3>📊 Findings</h3>
+                        <div class="item-status">Complete</div>
+                    </div>
+                    <div class="item-content" id="findings">
+                        <div class="loading-state">Key findings will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-item risks">
+                    <div class="item-header">
+                        <h3>⚠️ Risk Factors</h3>
+                        <div class="item-status">Complete</div>
+                    </div>
+                    <div class="item-content" id="riskFactors">
+                        <div class="loading-state">Risk assessment will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-item similar">
+                    <div class="item-header">
+                        <h3>📈 Similar Projects</h3>
+                        <div class="item-status">Complete</div>
+                    </div>
+                    <div class="item-content" id="similarProjects">
+                        <div class="loading-state">Historical matches will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-item rationale">
+                    <div class="item-header">
+                        <h3>💡 Rationale</h3>
+                        <div class="item-status">Complete</div>
+                    </div>
+                    <div class="item-content" id="rationale">
+                        <div class="loading-state">Analysis rationale will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-item full-analysis">
+                    <div class="item-header">
+                        <h3>📋 Full Analysis</h3>
+                        <div class="item-status">Complete</div>
+                    </div>
+                    <div class="item-content" id="fullAnalysis">
+                        <div class="loading-state">Complete analysis will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="analysis-item bedrock-response">
+                    <div class="item-header">
+                        <h3>🤖 Complete Bedrock Response</h3>
+                        <div class="item-status">Raw Analysis</div>
+                    </div>
+                    <div class="item-content" id="bedrockResponse">
+                        <div class="loading-state">Complete Bedrock response will appear here...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Funding & Follow-On Sections -->
+        <section class="additional-sections" id="additionalSections" style="display: none;">
+            <div class="section-grid">
+                <div class="additional-section funding">
+                    <div class="section-header">
+                        <h2>💰 Funding Options</h2>
+                        <div class="section-badge">Financial Planning</div>
+                    </div>
+                    <div class="section-content" id="fundingOptions">
+                        <div class="loading-state">Funding recommendations will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="additional-section followon">
+                    <div class="section-header">
+                        <h2>🚀 Follow-On Opportunities</h2>
+                        <div class="section-badge">Growth Planning</div>
+                    </div>
+                    <div class="section-content" id="followOnOpportunities">
+                        <div class="loading-state">Future opportunities will appear here...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Debug Section -->
+        <section class="debug-section" id="debugSection" style="display: none;">
+            <div class="debug-header">
+                <h2>🔧 Debug Information</h2>
+                <button class="debug-toggle" onclick="toggleDebugSection()">Toggle Debug</button>
+            </div>
+            
+            <div class="debug-content">
+                <div class="debug-item">
+                    <h3>1. SQL Query Generated</h3>
+                    <textarea id="debugSqlQuery" class="debug-textarea" readonly placeholder="SQL query will appear here after analysis..."></textarea>
+                </div>
+                
+                <div class="debug-item">
+                    <h3>2. Query Results</h3>
+                    <div class="debug-query-info">
+                        <div class="query-stats">
+                            <span class="stat-item">
+                                <strong>Row Count:</strong> <span id="queryRowCount">-</span>
+                            </span>
+                            <span class="stat-item">
+                                <strong>Data Size:</strong> <span id="queryDataSize">-</span>
+                            </span>
+                        </div>
+                        <div class="debug-view-controls">
+                            <button class="debug-view-btn active" onclick="showQueryView('raw')" id="rawViewBtn">Raw JSON</button>
+                            <button class="debug-view-btn" onclick="showQueryView('table')" id="tableViewBtn">Table View</button>
+                        </div>
+                    </div>
+                    <div id="debugQueryRaw" class="debug-view active">
+                        <textarea id="debugQueryResults" class="debug-textarea" readonly placeholder="Query results will appear here after analysis..."></textarea>
+                    </div>
+                    <div id="debugQueryTable" class="debug-view" style="display: none;">
+                        <div id="queryTableContainer" class="query-table-container">
+                            <div class="table-placeholder">Table view will appear here after analysis...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="debug-item">
+                    <h3>3. Full Bedrock Analysis Response</h3>
+                    <textarea id="debugFullResponse" class="debug-textarea" readonly placeholder="Full Bedrock response will appear here after analysis..."></textarea>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app-compact-option-c.js"></script>
+</body>
+</html>

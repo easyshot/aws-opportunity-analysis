@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Error Handling Test</title>
+    <style>
+        .debug-error {
+            color: #dc3545;
+            font-weight: bold;
+            background-color: #f8d7da;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Error Handling Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Null Value Handling</h2>
+        <p>SQL Model ID: <span id="sqlModelId">-</span></p>
+        <p>SQL Temperature: <span id="sqlTemperature">-</span></p>
+        <p>SQL Max Tokens: <span id="sqlMaxTokens">-</span></p>
+        <div id="test1-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Valid Value Handling</h2>
+        <p>Analysis Model ID: <span id="analysisModelId">-</span></p>
+        <p>Analysis Payload Size: <span id="analysisPayloadSize">-</span></p>
+        <div id="test2-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Mixed Values</h2>
+        <p>Analysis Token Estimate: <span id="analysisTokenEstimate">-</span></p>
+        <p>Analysis Duration: <span id="analysisDuration">-</span></p>
+        <div id="test3-result" class="test-result"></div>
+    </div>
+    
+    <button onclick="runTests()">Run Error Handling Tests</button>
+    
+    <script>
+        // Copy the updateElement function from app-clean.js
+        function updateElement(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                if (value === null || value === undefined) {
+                    // Show error state for missing data
+                    element.textContent = 'ERROR: Data not received';
+                    element.className = 'debug-error';
+                    element.title = 'This data was not received from the backend. Check debug logs for issues.';
+                } else {
+                    element.textContent = value;
+                    element.className = '';
+                    element.title = '';
+                }
+            }
+        }
+        
+        function runTests() {
+            console.log('Running error handling tests...');
+            
+            // Test 1: Null values should show errors
+            updateElement('sqlModelId', null);
+            updateElement('sqlTemperature', null);
+            updateElement('sqlMaxTokens', undefined);
+            
+            // Check if error styling was applied
+            const sqlModelElement = document.getElementById('sqlModelId');
+            const test1Pass = sqlModelElement.textContent === 'ERROR: Data not received' && 
+                             sqlModelElement.className === 'debug-error';
+            
+            document.getElementById('test1-result').innerHTML = test1Pass ? 
+                '<div class="test-pass">✅ PASS: Null values correctly show error states</div>' :
+                '<div class="test-fail">❌ FAIL: Null values not handled correctly</div>';
+            
+            // Test 2: Valid values should display normally
+            updateElement('analysisModelId', 'Claude 3.5 Sonnet');
+            updateElement('analysisPayloadSize', '1.2 MB');
+            
+            const analysisModelElement = document.getElementById('analysisModelId');
+            const test2Pass = analysisModelElement.textContent === 'Claude 3.5 Sonnet' && 
+                             analysisModelElement.className === '';
+            
+            document.getElementById('test2-result').innerHTML = test2Pass ? 
+                '<div class="test-pass">✅ PASS: Valid values display correctly</div>' :
+                '<div class="test-fail">❌ FAIL: Valid values not handled correctly</div>';
+            
+            // Test 3: Mixed values
+            updateElement('analysisTokenEstimate', '15,000');
+            updateElement('analysisDuration', null);
+            
+            const tokenElement = document.getElementById('analysisTokenEstimate');
+            const durationElement = document.getElementById('analysisDuration');
+            const test3Pass = tokenElement.textContent === '15,000' && 
+                             tokenElement.className === '' &&
+                             durationElement.textContent === 'ERROR: Data not received' &&
+                             durationElement.className === 'debug-error';
+            
+            document.getElementById('test3-result').innerHTML = test3Pass ? 
+                '<div class="test-pass">✅ PASS: Mixed values handled correctly</div>' :
+                '<div class="test-fail">❌ FAIL: Mixed values not handled correctly</div>';
+            
+            console.log('Error handling tests completed');
+        }
+        
+        // Run tests automatically on page load
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>
